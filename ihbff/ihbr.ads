@@ -10,6 +10,9 @@ with Ada.Text_Io ;
 
 package Ihbr is
    
+   Verbose : Boolean := False ; 
+   format_error : exception ;
+   
    type Rectype_Type is
      (
       Data_Rec ,
@@ -43,8 +46,8 @@ package Ihbr is
       end record ;
    
    type File_Type is private ;
-   
- 
+   MAX_LINE_LENGTH : constant := 300 ;
+
    procedure Open( Name : String ;
 		   File : out file_type ) ;
    procedure Close( File : in out file_type ) ;
