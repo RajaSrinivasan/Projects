@@ -2,6 +2,8 @@ with Unchecked_Deallocation;
 with Ada.Exceptions;
 with Ada.Integer_Text_IO;
 
+with hex;
+
 package body Ihbr is
 
    use Ada.Text_IO;
@@ -12,51 +14,10 @@ package body Ihbr is
    subtype Hexf_Address is String (1 .. 4);
    subtype Record_Type is String (1 .. 2);
    subtype Checksum is String (1 .. 2);
-   subtype Hexstring is String (1 .. 2);
+
+   databegin : constant := 10;
 
    procedure free is new Unchecked_Deallocation (file_rec_type, File_Type);
-
-   function Value (Hex : Character) return Interfaces.Unsigned_8 is
-   begin
-      if Hex in '0' .. '9' then
-         return Interfaces.Unsigned_8
-             (Character'Pos (Hex) - Character'Pos ('0'));
-      end if;
-      if Hex in 'a' .. 'f' then
-         return Interfaces.Unsigned_8
-             (10 + Character'Pos (Hex) - Character'Pos ('a'));
-      end if;
-      if Hex in 'A' .. 'F' then
-         return Interfaces.Unsigned_8
-             (10 + Character'Pos (Hex) - Character'Pos ('A'));
-      end if;
-      raise format_error with "InvalidHex";
-   end Value;
-
-   function Value (Hex : Hexstring) return Interfaces.Unsigned_8 is
-      use Interfaces;
-      Vhigh, Vlow : Interfaces.Unsigned_8;
-   begin
-      Vhigh := Value (Hex (1));
-      Vlow  := Value (Hex (2));
-      return Vhigh * 16 + Vlow;
-   end Value;
-   function Value (Str : String) return Interfaces.Unsigned_16 is
-      use Interfaces;
-      Result   : Interfaces.Unsigned_16 := 0;
-      Numbytes : Integer;
-      Nextbyte : Interfaces.Unsigned_8;
-   begin
-      if Str'Length /= 4 then
-         raise format_error with "HexWord";
-      end if;
-      Numbytes := Str'Length / 2;
-      for B in 1 .. Numbytes loop
-         Nextbyte := Value (Str ((B - 1) * 2 + 1 .. B * 2));
-         Result := Shift_Left (Result, 8) + Interfaces.Unsigned_16 (Nextbyte);
-      end loop;
-      return Result;
-   end Value;
 
    function ComputeChecksum (Str : String) return Interfaces.Unsigned_8 is
       use Interfaces;
@@ -71,7 +32,7 @@ package body Ihbr is
       end if;
       Numbytes := Str'Length / 2;
       for byte in 1 .. Numbytes loop
-         Nextbyte := Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));
+         Nextbyte := hex.Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));
          Cs       := Cs + Interfaces.Unsigned_16 (Nextbyte);
       end loop;
       Result := Interfaces.Unsigned_8 (Cs and 16#00ff#);
@@ -94,7 +55,10 @@ package body Ihbr is
       File := null;
    end Close;
 
-   procedure GetNext (File : in out File_Type; Rec : out Ihbr_Binary_Record_Type) is
+   procedure GetNext
+     (File : in out File_Type;
+      Rec  :    out Ihbr_Binary_Record_Type)
+   is
       use Interfaces;
       input_line  : String (1 .. MAX_LINE_LENGTH);
       line_length : Natural;
@@ -116,9 +80,8 @@ package body Ihbr is
          for Rt'Address use newline (8)'Address;
          Rtval : Interfaces.Unsigned_8;
 
-         Cs    : Checksum;
-         Csval : Interfaces.Unsigned_8;
-
+         Cs        : Checksum;
+         Csval     : Interfaces.Unsigned_8;
          calccsval : Interfaces.Unsigned_8;
 
       begin
@@ -128,23 +91,22 @@ package body Ihbr is
          end if;
 
          Cs        := newline (line_length - 1 .. line_length);
-         Csval     := Value (Cs);
+         Csval     := hex.Value (Cs);
          calccsval := ComputeChecksum (newline (2 .. newline'Length - 2));
          if Csval /= calccsval then
             raise format_error with "Checksum";
          else
-            if verbose
-            then
-               put("Line ");
-               put(file.Current_Line, width => 5) ;
-               put_line(" checksum ok");
-            end if ;
+            if Verbose then
+               Put ("Line ");
+               Put (File.Current_Line, Width => 5);
+               Put_Line (" checksum ok");
+            end if;
          end if;
 
-         Bcval  := Value (Bc);
-         Hxaval := Value (Hxa);
+         Bcval  := hex.Value (Bc);
+         Hxaval := hex.Value (Hxa);
 
-         Rtval := Value (Rt);
+         Rtval := hex.Value (Rt);
          case Rectype_Type'Val (Rtval) is
             when Data_Rec =>
                declare
@@ -152,7 +114,14 @@ package body Ihbr is
                begin
                   drdata.LoadOffset := Hxaval;
                   drdata.DataRecLen := Bcval;
-                  Rec               := drdata;
+                  for byte in 1 .. Integer (Bcval) loop
+                     drdata.Data (byte) :=
+                       hex.Value
+                         (newline
+                            (databegin + 2 * (byte - 1) ..
+                                 databegin + 2 * (byte - 1) + 1));
+                  end loop;
+                  Rec := drdata;
                end;
 
             when End_Of_File_Rec =>
@@ -178,9 +147,12 @@ package body Ihbr is
          raise;
    end GetNext;
 
-   procedure PutNext (File : in out File_Type; Rec : not null Ihbr_Record_Type) is
+   procedure PutNext
+     (File : in out File_Type;
+      Rec  :        not null ihbr_Record_Type)
+   is
    begin
-      null ;
+      null;
    end PutNext;
 
    function End_Of_File (file : Ihbr.File_Type) return Boolean is

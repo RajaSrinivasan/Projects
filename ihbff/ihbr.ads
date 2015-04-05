@@ -33,7 +33,7 @@ package Ihbr is
          when Data_Rec =>
             DataRecLen : Interfaces.Unsigned_8;
             LoadOffset : Interfaces.Unsigned_16;
-            Data       : Data_Rec_Type (0 .. 255);
+            Data       : Data_Rec_Type (1 .. 256);
          when Start_Lin_Adr_Rec =>
             Exec_LinStart_Adr : Interfaces.Unsigned_32;
          when Start_Seg_Adr_Rec =>
