@@ -1,6 +1,7 @@
 project Ihbanalyze is
 
    for Object_Dir use "build";
+   for Main use ("ihbranalyze.adb");
 
 end Ihbanalyze;
 
