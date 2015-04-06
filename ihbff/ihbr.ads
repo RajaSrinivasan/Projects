@@ -50,10 +50,10 @@ package Ihbr is
    MAX_LINE_LENGTH : constant := 300;
 
    procedure Open (Name : String; File : out File_Type);
+   function Create( name : string ) return file_type ;
    procedure Close (File : in out File_Type);
+
    procedure GetNext (File : in out File_Type; Rec : out Ihbr_Binary_Record_Type);
-
-
    procedure PutNext (File : in out File_Type; Rec : not null Ihbr_Record_Type);
    function End_Of_File (file : Ihbr.File_Type) return Boolean;
 

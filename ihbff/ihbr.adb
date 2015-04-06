@@ -47,6 +47,13 @@ package body Ihbr is
       temp.Current_Line := 0;
       File              := temp;
    end Open;
+   function Create( name : string ) return file_type is
+      temp : file_type := new file_rec_type ;
+   begin
+      ada.text_io.Create( file => temp.file , name => name ) ;
+      temp.Current_Line := 0 ;
+      return temp ;
+   end Create ;
 
    procedure Close (File : in out File_Type) is
    begin
@@ -125,6 +132,14 @@ package body Ihbr is
                end;
 
             when End_Of_File_Rec =>
+               if Bcval /= 0
+               then
+                  put_Line("Non zero byte count for End_Of_File record");
+               end if ;
+               if Hxaval /= 0
+               then
+                  put_line("Non zero Load address value for End_Of_File record");
+               end if ;
                if Verbose then
                   Put_Line ("End of File Record Found");
                end if;
@@ -151,8 +166,25 @@ package body Ihbr is
      (File : in out File_Type;
       Rec  :        not null ihbr_Record_Type)
    is
+      cs : interfaces.unsigned_8 ;
+      bc : interfaces.unsigned_8 := 0 ;
+      loadadr : interfaces.unsigned_16 := 0 ;
+      rectypecode : interfaces.unsigned_8 ;
    begin
-      null;
+      ada.text_io.put( file.file , Start_Code ) ;
+      case rec.Rectype is
+         when Data_Rec =>
+            null ;
+         when End_Of_File_Rec =>
+            ada.text_io.put( file.file , hex.image(bc) ) ;
+            ada.text_io.put( file.file , hex.image(loadadr) ) ;
+            rectypecode := interfaces.unsigned_8( Rectype_Type'pos(End_Of_File_Rec) ) ;
+            ada.text_io.put( file.file , hex.image(rectypecode) ) ;
+            ada.text_io.put( file.file , "ff" );
+            ada.text_io.new_line ;
+         when others =>
+            raise format_error with "Unsupported:" & Rectype_Type'Image(rec.Rectype) ;
+      end case ;
    end PutNext;
 
    function End_Of_File (file : Ihbr.File_Type) return Boolean is
