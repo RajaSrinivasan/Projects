@@ -2,7 +2,7 @@ package body hex is
 
    use System;
 
-   Nibble_Hex : constant String := "0123456789abcdef";
+   Nibble_Hex : constant String := "0123456789ABCDEF";
 
 
    function Value (Hex : Character) return Interfaces.Unsigned_8 is
