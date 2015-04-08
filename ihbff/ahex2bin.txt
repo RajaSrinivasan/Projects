@@ -1,0 +1,8 @@
+ahex2bin
+
+     -h        - help
+     -v        - Verbose
+     -o [file] - output file name
+     -s [n]    - prom size. nK bytes
+     -e [hex]  - page erase value. hex=16#ff#
+     -b [hex]  - base address. default=16#0000#
