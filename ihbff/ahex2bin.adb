@@ -144,7 +144,7 @@ procedure ahex2bin is
 
    procedure WriteBinFile is
    begin
-      null ;
+      ByteProm_pkg.Write( to_string(OutputFileName) , myprom ) ;
    end WriteBinFile ;
 begin
    ProcessCommandLine;

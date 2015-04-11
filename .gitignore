@@ -6,3 +6,5 @@ ihbff/build/ihbanalyze-loc.xml
 *.ali
 *.o
 *.hex#
+*.bin
+*.dump
