@@ -1,76 +1,118 @@
-package body prom is
-   function create( size : Positive ) return module_type is
-   begin
-      return new cells_type( 1..size ) ;
-   end create ;
+with Ada.Streams; use Ada.Streams;
+with Ada.Streams.Stream_IO;
 
-   procedure erase( module : in out module_type ;
-                    value : word_type := word_type'last ) is
+package body Prom is
+   use Ada.Streams;
+   function Create (size : Positive) return module_type is
    begin
-      module.all := (others => value) ;
-   end erase ;
+      return new cells_type (1 .. size);
+   end Create;
 
-   procedure Set( module : in out module_type ;
-                  address : positive ;
-                  value : word_type ) is
+   procedure Erase
+     (module : in out module_type;
+      value  :        word_type := word_type'Last)
+   is
    begin
-      module(address+1) := value ;
-   end Set ;
+      module.all := (others => value);
+   end Erase;
 
-
-   function Get( module : module_type ;
-                 address : positive ) return word_type is
+   procedure Set
+     (module  : in out module_type;
+      address :        Positive;
+      value   :        word_type)
+   is
    begin
-      return module(address+1) ;
-   end get ;
+      module (address + 1) := value;
+   end Set;
 
-   procedure Load( filename : string ;
-                   module : out module_type ;
-                   context : in out context_type ;
-                   extractor : extractor_procedure ) is
-      ihbrfile : ihbr.file_type ;
+   function Get (module : module_type; address : Positive) return word_type is
    begin
-      ihbr.open( filename , ihbrfile ) ;
-      while not ihbr.End_Of_File(ihbrfile)
-      loop
+      return module (address + 1);
+   end Get;
+
+   procedure Load
+     (filename  :        String;
+      module    :    out module_type;
+      context   : in out context_type;
+      extractor :        extractor_procedure)
+   is
+      ihbrfile : Ihbr.File_Type;
+   begin
+      Ihbr.Open (filename, ihbrfile);
+      while not Ihbr.End_Of_File (ihbrfile) loop
          declare
-            nextrec : ihbr.Ihbr_Binary_Record_Type ;
+            nextrec : Ihbr.Ihbr_Binary_Record_Type;
          begin
-            ihbr.GetNext( ihbrfile , nextrec ) ;
+            Ihbr.GetNext (ihbrfile, nextrec);
             case nextrec.Rectype is
-            when ihbr.Data_Rec =>
-                 extractor( module , nextrec , context ) ;
-            when ihbr.End_Of_File_Rec =>
-               exit ;
-            when others =>
-               null ;
-            end case ;
-         end ;
-      end loop ;
-      ihbr.close(ihbrfile) ;
-   end load ;
+               when Ihbr.Data_Rec =>
+                  extractor (module, nextrec, context);
+               when Ihbr.End_Of_File_Rec =>
+                  exit;
+               when others =>
+                  null;
+            end case;
+         end;
+      end loop;
+      Ihbr.Close (ihbrfile);
+   end Load;
 
-   procedure Save( filename : string ;
-                   module : module_type ;
-                   context : in out context_type ;
-                   converter : converter_procedure ) is
-      use ihbr ;
-      ihbroutfile : ihbr.file_type ;
+   procedure Read (filename : String; module : out module_type) is
+      binfile : Stream_IO.File_Type;
    begin
-      ihbroutfile := ihbr.create( filename ) ;
+      Stream_IO.Open
+        (File => binfile,
+         Mode => Stream_IO.In_File,
+         Name => filename);
+      module := new cells_type (1 .. Integer (Stream_IO.Size (binfile)));
+      declare
+         bindata : Ada.Streams
+           .Stream_Element_Array
+         (1 .. Ada.Streams.Stream_Element_Offset (Stream_IO.Size (binfile)));
+         for bindata'Address use module.all'Address;
+         actualsize : Ada.Streams.Stream_Element_Offset;
+      begin
+         Stream_IO.Read (File => binfile, Item => bindata, Last => actualsize);
+      end;
+      Stream_IO.Close (binfile);
+   end Read;
+
+   procedure Save
+     (filename  :        String;
+      module    :        module_type;
+      context   : in out context_type;
+      converter :        converter_procedure)
+   is
+      use Ihbr;
+      ihbroutfile : Ihbr.File_Type;
+   begin
+      ihbroutfile := Ihbr.Create (filename);
       loop
          declare
-            nextrec : ihbr.Ihbr_Binary_Record_Type ;
+            nextrec : Ihbr.Ihbr_Binary_Record_Type;
          begin
-            converter( module ,  nextrec , context ) ;
-            ihbr.PutNext( ihbroutfile , nextrec ) ;
-            if nextrec.Rectype = ihbr.End_Of_File_Rec
-            then
-               exit ;
-            end if ;
-         end ;
-      end loop ;
-      ihbr.close(ihbroutfile) ;
-   end save ;
+            converter (module, nextrec, context);
+            Ihbr.PutNext (ihbroutfile, nextrec);
+            if nextrec.Rectype = Ihbr.End_Of_File_Rec then
+               exit;
+            end if;
+         end;
+      end loop;
+      Ihbr.Close (ihbroutfile);
+   end Save;
 
-end prom ;
+   procedure Write (filename : String; module : module_type) is
+      Block_Size : Stream_Element_Count :=
+        Stream_Element_Count (module.all'Length);
+      block : Stream_Element_Array (1 .. Block_Size);
+      for block'Address use module.all'Address;
+      binfile : Stream_IO.File_Type;
+   begin
+      Stream_IO.Create
+        (File => binfile,
+         Mode => Stream_IO.Out_File,
+         Name => filename);
+      Stream_IO.Write (binfile, block);
+      Stream_IO.Close (binfile);
+   end Write;
+end Prom;

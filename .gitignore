@@ -1,0 +1,4 @@
+*.db
+*.db-wal
+ihbff/build/ihbanalyze-loc.xml
+*.db-shm

@@ -5,10 +5,13 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Command_Line;
 
+with Prom_Models; use Prom_Models;
+with Ihbr;
+
 procedure ahex2bin is
-   Version : String := "ahex2bin Version 0.0";
-   Kilo : constant := 1024 ;
-   Mega : constant := 1024 * 1024 ;
+   Version : String   := "ahex2bin Version 0.0";
+   Kilo    : constant := 1024;
+   Mega    : constant := 1024 * 1024;
    ----------------------
    Verbose        : Boolean                                := False;
    DumpOption     : Boolean                                := False;
@@ -18,6 +21,9 @@ procedure ahex2bin is
      Ada.Strings.Unbounded.Null_Unbounded_String;
    PromSize       : Natural               := 0;
    WordEraseValue : Interfaces.Unsigned_8 := 16#ff#;
+   ----------------------
+   myprom    : ByteProm_pkg.module_type;
+   myhexfile : Ihbr.File_Type;
    ----------------------
    procedure ShowUsage is
       procedure Switch (sw : Character; argind : String; help : String) is
@@ -59,33 +65,77 @@ procedure ahex2bin is
                    (GNAT.Command_Line.Parameter);
             when 's' =>
                declare
-                  PromSizeSpec : string := gnat.command_line.Parameter ;
+                  PromSizeSpec : String := GNAT.Command_Line.Parameter;
                begin
 
-                  if PromSizeSpec(PromSizeSpec'length) = 'K' or
-                     PromSizeSpec(PromSizeSpec'length) = 'k'
+                  if PromSizeSpec (PromSizeSpec'Length) = 'K' or
+                    PromSizeSpec (PromSizeSpec'Length) = 'k'
                   then
-                     PromSize := Kilo * Positive'value( PromSizeSpec(1..PromSizeSpec'Length-1)) ;
-                  elsif PromSizeSpec(PromSizeSpec'length) = 'M' or
-                        PromSizeSpec(PromSizeSpec'length) = 'm'
+                     PromSize :=
+                       Kilo *
+                       Positive'Value
+                         (PromSizeSpec (1 .. PromSizeSpec'Length - 1));
+                  elsif PromSizeSpec (PromSizeSpec'Length) = 'M' or
+                    PromSizeSpec (PromSizeSpec'Length) = 'm'
                   then
-                     PromSize := Mega * Positive'value( PromSizeSpec(1..PromSizeSpec'Length-1)) ;
+                     PromSize :=
+                       Mega *
+                       Positive'Value
+                         (PromSizeSpec (1 .. PromSizeSpec'Length - 1));
                   else
-                     PromSize := Positive'Value (GNAT.Command_Line.Parameter) ;
+                     PromSize := Positive'Value (GNAT.Command_Line.Parameter);
                   end if;
-               end ;
+               end;
             when 'v' =>
                Verbose := True;
             when others =>
                raise Program_Error;
          end case;
       end loop;
-      HexFileName := To_Unbounded_String( gnat.command_line.Get_Argument );
+      HexFileName := To_Unbounded_String (GNAT.Command_Line.Get_Argument);
    end ProcessCommandLine;
+
+   procedure LoadHexFile is
+      use Ihbr;
+   begin
+      myprom := Prom_Models.ByteProm_pkg.Create (PromSize);
+      Prom_Models.ByteProm_pkg.Erase (myprom);
+      myhexfile := Ihbr.Create (To_String (HexFileName));
+      while not Ihbr.End_Of_File (myhexfile) loop
+         declare
+            nextrec : Ihbr.Ihbr_Binary_Record_Type;
+         begin
+            Ihbr.GetNext (myhexfile, nextrec);
+            if nextrec.Rectype = Ihbr.End_Of_File_Rec then
+               exit;
+            end if;
+            if nextrec.Rectype = Ihbr.Data_Rec then
+               for db in 1 .. nextrec.DataRecLen loop
+                  ByteProm_pkg.Set
+                    (myprom,
+                     Integer (nextrec.LoadOffset) + Integer (db) - 1,
+                     nextrec.Data (Integer (db)));
+               end loop;
+            else
+               raise Ihbr.format_error with "UnknownRecType";
+            end if;
+         end;
+      end loop;
+      Ihbr.Close (myhexfile);
+   end LoadHexFile;
+   procedure DumpHexFile is
+   begin
+      null ;
+   end DumpHexFile ;
+   procedure WriteBinFile is
+   begin
+      null ;
+   end WriteBinFile ;
 begin
    ProcessCommandLine;
    if Verbose then
-      Put_Line(Version & " ----------------------------------------------------") ;
+      Put_Line
+        (Version & " ----------------------------------------------------");
       Put ("Hex File : ");
       Put_Line (To_String (HexFileName));
       if DumpOption then
@@ -99,7 +149,21 @@ begin
       Put (Integer (PromSize));
       New_Line;
       Put ("Erase : ");
-      Put (Integer (WordEraseValue), Base => 16); New_Line ;
-      Put_Line("-------------------------------------------------------------------------");
+      Put (Integer (WordEraseValue), Base => 16);
+      New_Line;
+      Put_Line
+        ("-------------------------------------------------------------------------");
+      if Length (HexFileName) = 0 then
+         return;
+      end if;
    end if;
+   LoadHexFile;
+   if DumpOption
+   then
+      DumpHexFile ;
+   end if ;
+   if Length(OutputFileName) /= 0
+   then
+      WriteBinFile ;
+   end if ;
 end ahex2bin;
