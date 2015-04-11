@@ -101,7 +101,7 @@ procedure ahex2bin is
    begin
       myprom := Prom_Models.ByteProm_pkg.Create (PromSize);
       Prom_Models.ByteProm_pkg.Erase (myprom);
-      myhexfile := Ihbr.Create (To_String (HexFileName));
+      Ihbr.Open (To_String (HexFileName),myhexfile);
       while not Ihbr.End_Of_File (myhexfile) loop
          declare
             nextrec : Ihbr.Ihbr_Binary_Record_Type;
