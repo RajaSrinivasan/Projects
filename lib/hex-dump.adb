@@ -1,13 +1,13 @@
 with system.Storage_Elements ; use system.Storage_Elements ;
 with ada.Characters.handling ;
 with ada.text_io; use ada.text_io ;
+with ada.integer_text_io; use ada.integer_text_io ;
 with gnat.Debug_Utilities ;
 
 package body hex.dump is
    procedure Dump
      (Adr     : System.Address;
       Length  : Integer;
-      Offset : Integer := 0;
       show_offset : boolean := true ;
       Blocklen : Integer := DEFAULT_BLOCK_LENGTH;
       Outfile : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output)
@@ -38,17 +38,18 @@ package body hex.dump is
 
    begin
       new_line ;
-      if show_offset
-      then
-         put( Image( interfaces.unsigned_32(offset) )) ;
-      else
-         put( Outfile , gnat.Debug_Utilities.Image( blockadr )) ;
-      end if ;
 
       for B in 1 .. No_Blocks
       loop
          Blockstart := (B - 1) * Blocklen + 1;
-         if Lengthleft > Blocklen then
+         if show_offset
+         then
+            put( outfile , blockstart , base => 16 ) ;
+         else
+            put( Outfile , gnat.Debug_Utilities.Image( blockadr )) ;
+         end if ;
+
+         if Lengthleft >= Blocklen then
             Lengthtodump := Blocklen ;
          else
             Lengthtodump := Lengthleft ;

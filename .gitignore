@@ -5,3 +5,4 @@ ihbff/build/ihbanalyze-loc.xml
 *.npp
 *.ali
 *.o
+*.hex#

@@ -10,7 +10,7 @@ with Ada.Text_IO;
 
 package Ihbr is
 
-   Verbose : Boolean := true ;
+   Verbose : Boolean := false ;
    format_error : exception;
 
    type Rectype_Type is

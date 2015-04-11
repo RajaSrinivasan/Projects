@@ -18,14 +18,14 @@ package body Prom is
 
    procedure Set
      (module  : in out module_type;
-      address :        Positive;
+      address :        natural ;
       value   :        word_type)
    is
    begin
       module (address + 1) := value;
    end Set;
 
-   function Get (module : module_type; address : Positive) return word_type is
+   function Get (module : module_type; address : natural) return word_type is
    begin
       return module (address + 1);
    end Get;

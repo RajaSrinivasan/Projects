@@ -102,21 +102,34 @@ procedure ahex2bin is
       myprom := Prom_Models.ByteProm_pkg.Create (PromSize);
       Prom_Models.ByteProm_pkg.Erase (myprom);
       Ihbr.Open (To_String (HexFileName),myhexfile);
-      while not Ihbr.End_Of_File (myhexfile) loop
+      while not Ihbr.End_Of_File (myhexfile)
+      loop
          declare
             nextrec : Ihbr.Ihbr_Binary_Record_Type;
          begin
             Ihbr.GetNext (myhexfile, nextrec);
-            if nextrec.Rectype = Ihbr.End_Of_File_Rec then
+            if nextrec.Rectype = Ihbr.End_Of_File_Rec
+            then
                exit;
             end if;
-            if nextrec.Rectype = Ihbr.Data_Rec then
-               for db in 1 .. nextrec.DataRecLen loop
-                  ByteProm_pkg.Set
-                    (myprom,
-                     Integer (nextrec.LoadOffset) + Integer (db) - 1,
-                     nextrec.Data (Integer (db)));
-               end loop;
+            if nextrec.Rectype = Ihbr.Data_Rec
+            then
+               if integer(nextrec.LoadOffset) > PromSize
+               then
+                  if verbose
+                  then
+                     put("Ignoring data rec for address ");
+                     put(integer(nextrec.loadOffset)) ; put(" ("); put(integer(nextrec.LoadOffset),base=>16) ; put(" )");
+                     new_line ;
+                  end if ;
+               else
+                  for db in 1 .. nextrec.DataRecLen loop
+                     ByteProm_pkg.Set
+                       (myprom,
+                        Integer (nextrec.LoadOffset) + Integer (db) - 1,
+                        nextrec.Data (Integer (db)));
+                  end loop;
+               end if ;
             else
                raise Ihbr.format_error with "UnknownRecType";
             end if;
@@ -126,7 +139,7 @@ procedure ahex2bin is
    end LoadHexFile;
    procedure DumpHexFile is
    begin
-      hex.dump.dump( myprom.all'address , PromSize , show_offset => true ) ;
+      hex.dump.dump( myprom.all'address , PromSize , blocklen => 16 , show_offset => true ) ;
    end DumpHexFile ;
 
    procedure WriteBinFile is
@@ -158,6 +171,7 @@ begin
       if Length (HexFileName) = 0 then
          return;
       end if;
+      ihbr.verbose := true ;
    end if;
    LoadHexFile;
    if DumpOption
