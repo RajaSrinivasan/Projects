@@ -7,6 +7,7 @@ with GNAT.Command_Line;
 
 with Prom_Models; use Prom_Models;
 with Ihbr;
+with hex.dump ;
 
 procedure ahex2bin is
    Version : String   := "ahex2bin Version 0.0";
@@ -125,8 +126,9 @@ procedure ahex2bin is
    end LoadHexFile;
    procedure DumpHexFile is
    begin
-      null ;
+      hex.dump.dump( myprom.all'address , PromSize , show_offset => true ) ;
    end DumpHexFile ;
+
    procedure WriteBinFile is
    begin
       null ;

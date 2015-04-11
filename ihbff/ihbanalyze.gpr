@@ -2,6 +2,7 @@ project Ihbanalyze is
 
    for Object_Dir use "build";
    for Main use ("ahex2bin.adb", "ihbranalyze.adb");
+   for Source_Dirs use (".", "..\lib");
 
 end Ihbanalyze;
 
