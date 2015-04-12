@@ -8,3 +8,4 @@ ihbff/build/ihbanalyze-loc.xml
 *.hex#
 *.bin
 *.dump
+*.pp

@@ -13,9 +13,9 @@ package Prom is
       value  :        word_type := word_type'Last);
    procedure Set
      (module  : in out module_type;
-      address :        natural ;
+      address :        Natural;
       value   :        word_type);
-   function Get (module : module_type; address : natural) return word_type;
+   function Get (module : module_type; address : Natural) return word_type;
    type extractor_procedure is access procedure
      (module  : in out module_type;
       binrec  :        Ihbr.Ihbr_Binary_Record_Type;

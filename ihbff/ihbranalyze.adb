@@ -1,36 +1,38 @@
-with ada.command_line ;
-with ada.text_io ; use ada.text_io ;
+with Ada.Command_Line;
+with Ada.Text_IO; use Ada.Text_IO;
 
-with ihbr ;
-with hex ;
+with Ihbr;
+with Hex;
 
 procedure ihbranalyze is
-   hexfilename : string := ada.command_line.Argument(1) ;
-   ihbrfile : ihbr.file_type ;
-   ihbroutfile : ihbr.file_type ;
+   hexfilename : String := Ada.Command_Line.Argument (1);
+   ihbrfile    : Ihbr.File_Type;
+   ihbroutfile : Ihbr.File_Type;
 begin
-   ihbr.open( hexfilename , ihbrfile ) ;
-   ihbroutfile := ihbr.create( hexfilename & ".out" ) ;
-   while not ihbr.End_Of_File(ihbrfile)
-   loop
+   Ihbr.Open (hexfilename, ihbrfile);
+   ihbroutfile := Ihbr.Create (hexfilename & ".out");
+   while not Ihbr.End_Of_File (ihbrfile) loop
       declare
-         nextrec : ihbr.Ihbr_Binary_Record_Type ;
+         nextrec : Ihbr.Ihbr_Binary_Record_Type;
       begin
-         ihbr.GetNext( ihbrfile , nextrec ) ;
+         Ihbr.GetNext (ihbrfile, nextrec);
          case nextrec.Rectype is
-            when ihbr.Data_Rec =>
-               put("Load :");
-               put( hex.image( nextrec.LoadOffset ));
-               put(" ");
-               put_line( hex.image( nextrec.Data'Address , integer(nextrec.DataRecLen) ) ) ;
-            when ihbr.End_Of_File_Rec =>
-               put_line("End Of File Rec");
+            when Ihbr.Data_Rec =>
+               Put ("Load :");
+               Put (Hex.Image (nextrec.LoadOffset));
+               Put (" ");
+               Put_Line
+                 (Hex.Image
+                    (nextrec.Data'Address,
+                     Integer (nextrec.DataRecLen)));
+            when Ihbr.End_Of_File_Rec =>
+               Put_Line ("End Of File Rec");
             when others =>
-               null ;
-         end case ;
-         ihbr.PutNext(ihbroutfile,nextrec) ;
-      end ;
-   end loop ;
-   ihbr.close(ihbrfile) ;
-   ihbr.close(ihbroutfile) ;
-end ihbranalyze ;
+               null;
+         end case;
+         Ihbr.PutNext (ihbroutfile, nextrec);
+      end;
+   end loop;
+   Ihbr.Close (ihbrfile);
+   Ihbr.Close (ihbroutfile);
+end ihbranalyze;

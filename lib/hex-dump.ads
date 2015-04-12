@@ -1,15 +1,15 @@
-with system ;
-with ada.text_io ;
+with System;
+with Ada.Text_IO;
 
-package hex.dump is
+package Hex.dump is
 
-   DEFAULT_BLOCK_LENGTH : constant Integer := 32 ;
+   DEFAULT_BLOCK_LENGTH : constant Integer := 32;
 
    procedure Dump
-     (Adr     : System.Address;
-      Length  : Integer;
-      show_offset : boolean := true ;
-      Blocklen : Integer := DEFAULT_BLOCK_LENGTH;
-      Outfile : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
+     (Adr         : System.Address;
+      Length      : Integer;
+      show_offset : Boolean               := True;
+      Blocklen    : Integer               := DEFAULT_BLOCK_LENGTH;
+      Outfile     : Ada.Text_IO.File_Type := Ada.Text_IO.Standard_Output);
 
-end hex.dump ;
+end Hex.dump;

@@ -2,7 +2,7 @@ with Unchecked_Deallocation;
 with Ada.Exceptions;
 with Ada.Integer_Text_IO;
 
-with hex;
+with Hex;
 
 package body Ihbr is
 
@@ -32,7 +32,7 @@ package body Ihbr is
       end if;
       Numbytes := Str'Length / 2;
       for byte in 1 .. Numbytes loop
-         Nextbyte := hex.Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));
+         Nextbyte := Hex.Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));
          Cs       := Cs + Interfaces.Unsigned_16 (Nextbyte);
       end loop;
       Result := Interfaces.Unsigned_8 (Cs and 16#00ff#);
@@ -47,13 +47,13 @@ package body Ihbr is
       temp.Current_Line := 0;
       File              := temp;
    end Open;
-   function Create( name : string ) return file_type is
-      temp : file_type := new file_rec_type ;
+   function Create (name : String) return File_Type is
+      temp : File_Type := new file_rec_type;
    begin
-      ada.text_io.Create( file => temp.file , name => name ) ;
-      temp.Current_Line := 0 ;
-      return temp ;
-   end Create ;
+      Ada.Text_IO.Create (File => temp.File, Name => name);
+      temp.Current_Line := 0;
+      return temp;
+   end Create;
 
    procedure Close (File : in out File_Type) is
    begin
@@ -98,7 +98,7 @@ package body Ihbr is
          end if;
 
          Cs        := newline (line_length - 1 .. line_length);
-         Csval     := hex.Value (Cs);
+         Csval     := Hex.Value (Cs);
          calccsval := ComputeChecksum (newline (2 .. newline'Length - 2));
          if Csval /= calccsval then
             raise format_error with "Checksum";
@@ -110,10 +110,10 @@ package body Ihbr is
             end if;
          end if;
 
-         Bcval  := hex.Value (Bc);
-         Hxaval := hex.Value (Hxa);
+         Bcval  := Hex.Value (Bc);
+         Hxaval := Hex.Value (Hxa);
 
-         Rtval := hex.Value (Rt);
+         Rtval := Hex.Value (Rt);
          case Rectype_Type'Val (Rtval) is
             when Data_Rec =>
                declare
@@ -123,7 +123,7 @@ package body Ihbr is
                   drdata.DataRecLen := Bcval;
                   for byte in 1 .. Integer (Bcval) loop
                      drdata.Data (byte) :=
-                       hex.Value
+                       Hex.Value
                          (newline
                             (databegin + 2 * (byte - 1) ..
                                  databegin + 2 * (byte - 1) + 1));
@@ -132,14 +132,13 @@ package body Ihbr is
                end;
 
             when End_Of_File_Rec =>
-               if Bcval /= 0
-               then
-                  put_Line("Non zero byte count for End_Of_File record");
-               end if ;
-               if Hxaval /= 0
-               then
-                  put_line("Non zero Load address value for End_Of_File record");
-               end if ;
+               if Bcval /= 0 then
+                  Put_Line ("Non zero byte count for End_Of_File record");
+               end if;
+               if Hxaval /= 0 then
+                  Put_Line
+                    ("Non zero Load address value for End_Of_File record");
+               end if;
                if Verbose then
                   Put_Line ("End of File Record Found");
                end if;
@@ -164,39 +163,44 @@ package body Ihbr is
 
    procedure PutNext
      (File : in out File_Type;
-      Rec  :  Ihbr_Binary_Record_Type)
+      Rec  :        Ihbr_Binary_Record_Type)
    is
-      output_line  : String (1 .. MAX_LINE_LENGTH);
-      outptr : integer := 1 ;
-      bc : interfaces.unsigned_8 := 0 ;
-      loadadr : interfaces.unsigned_16 := 0 ;
-      rectypecode : interfaces.unsigned_8 ;
-      procedure store( str : String ) is
+      output_line : String (1 .. MAX_LINE_LENGTH);
+      outptr      : Integer                := 1;
+      bc          : Interfaces.Unsigned_8  := 0;
+      loadadr     : Interfaces.Unsigned_16 := 0;
+      rectypecode : Interfaces.Unsigned_8;
+      procedure store (str : String) is
       begin
-         output_line( outptr .. outptr+str'length -1 ) := str ;
-         outptr := outptr + str'length ;
-      end store ;
+         output_line (outptr .. outptr + str'Length - 1) := str;
+         outptr := outptr + str'Length;
+      end store;
    begin
-      ada.text_io.put( file.file , Start_Code ) ;
-      case rec.Rectype is
+      Ada.Text_IO.Put (File.File, Start_Code);
+      case Rec.Rectype is
          when Data_Rec =>
-            store(hex.image(rec.DataRecLen));
-            store(hex.image(rec.LoadOffset) ) ;
-            store(hex.image( interfaces.unsigned_8(Rectype_Type'pos(Data_Rec)) ) ) ;
-            for dptr in 1..integer(rec.DataRecLen)
-            loop
-               store(hex.image(rec.Data(dptr))) ;
-            end loop ;
+            store (Hex.Image (Rec.DataRecLen));
+            store (Hex.Image (Rec.LoadOffset));
+            store
+              (Hex.Image
+                 (Interfaces.Unsigned_8 (Rectype_Type'Pos (Data_Rec))));
+            for dptr in 1 .. Integer (Rec.DataRecLen) loop
+               store (Hex.Image (Rec.Data (dptr)));
+            end loop;
          when End_Of_File_Rec =>
-            store( hex.image(bc) ) ;
-            store( hex.image(loadadr) ) ;
-            rectypecode := interfaces.unsigned_8( Rectype_Type'pos(End_Of_File_Rec) ) ;
-            store(hex.image(rectypecode) ) ;
+            store (Hex.Image (bc));
+            store (Hex.Image (loadadr));
+            rectypecode :=
+              Interfaces.Unsigned_8 (Rectype_Type'Pos (End_Of_File_Rec));
+            store (Hex.Image (rectypecode));
          when others =>
-            raise format_error with "Unsupported:" & Rectype_Type'Image(rec.Rectype) ;
-      end case ;
-      ada.text_io.put(file.file, output_line(1..outptr-1)) ;
-      ada.text_io.put_line( file.file , hex.image(ComputeChecksum(output_line(1..outptr-1))));
+            raise format_error
+              with "Unsupported:" & Rectype_Type'Image (Rec.Rectype);
+      end case;
+      Ada.Text_IO.Put (File.File, output_line (1 .. outptr - 1));
+      Ada.Text_IO.Put_Line
+        (File.File,
+         Hex.Image (ComputeChecksum (output_line (1 .. outptr - 1))));
    end PutNext;
 
    function End_Of_File (file : Ihbr.File_Type) return Boolean is

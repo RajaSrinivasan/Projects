@@ -10,7 +10,7 @@ with Ada.Text_IO;
 
 package Ihbr is
 
-   Verbose : Boolean := false ;
+   Verbose : Boolean := False;
    format_error : exception;
 
    type Rectype_Type is
@@ -24,7 +24,8 @@ package Ihbr is
 
    type Data_Rec_Type is array (Natural range <>) of Interfaces.Unsigned_8;
 
-   type Ihbr_Binary_Record_Type (Rectype : Rectype_Type := Unknown_Rec) is record
+   type Ihbr_Binary_Record_Type
+     (Rectype : Rectype_Type := Unknown_Rec) is record
       case Rectype is
          when Extended_Lin_Adr_Rec =>
             Linear_Base_Address : Interfaces.Unsigned_32;
@@ -44,16 +45,18 @@ package Ihbr is
             null;
       end case;
    end record;
-   type ihbr_Record_Type is access all Ihbr_Binary_Record_Type ;
+   type ihbr_Record_Type is access all Ihbr_Binary_Record_Type;
 
    type File_Type is private;
    MAX_LINE_LENGTH : constant := 300;
 
    procedure Open (Name : String; File : out File_Type);
-   function Create( name : string ) return file_type ;
+   function Create (name : String) return File_Type;
    procedure Close (File : in out File_Type);
 
-   procedure GetNext (File : in out File_Type; Rec : out Ihbr_Binary_Record_Type);
+   procedure GetNext
+     (File : in out File_Type;
+      Rec  :    out Ihbr_Binary_Record_Type);
    procedure PutNext (File : in out File_Type; Rec : Ihbr_Binary_Record_Type);
    function End_Of_File (file : Ihbr.File_Type) return Boolean;
 
