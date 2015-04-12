@@ -168,23 +168,21 @@ package body Ihbr is
    is
       output_line  : String (1 .. MAX_LINE_LENGTH);
       outptr : integer := 1 ;
-      cs : interfaces.unsigned_8 ;
       bc : interfaces.unsigned_8 := 0 ;
       loadadr : interfaces.unsigned_16 := 0 ;
       rectypecode : interfaces.unsigned_8 ;
       procedure store( str : String ) is
       begin
-         output_line( outptr .. outptr+str'length-1 ) := str ;
+         output_line( outptr .. outptr+str'length -1 ) := str ;
          outptr := outptr + str'length ;
       end store ;
-
    begin
       ada.text_io.put( file.file , Start_Code ) ;
       case rec.Rectype is
          when Data_Rec =>
             store(hex.image(rec.DataRecLen));
             store(hex.image(rec.LoadOffset) ) ;
-            store( hex.image( interfaces.unsigned_8(Rectype_Type'pos(Data_Rec)) ) ) ;
+            store(hex.image( interfaces.unsigned_8(Rectype_Type'pos(Data_Rec)) ) ) ;
             for dptr in 1..integer(rec.DataRecLen)
             loop
                store(hex.image(rec.Data(dptr))) ;
@@ -194,7 +192,6 @@ package body Ihbr is
             store( hex.image(loadadr) ) ;
             rectypecode := interfaces.unsigned_8( Rectype_Type'pos(End_Of_File_Rec) ) ;
             store(hex.image(rectypecode) ) ;
-
          when others =>
             raise format_error with "Unsupported:" & Rectype_Type'Image(rec.Rectype) ;
       end case ;

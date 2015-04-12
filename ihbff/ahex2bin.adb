@@ -3,8 +3,10 @@ with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Integer_Text_IO;   use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+
 with GNAT.Command_Line;
 with gnat.Debug_Utilities ;
+with gnat.crc32 ;
 
 with Prom_Models; use Prom_Models;
 with Ihbr;
@@ -60,7 +62,7 @@ procedure ahex2bin is
    procedure ProcessCommandLine is
    begin
       loop
-         case GNAT.Command_Line.Getopt ("c16: c32: d e: h ob: oh: s: v") is
+         case GNAT.Command_Line.Getopt ("c16 c32 d e: h ob: oh: s: v") is
             when ASCII.NUL =>
                exit;
             when 'c' =>
@@ -199,12 +201,36 @@ procedure ahex2bin is
                ByteProm_Pkg.Set( myprom , integer(PromSize-1) , unsigned_8( shift_right(crcvalue,8) ) ) ;
             end if ;
          end ;
+      elsif crc32Option then
+         declare
+            crc : gnat.crc32.CRC32 ;
+            finalvalue : interfaces.unsigned_32 ;
+         begin
+            gnat.crc32.Initialize( crc ) ;
+            for b in 1..PromSize-4
+            loop
+               gnat.crc32.update(crc,character'val( integer(myprom(b)) )) ;
+            end loop ;
+            finalvalue := gnat.crc32.Get_Value(crc) ;
+            put("CRC32 "); put( unsigned_32'image(finalvalue) ) ; new_line ;
+            ByteProm_pkg.Set( myprom , integer(PromSize-4) , unsigned_8( finalvalue and 16#0000_00ff# ));
+            ByteProm_pkg.Set( myprom , integer(PromSize-3) , unsigned_8(shift_right( finalvalue and 16#0000_ff00# ,8)));
+            ByteProm_pkg.Set( myprom , integer(PromSize-2) , unsigned_8(shift_right( finalvalue and 16#00ff_0000# ,16)));
+            ByteProm_pkg.Set( myprom , integer(PromSize-1) , unsigned_8(shift_right( finalvalue and 16#ff00_0000# ,24)));
+         end ;
       end if ;
    end ComputeAndUpdateCRC ;
 
    procedure SaveHexFile is
+      savecontext : Prom_Models.context_type ;
    begin
-      null ;
+      savecontext.blocksize := 16 ;
+      savecontext.called := 0 ;
+      if verbose
+      then
+         put("Saving the prom data to "); put( to_string(OutputHexFileName) ) ; new_line ;
+      end if ;
+      ByteProm_pkg.Save( to_string(OutputHexFileName) , myprom , savecontext ,  Prom_Models.Converter'access ) ;
    end SaveHexFile ;
 
 begin
