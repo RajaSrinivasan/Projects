@@ -1,13 +1,16 @@
-with Interfaces;
+with Interfaces;  use interfaces ;
 with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Integer_Text_IO;   use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Command_Line;
+with gnat.Debug_Utilities ;
 
 with Prom_Models; use Prom_Models;
 with Ihbr;
 with hex.dump ;
+with crc16 ;
+
 
 procedure ahex2bin is
    Version : String   := "ahex2bin Version 0.0";
@@ -16,6 +19,9 @@ procedure ahex2bin is
    ----------------------
    Verbose        : Boolean                                := False;
    DumpOption     : Boolean                                := False;
+   crc16Option    : boolean := false ;
+   crc32Option    : boolean := false ;
+   OutputHexFileName : unbounded_string := Null_Unbounded_String ;
    OutputFileName : Ada.Strings.Unbounded.Unbounded_String :=
      Ada.Strings.Unbounded.Null_Unbounded_String;
    HexFileName : Ada.Strings.Unbounded.Unbounded_String :=
@@ -27,7 +33,7 @@ procedure ahex2bin is
    myhexfile : Ihbr.File_Type;
    ----------------------
    procedure ShowUsage is
-      procedure Switch (sw : Character; argind : String; help : String) is
+      procedure Switch (sw : string ; argind : String; help : String) is
       begin
          Put (ASCII.HT);
          Put ('-');
@@ -39,20 +45,35 @@ procedure ahex2bin is
       end Switch;
    begin
       Put_Line (Version);
-      Switch ('h', "", "help");
-      Switch ('v', "", "verbose");
-      Switch ('d', "", "dump the data");
-      Switch ('o', "<name>", "output file name");
-      Switch ('s', "<size>", "prom size in K (bytes)");
-      Switch ('e', "<hex>", "word erase value");
-      Switch (' ', "", "default = 16#ff#");
+      Switch ("h", "", "help");
+      Switch ("v", "", "verbose");
+      Switch ("d", "", "dump the data");
+      Switch ("ob", "<name>", "output binary file name");
+      Switch ("oh", "<name>", "output hex file name. use with c");
+      Switch ("c" , "<hex>" , "Update binary with CRC value. Use hex value as the address");
+      Switch ("c16" , "" , "CRC16 will be stored at the last 2 bytes");
+      Switch ("c32" , "" , "CRC32 will be stored at the last 4 bytes");
+      Switch ("s", "<size>", "prom size in K (bytes)");
+      Switch ("e", "<hex>", "word erase value");
+      Switch ("", "", "default = 16#ff#");
    end ShowUsage;
    procedure ProcessCommandLine is
    begin
       loop
-         case GNAT.Command_Line.Getopt ("d e: h o: s: v") is
+         case GNAT.Command_Line.Getopt ("c16: c32: d e: h ob: oh: s: v") is
             when ASCII.NUL =>
                exit;
+            when 'c' =>
+               if gnat.command_line.Full_Switch = "c16"
+               then
+                  crc16Option := true ;
+               elsif
+                 gnat.command_line.Full_Switch = "c32"
+               then
+                  crc32Option := true ;
+               else
+                  raise Program_Error with gnat.command_line.full_switch ;
+               end if ;
             when 'd' =>
                DumpOption := True;
             when 'e' =>
@@ -61,9 +82,17 @@ procedure ahex2bin is
             when 'h' =>
                ShowUsage;
             when 'o' =>
-               OutputFileName :=
-                 Ada.Strings.Unbounded.To_Unbounded_String
-                   (GNAT.Command_Line.Parameter);
+               if gnat.command_line.Full_Switch = "oh"
+               then
+                  OutputHexFileName := To_Unbounded_String(gnat.command_line.parameter) ;
+               elsif gnat.command_line.full_switch = "ob"
+               then
+                  OutputFileName :=
+                    Ada.Strings.Unbounded.To_Unbounded_String
+                      (GNAT.Command_Line.Parameter);
+               else
+                  raise Program_Error with gnat.command_line.Full_Switch ;
+               end if ;
             when 's' =>
                declare
                   PromSizeSpec : String := GNAT.Command_Line.Parameter;
@@ -146,6 +175,38 @@ procedure ahex2bin is
    begin
       ByteProm_pkg.Write( to_string(OutputFileName) , myprom ) ;
    end WriteBinFile ;
+
+   procedure ComputeAndUpdateCRC is
+   begin
+      if crc16Option
+      then
+         declare
+            crcinit : unsigned_16 := 0 ;
+            crcvalue : unsigned_16 ;
+         begin
+            if verbose
+            then
+               put("Comupting CRC16 ");
+               put( "Memory block address "); put(gnat.Debug_Utilities.Image( myprom.all'address )) ;
+               put( " Total Memory Size "); put( integer'image( myprom.all'length )) ;
+               new_line ;
+            end if ;
+            crcvalue := crc16.Compute( myprom.all(1)'address , PromSize -2 ) ;
+            if verbose
+            then
+               put("CRC16 "); put( integer(crcvalue) , base => 16 ) ; new_line ;
+               ByteProm_pkg.Set( myprom , integer(PromSize-2) , unsigned_8( crcvalue and 16#00ff#)) ;
+               ByteProm_Pkg.Set( myprom , integer(PromSize-1) , unsigned_8( shift_right(crcvalue,8) ) ) ;
+            end if ;
+         end ;
+      end if ;
+   end ComputeAndUpdateCRC ;
+
+   procedure SaveHexFile is
+   begin
+      null ;
+   end SaveHexFile ;
+
 begin
    ProcessCommandLine;
    if Verbose then
@@ -157,7 +218,11 @@ begin
          Put_Line ("Will generate output to standard output");
       end if;
       if Length (OutputFileName) > 0 then
-         Put ("Output File :");
+         Put ("Output Binary File :");
+         Put_Line (To_String (OutputFileName));
+      end if;
+      if Length (OutputHexFileName) > 0 then
+         Put ("Output Hex File :");
          Put_Line (To_String (OutputFileName));
       end if;
       Put ("Prom Size : ");
@@ -166,12 +231,22 @@ begin
       Put ("Erase : ");
       Put (Integer (WordEraseValue), Base => 16);
       New_Line;
-      Put_Line
-        ("-------------------------------------------------------------------------");
-      if Length (HexFileName) = 0 then
-         return;
-      end if;
-      ihbr.verbose := true ;
+
+      if crc16Option
+      then
+         put("CRC16 will be computed and stored at ");
+         put( integer( PromSize - 2 ) , base => 16 ) ;
+      elsif crc32Option
+      then
+         put("CRC32 will be computed and stored at ") ;
+         put( integer( PromSize - 4 ) , base => 16 ) ;
+      end if ;
+      New_Line ;
+      put_line("-------------------------------------------------------------------------");
+      crc16.Selftest ;
+   end if;
+   if Length (HexFileName) = 0 then
+      return;
    end if;
    LoadHexFile;
    if DumpOption
@@ -181,5 +256,13 @@ begin
    if Length(OutputFileName) /= 0
    then
       WriteBinFile ;
+   end if ;
+   if crc16Option or crc32Option
+   then
+      ComputeAndUpdateCRC ;
+   end if ;
+   if Length(OutputHexFileName) /= 0
+   then
+      SaveHexFile ;
    end if ;
 end ahex2bin;

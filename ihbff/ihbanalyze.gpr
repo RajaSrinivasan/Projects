@@ -4,5 +4,17 @@ project Ihbanalyze is
    for Main use ("ahex2bin.adb", "ihbranalyze.adb");
    for Source_Dirs use (".", "..\lib");
 
+   package Builder is
+      for Default_Switches ("ada") use ("-g");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-g");
+   end Compiler;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g");
+   end Linker;
+
 end Ihbanalyze;
 
