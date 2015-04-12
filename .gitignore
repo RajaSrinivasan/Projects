@@ -9,3 +9,10 @@ ihbff/build/ihbanalyze-loc.xml
 *.bin
 *.dump
 *.pp
+ihbff/build/ahex2bin
+
+*.bexch
+
+*.cgpr
+
+ihbff/build/ihbranalyze
