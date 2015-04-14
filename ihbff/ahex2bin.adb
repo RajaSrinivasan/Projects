@@ -28,6 +28,7 @@ procedure ahex2bin is
      Ada.Strings.Unbounded.Null_Unbounded_String;
    PromSize       : Natural               := 0;
    WordEraseValue : Interfaces.Unsigned_8 := 16#ff#;
+   excludeunwritten : boolean := false ;
    ----------------------
    myprom    : ByteProm_pkg.module_type;
    myhexfile : Ihbr.File_Type;
@@ -59,11 +60,12 @@ procedure ahex2bin is
       Switch ("s", "<size>", "prom size in K (bytes)");
       Switch ("e", "<hex>", "word erase value");
       Switch ("", "", "default = 16#ff#");
+      Switch ("x" , "" , "exclude unwritten") ;
    end ShowUsage;
    procedure ProcessCommandLine is
    begin
       loop
-         case GNAT.Command_Line.Getopt ("c16 c32 d e: h ob: oh: s: v") is
+         case GNAT.Command_Line.Getopt ("c16 c32 d e: h ob: oh: s: v x") is
             when ASCII.NUL =>
                exit;
             when 'c' =>
@@ -117,6 +119,8 @@ procedure ahex2bin is
                end;
             when 'v' =>
                Verbose := True;
+            when 'x' =>
+               excludeunwritten := true ;
             when others =>
                raise Program_Error;
          end case;

@@ -8,6 +8,7 @@ package body Prom_Models is
       use Interfaces;
       eofrec  : Ihbr.Ihbr_Binary_Record_Type (Ihbr.End_Of_File_Rec);
       datarec : Ihbr.Ihbr_Binary_Record_Type (Ihbr.Data_Rec);
+      skipthisrecord : boolean := true ;
    begin
       if context.called = 0 then
          context.called   := 1;
@@ -21,6 +22,10 @@ package body Prom_Models is
       datarec.LoadOffset := Unsigned_16 (context.nextbyte - 1);
       for b in 1 .. context.blocksize loop
          datarec.Data (b)   := module.all (context.nextbyte);
+         if module.all(context.nextbyte) /= 16#ff#
+         then
+            skipthisrecord := false ;
+         end if ;
          datarec.DataRecLen := datarec.DataRecLen + 1;
          context.nextbyte   := context.nextbyte + 1;
          if context.nextbyte > module.all'Length then
@@ -28,5 +33,9 @@ package body Prom_Models is
          end if;
       end loop;
       binrec := datarec;
+      if skipthisrecord
+      then
+         binrec.DataRecLen := 0 ;
+      end if ;
    end Converter;
 end Prom_Models;
