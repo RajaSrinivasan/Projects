@@ -13,9 +13,9 @@ with Hex.dump;
 with crc16;
 
 procedure ahex2bin is
-   Version : String   := "ahex2bin Version 0.1";
-   Kilo    : constant := 1024;
-   Mega    : constant := 1024 * 1024;
+
+   Version : String   := "ahex2bin Version 0.2";
+
    ----------------------
    Verbose           : Boolean                                := False;
    DumpOption        : Boolean                                := False;
@@ -26,9 +26,9 @@ procedure ahex2bin is
      Ada.Strings.Unbounded.Null_Unbounded_String;
    HexFileName : Ada.Strings.Unbounded.Unbounded_String :=
      Ada.Strings.Unbounded.Null_Unbounded_String;
-   PromSize       : Natural               := 0;
-   WordEraseValue : Interfaces.Unsigned_8 := 16#ff#;
-   excludeunwritten : boolean := false ;
+   PromSize         : Natural               := 0;
+   WordEraseValue   : Interfaces.Unsigned_8 := 16#ff#;
+   excludeunwritten : Boolean               := False;
    ----------------------
    myprom    : ByteProm_pkg.module_type;
    myhexfile : Ihbr.File_Type;
@@ -60,7 +60,7 @@ procedure ahex2bin is
       Switch ("s", "<size>", "prom size in K (bytes)");
       Switch ("e", "<hex>", "word erase value");
       Switch ("", "", "default = 16#ff#");
-      Switch ("x" , "" , "exclude unwritten") ;
+      Switch ("x", "", "exclude unwritten");
    end ShowUsage;
    procedure ProcessCommandLine is
    begin
@@ -103,14 +103,14 @@ procedure ahex2bin is
                     PromSizeSpec (PromSizeSpec'Length) = 'k'
                   then
                      PromSize :=
-                       Kilo *
+                       prom_models.Kilo *
                        Positive'Value
                          (PromSizeSpec (1 .. PromSizeSpec'Length - 1));
                   elsif PromSizeSpec (PromSizeSpec'Length) = 'M' or
                     PromSizeSpec (PromSizeSpec'Length) = 'm'
                   then
                      PromSize :=
-                       Mega *
+                       Prom_Models.Mega *
                        Positive'Value
                          (PromSizeSpec (1 .. PromSizeSpec'Length - 1));
                   else
@@ -120,7 +120,7 @@ procedure ahex2bin is
             when 'v' =>
                Verbose := True;
             when 'x' =>
-               excludeunwritten := true ;
+               excludeunwritten := True;
             when others =>
                raise Program_Error;
          end case;
@@ -167,6 +167,7 @@ procedure ahex2bin is
       end loop;
       Ihbr.Close (myhexfile);
    end LoadHexFile;
+
    procedure DumpHexFile is
    begin
       Hex.dump.Dump
@@ -299,19 +300,32 @@ begin
       crc16.Selftest;
    end if;
    if Length (HexFileName) = 0 then
+      put_line("Need an input hex file name");
+      ShowUsage ;
       return;
    end if;
+   if PromSize < 1
+   then
+      put_line("Need the size of the PROM module");
+      ShowUsage ;
+      return ;
+   end if ;
    LoadHexFile;
-   if DumpOption then
-      DumpHexFile;
-   end if;
-   if Length (OutputFileName) /= 0 then
-      WriteBinFile;
-   end if;
+
    if crc16Option or crc32Option then
       ComputeAndUpdateCRC;
    end if;
+
+   if DumpOption then
+      DumpHexFile;
+   end if;
+
+   if Length (OutputFileName) /= 0 then
+      WriteBinFile;
+   end if;
+
    if Length (OutputHexFileName) /= 0 then
       SaveHexFile;
    end if;
+
 end ahex2bin;

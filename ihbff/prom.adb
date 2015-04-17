@@ -1,6 +1,6 @@
 with Ada.Streams; use Ada.Streams;
 with Ada.Streams.Stream_IO;
-with interfaces ;
+with Interfaces;
 
 package body Prom is
    use Ada.Streams;
@@ -84,7 +84,7 @@ package body Prom is
       context   : in out context_type;
       converter :        converter_procedure)
    is
-      use interfaces ;
+      use Interfaces;
       use Ihbr;
       ihbroutfile : Ihbr.File_Type;
    begin
@@ -97,10 +97,11 @@ package body Prom is
             if nextrec.Rectype = Ihbr.End_Of_File_Rec then
                exit;
             end if;
-            if nextrec.Rectype = Ihbr.Data_Rec and then nextrec.DataRecLen > 0
+            if nextrec.Rectype = Ihbr.Data_Rec
+              and then nextrec.DataRecLen > 0
             then
                Ihbr.PutNext (ihbroutfile, nextrec);
-            end if ;
+            end if;
          end;
       end loop;
       Ihbr.Close (ihbroutfile);

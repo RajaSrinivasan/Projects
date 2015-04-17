@@ -4,6 +4,10 @@ with Ihbr;
 with Prom;
 
 package Prom_Models is
+
+   Kilo    : constant := 1024;
+   Mega    : constant := 1024 * 1024;
+
    type context_type is record
       called    : Integer := 0;
       blocksize : Integer := 16;

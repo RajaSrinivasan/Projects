@@ -16,3 +16,4 @@ ihbff/build/ahex2bin
 *.cgpr
 
 ihbff/build/ihbranalyze
+*.out
