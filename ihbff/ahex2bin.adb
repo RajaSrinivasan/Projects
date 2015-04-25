@@ -14,7 +14,7 @@ with crc16;
 
 procedure ahex2bin is
 
-   Version : String   := "ahex2bin Version 0.2";
+   Version : String   := "ahex2bin Version 0.3";
 
    ----------------------
    Verbose           : Boolean                                := False;
@@ -30,7 +30,7 @@ procedure ahex2bin is
    WordEraseValue   : Interfaces.Unsigned_8 := 16#ff#;
    excludeunwritten : Boolean               := False;
    ----------------------
-   myprom    : ByteProm_pkg.module_type;
+   myprom    : ByteProm_pkg.module_type ;
    myhexfile : Ihbr.File_Type;
    ----------------------
    procedure ShowUsage is
@@ -128,123 +128,6 @@ procedure ahex2bin is
       HexFileName := To_Unbounded_String (GNAT.Command_Line.Get_Argument);
    end ProcessCommandLine;
 
-   procedure LoadHexFile is
-      use Ihbr;
-   begin
-      myprom := Prom_Models.ByteProm_pkg.Create (PromSize);
-      Prom_Models.ByteProm_pkg.Erase (myprom);
-      Ihbr.Open (To_String (HexFileName), myhexfile);
-      while not Ihbr.End_Of_File (myhexfile) loop
-         declare
-            nextrec : Ihbr.Ihbr_Binary_Record_Type;
-         begin
-            Ihbr.GetNext (myhexfile, nextrec);
-            if nextrec.Rectype = Ihbr.End_Of_File_Rec then
-               exit;
-            end if;
-            if nextrec.Rectype = Ihbr.Data_Rec then
-               if Integer (nextrec.LoadOffset) > PromSize then
-                  if Verbose then
-                     Put ("Ignoring data rec for address ");
-                     Put (Integer (nextrec.LoadOffset));
-                     Put (" (");
-                     Put (Integer (nextrec.LoadOffset), Base => 16);
-                     Put (" )");
-                     New_Line;
-                  end if;
-               else
-                  for db in 1 .. nextrec.DataRecLen loop
-                     ByteProm_pkg.Set
-                       (myprom,
-                        Integer (nextrec.LoadOffset) + Integer (db) - 1,
-                        nextrec.Data (Integer (db)));
-                  end loop;
-               end if;
-            else
-               raise Ihbr.format_error with "UnknownRecType";
-            end if;
-         end;
-      end loop;
-      Ihbr.Close (myhexfile);
-   end LoadHexFile;
-
-   procedure DumpHexFile is
-   begin
-      Hex.dump.Dump
-        (myprom.all'Address,
-         PromSize,
-         Blocklen    => 16,
-         show_offset => True);
-   end DumpHexFile;
-
-   procedure WriteBinFile is
-   begin
-      ByteProm_pkg.Write (To_String (OutputFileName), myprom);
-   end WriteBinFile;
-
-   procedure ComputeAndUpdateCRC is
-   begin
-      if crc16Option then
-         declare
-            crcinit  : Unsigned_16 := 0;
-            crcvalue : Unsigned_16;
-         begin
-            if Verbose then
-               Put ("Comupting CRC16 ");
-               Put ("Memory block address ");
-               Put (GNAT.Debug_Utilities.Image (myprom.all'Address));
-               Put (" Total Memory Size ");
-               Put (Integer'Image (myprom.all'Length));
-               New_Line;
-            end if;
-            crcvalue := crc16.Compute (myprom.all (1)'Address, PromSize - 2);
-            if Verbose then
-               Put ("CRC16 ");
-               Put (Integer (crcvalue), Base => 16);
-               New_Line;
-               ByteProm_pkg.Set
-                 (myprom,
-                  Integer (PromSize - 2),
-                  Unsigned_8 (crcvalue and 16#00ff#));
-               ByteProm_pkg.Set
-                 (myprom,
-                  Integer (PromSize - 1),
-                  Unsigned_8 (Shift_Right (crcvalue, 8)));
-            end if;
-         end;
-      elsif crc32Option then
-         declare
-            crc        : GNAT.CRC32.CRC32;
-            finalvalue : Interfaces.Unsigned_32;
-         begin
-            GNAT.CRC32.Initialize (crc);
-            for b in 1 .. PromSize - 4 loop
-               GNAT.CRC32.Update (crc, Character'Val (Integer (myprom (b))));
-            end loop;
-            finalvalue := GNAT.CRC32.Get_Value (crc);
-            Put ("CRC32 ");
-            Put (Unsigned_32'Image (finalvalue));
-            New_Line;
-            ByteProm_pkg.Set
-              (myprom,
-               Integer (PromSize - 4),
-               Unsigned_8 (finalvalue and 16#0000_00ff#));
-            ByteProm_pkg.Set
-              (myprom,
-               Integer (PromSize - 3),
-               Unsigned_8 (Shift_Right (finalvalue and 16#0000_ff00#, 8)));
-            ByteProm_pkg.Set
-              (myprom,
-               Integer (PromSize - 2),
-               Unsigned_8 (Shift_Right (finalvalue and 16#00ff_0000#, 16)));
-            ByteProm_pkg.Set
-              (myprom,
-               Integer (PromSize - 1),
-               Unsigned_8 (Shift_Right (finalvalue and 16#ff00_0000#, 24)));
-         end;
-      end if;
-   end ComputeAndUpdateCRC;
-
    procedure SaveHexFile is
       savecontext : Prom_Models.context_type;
    begin
@@ -310,18 +193,21 @@ begin
       ShowUsage ;
       return ;
    end if ;
-   LoadHexFile;
+
+   myprom := Prom_Models.LoadHexFile(To_String(HexFileName),PromSize,WordEraseValue);
 
    if crc16Option or crc32Option then
-      ComputeAndUpdateCRC;
+      Prom_Models.ComputeAndUpdateCRC(myprom,
+                                      computecrc16=> crc16option,
+                                      computecrc32 => crc32option) ;
    end if;
 
    if DumpOption then
-      DumpHexFile;
+      Prom_Models.DumpModule(myprom) ;
    end if;
 
    if Length (OutputFileName) /= 0 then
-      WriteBinFile;
+      ByteProm_pkg.Write (To_String (OutputFileName), myprom);
    end if;
 
    if Length (OutputHexFileName) /= 0 then

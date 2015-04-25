@@ -46,6 +46,20 @@ package body Hex is
       return Result;
    end Value;
 
+   function Value (Hex : Character) return System.Storage_ELements.Storage_Element is
+      u8 : Interfaces.Unsigned_8 ;
+   begin
+      u8 := Value(hex) ;
+      return System.Storage_ELements.Storage_Element(u8) ;
+   end Value ;
+
+   function Value (Hex : Hexstring) return System.Storage_ELements.Storage_Element is
+      u8 : Interfaces.Unsigned_8 ;
+   begin
+      u8 := Value(hex) ;
+      return System.Storage_Elements.Storage_Element( u8 ) ;
+   end Value ;
+
    function Image (bin : Interfaces.Unsigned_8) return Hexstring is
       use Interfaces;
       img     : Hexstring;
@@ -97,5 +111,10 @@ package body Hex is
       end loop;
       return img;
    end Image;
+
+   function Image (bin : System.Storage_Elements.Storage_Element) return Hexstring is
+   begin
+      return Image( Interfaces.Unsigned_8(bin) ) ;
+   end Image ;
 
 end Hex;

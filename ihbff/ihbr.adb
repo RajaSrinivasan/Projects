@@ -19,26 +19,6 @@ package body Ihbr is
 
    procedure free is new Unchecked_Deallocation (file_rec_type, File_Type);
 
-   function ComputeChecksum (Str : String) return Interfaces.Unsigned_8 is
-      use Interfaces;
-      Cs       : Interfaces.Unsigned_16            := 0;
-      Result   : Interfaces.Unsigned_8;
-      Numbytes : Integer;
-      Nextbyte : Interfaces.Unsigned_8;
-      Mystr    : constant String (1 .. Str'Length) := Str;
-   begin
-      if Str'Length mod 2 /= 0 then
-         raise Program_Error with "OddLengthStr";
-      end if;
-      Numbytes := Str'Length / 2;
-      for byte in 1 .. Numbytes loop
-         Nextbyte := Hex.Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));
-         Cs       := Cs + Interfaces.Unsigned_16 (Nextbyte);
-      end loop;
-      Result := Interfaces.Unsigned_8 (Cs and 16#00ff#);
-      Result := not Result;
-      return Result + 1;
-   end ComputeChecksum;
 
    procedure Open (Name : String; File : out File_Type) is
       temp : File_Type := new file_rec_type;
@@ -66,6 +46,7 @@ package body Ihbr is
      (File : in out File_Type;
       Rec  :    out Ihbr_Binary_Record_Type)
    is
+      use System.Storage_elements ;
       use Interfaces;
       input_line  : String (1 .. MAX_LINE_LENGTH);
       line_length : Natural;
@@ -121,8 +102,8 @@ package body Ihbr is
                begin
                   drdata.LoadOffset := Hxaval;
                   drdata.DataRecLen := Bcval;
-                  for byte in 1 .. Integer (Bcval) loop
-                     drdata.Data (byte) :=
+                  for byte in 1 .. integer(Bcval) loop
+                     drdata.Data (System.Storage_Elements.Storage_Offset(byte)) :=
                        Hex.Value
                          (newline
                             (databegin + 2 * (byte - 1) ..
@@ -184,8 +165,9 @@ package body Ihbr is
             store
               (Hex.Image
                  (Interfaces.Unsigned_8 (Rectype_Type'Pos (Data_Rec))));
-            for dptr in 1 .. Integer (Rec.DataRecLen) loop
-               store (Hex.Image (Rec.Data (dptr)));
+            for dptr in 1 .. System.Storage_Elements.Storage_Offset (Rec.DataRecLen)
+            loop
+               store (Hex.Image (Rec.Data (dptr))) ;
             end loop;
          when End_Of_File_Rec =>
             store (Hex.Image (bc));
@@ -200,12 +182,47 @@ package body Ihbr is
       Ada.Text_IO.Put (File.File, output_line (1 .. outptr - 1));
       Ada.Text_IO.Put_Line
         (File.File,
-         Hex.Image (ComputeChecksum (output_line (1 .. outptr - 1))));
+         Hex.Image(ComputeChecksum(Rec.Data(1..System.Storage_Elements.Storage_Offset (Rec.DataRecLen)))));
    end PutNext;
 
    function End_Of_File (file : Ihbr.File_Type) return Boolean is
    begin
       return Ada.Text_IO.End_Of_File (file.File);
    end End_Of_File;
+
+   function ComputeChecksum (Str : String) return Interfaces.Unsigned_8 is
+      use Interfaces;
+      Cs       : Interfaces.Unsigned_16            := 0;
+      Result   : Interfaces.Unsigned_8;
+      Numbytes : Integer;
+      Nextbyte : Interfaces.Unsigned_8;
+      Mystr    : constant String (1 .. Str'Length) := Str;
+   begin
+      if Str'Length mod 2 /= 0 then
+         raise Program_Error with "OddLengthStr";
+      end if;
+      Numbytes := Str'Length / 2;
+      for byte in 1 .. Numbytes loop
+         Nextbyte := Hex.Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));
+         Cs       := Cs + Interfaces.Unsigned_16 (Nextbyte);
+      end loop;
+      Result := Interfaces.Unsigned_8 (Cs and 16#00ff#);
+      Result := not Result;
+      return Result + 1;
+   end ComputeChecksum;
+
+   function ComputeChecksum (Bin : system.storage_elements.Storage_Array) return Interfaces.Unsigned_8 is
+      use Interfaces;
+      Cs       : Interfaces.Unsigned_16            := 0;
+      Result   : Interfaces.Unsigned_8;
+   begin
+      for byte in Bin'range
+      loop
+         Cs       := Cs + Interfaces.Unsigned_16 (Bin(byte));
+      end loop ;
+      Result := Interfaces.Unsigned_8 (Cs and 16#00ff#);
+      Result := not Result;
+      return Result + 1;
+   end ComputeChecksum ;
 
 end Ihbr;

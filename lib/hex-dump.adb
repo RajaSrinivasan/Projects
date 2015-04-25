@@ -28,9 +28,17 @@ package body Hex.dump is
       function CharImage (ci : Interfaces.Unsigned_8) return Character is
          c : Character := Character'Val (Integer (ci));
       begin
-         if Ada.Characters.Handling.Is_Graphic (c) then
-            return c;
+         if not ada.Characters.Handling.Is_ISO_646(c)
+         then
+            return '.' ;
+         end if ;
+         if Ada.Characters.Handling.Is_Alphanumeric(c) or
+            Ada.Characters.Handling.Is_Space(c) or
+            Ada.Characters.Handling.Is_Punctuation_Connector(c)
+         then
+            return c ;
          end if;
+
          return '.';
       end CharImage;
 

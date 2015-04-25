@@ -3,7 +3,7 @@
 --
 -- Reference: http://en.wikipedia.org/wiki/Intel_HEX
 -------------------------------------------------------------------------
-
+with System.Storage_Elements ;
 with Interfaces;
 with Ada.Streams;
 with Ada.Text_IO;
@@ -22,7 +22,7 @@ package Ihbr is
       Start_Lin_Adr_Rec,
       Unknown_Rec);
 
-   type Data_Rec_Type is array (Natural range <>) of Interfaces.Unsigned_8;
+   MAX_DATAREC_SIZE : constant := 256 ;
 
    type Ihbr_Binary_Record_Type
      (Rectype : Rectype_Type := Unknown_Rec) is record
@@ -34,7 +34,7 @@ package Ihbr is
          when Data_Rec =>
             DataRecLen : Interfaces.Unsigned_8;
             LoadOffset : Interfaces.Unsigned_16;
-            Data       : Data_Rec_Type (1 .. 256);
+            Data       : system.storage_elements.Storage_Array(1..MAX_DATAREC_SIZE) ;
          when Start_Lin_Adr_Rec =>
             Exec_LinStart_Adr : Interfaces.Unsigned_32;
          when Start_Seg_Adr_Rec =>
@@ -42,7 +42,7 @@ package Ihbr is
          when End_Of_File_Rec =>
             null;
          when Unknown_Rec =>
-            null;
+            null ;
       end case;
    end record;
    type ihbr_Record_Type is access all Ihbr_Binary_Record_Type;
@@ -68,5 +68,6 @@ private
    type File_Type is access all file_rec_type;
 
    function ComputeChecksum (Str : String) return Interfaces.Unsigned_8;
+   function ComputeChecksum (Bin : system.storage_elements.Storage_Array) return Interfaces.Unsigned_8 ;
 
 end Ihbr;
