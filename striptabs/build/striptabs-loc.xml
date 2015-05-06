@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<Locations >
+  <Project>
+    <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs.gpr</vfs_file>
+    <file_marker column=" 6" line=" 13" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 1" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\ihbff\ahex2bin.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 6" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 6" line=" 10" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 4" line=" 20" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 1" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 34" line=" 15" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 19" line=" 2" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_process.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 56" line=" 27" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_process.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 1" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs.adb</vfs_file>
+    </file_marker>
+    <file_marker current="true" column=" 1" line=" 1" >
+      <vfs_file>C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\build\striptabs_testinput.txt</vfs_file>
+    </file_marker>
+  </Project>
+  <Project >
+    <file_marker column=" 6" line=" 13">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 1">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\ihbff\ahex2bin.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 6">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs.adb</vfs_file>
+    </file_marker>
+    <file_marker column=" 6" line=" 10">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 4" line=" 20">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 1" line=" 1">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 34" line=" 15">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_options.ads</vfs_file>
+    </file_marker>
+    <file_marker column=" 19" line=" 2">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_process.ads</vfs_file>
+    </file_marker>
+    <file_marker current="true" column=" 56" line=" 27">
+      <vfs_file >C:\Users\Rajagopalan\Documents\GitHub\Projects\striptabs\striptabs_process.adb</vfs_file>
+    </file_marker>
+  </Project>
+</Locations>
