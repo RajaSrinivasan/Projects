@@ -17,3 +17,4 @@ ihbff/build/ahex2bin
 
 ihbff/build/ihbranalyze
 *.out
+*.ini

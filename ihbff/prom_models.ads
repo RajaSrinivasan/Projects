@@ -27,7 +27,11 @@ package Prom_Models is
    function LoadHexFile( filename : string ;
                          PromSize : integer ;
                          erasevalue : interfaces.unsigned_8 := interfaces.unsigned_8'last )
-     return ByteProm_pkg.module_type ;
+                        return ByteProm_pkg.module_type ;
+   function LoadBinFile( filename : string ;
+                         PromSize : integer ;
+                         erasevalue : interfaces.unsigned_8 := interfaces.unsigned_8'last )
+                        return ByteProm_pkg.module_type ;
    procedure DumpModule( module : ByteProm_pkg.module_type ;
                          blocklen : integer := 16 ) ;
    procedure ComputeAndUpdateCRC( module : in out ByteProm_pkg.module_type ;

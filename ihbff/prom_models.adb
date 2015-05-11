@@ -1,6 +1,7 @@
 with System.Storage_Elements ;
 with ada.text_io ; use ada.text_io ;
 with ada.Integer_Text_IO ; use ada.Integer_Text_IO ;
+with ada.Sequential_IO ;
 with interfaces ; use interfaces ;
 
 with GNAT.CRC32;
@@ -12,6 +13,7 @@ with Prom ;
 
 package body Prom_Models is
 
+   package Byte_IO is new Ada.Sequential_IO( interfaces.Unsigned_8 ) ;
    procedure Converter
      (module  :        ByteProm_pkg.module_type;
       binrec  :    out Ihbr.Ihbr_Binary_Record_Type;
@@ -95,6 +97,29 @@ package body Prom_Models is
       Ihbr.Close (myhexfile);
       return newmodule ;
    end LoadHexFile ;
+   function LoadBinFile( filename : string ;
+                         PromSize : integer ;
+                         erasevalue : interfaces.unsigned_8 := interfaces.unsigned_8'last )
+                        return ByteProm_pkg.module_type is
+      newmodule : ByteProm_pkg.module_type := ByteProm_pkg.Create( PromSize ) ;
+      byteio_file : Byte_IO.File_Type ;
+      bytevalue : interfaces.Unsigned_8 ;
+   begin
+      ByteProm_pkg.Erase(newmodule,erasevalue) ;
+      Byte_IO.Open(byteio_file,byte_io.in_file,filename) ;
+      for b in 1..PromSize
+      loop
+         if byte_io.End_Of_File(byteio_file)
+         then
+            exit ;
+         end if ;
+         byte_io.Read(byteio_file,bytevalue) ;
+         ByteProm_pkg.Set(newmodule,b-1,bytevalue) ;
+      end loop ;
+      byte_io.close(byteio_file) ;
+      return newmodule ;
+   end LOadBinFile ;
+
    procedure DumpModule( module : ByteProm_pkg.module_type ;
                          blocklen : integer := 16 ) is
    begin

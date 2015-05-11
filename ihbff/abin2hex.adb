@@ -2,7 +2,7 @@ with Interfaces;            use Interfaces;
 with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Integer_Text_IO;   use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
+with Ada.Directories ;
 with GNAT.Command_Line;
 with GNAT.Debug_Utilities;
 with GNAT.CRC32;
@@ -18,6 +18,7 @@ procedure abin2hex is
    DumpOption        : Boolean                                := False;
    crc16Option       : Boolean                                := False;
    crc32Option       : Boolean                                := False;
+   WordEraseValue   : Interfaces.Unsigned_8 := 16#ff#;
    OutputHexFileName : Unbounded_String := Null_Unbounded_String;
    BinFileName : Ada.Strings.Unbounded.Unbounded_String :=
      Ada.Strings.Unbounded.Null_Unbounded_String;
@@ -53,11 +54,12 @@ procedure abin2hex is
       Switch ("c32", "", "CRC32 will be stored at the last 4 bytes");
       Switch ("LA" , "<hex>" , "Load Address. default 0") ;
       Switch ("s", "<size>", "prom size in K (bytes)");
+      Switch ("e", "<hex>", "word erase value");
    end ShowUsage;
    procedure ProcessCommandLine is
    begin
       loop
-         case GNAT.Command_Line.Getopt ("c16 c32 d h LA: oh: s: v") is
+         case GNAT.Command_Line.Getopt ("c16 c32 d e: h LA: oh: s: v") is
             when ASCII.NUL =>
                exit;
             when 'c' =>
@@ -70,6 +72,9 @@ procedure abin2hex is
                end if;
             when 'd' =>
                DumpOption := True;
+            when 'e' =>
+               WordEraseValue :=
+                 Interfaces.Unsigned_8'Value (GNAT.Command_Line.Parameter);
             when 'h' =>
                ShowUsage;
             when 'o' =>
@@ -110,6 +115,44 @@ procedure abin2hex is
       end loop;
       BinFileName := To_Unbounded_String (GNAT.Command_Line.Get_Argument);
    end ProcessCommandLine;
+
+   procedure SaveHexFile is
+      savecontext : Prom_Models.context_type;
+   begin
+      savecontext.blocksize := 16;
+      savecontext.called    := 0;
+      if Verbose then
+         Put ("Saving the prom data to ");
+         Put (To_String (OutputHexFileName));
+         New_Line;
+      end if;
+      ByteProm_pkg.Save
+        (To_String (OutputHexFileName),
+         myprom,
+         savecontext,
+         Prom_Models.Converter'Access);
+   end SaveHexFile;
+
+   procedure LoadBinFile is
+      strfilename : constant string := to_string(BinFileName) ;
+      binfilesize : ada.directories.file_size ;
+   begin
+      if not Ada.Directories.Exists( strfilename )
+      then
+         put(strfilename) ;
+         put_line(" does not exist");
+         return ;
+      end if ;
+      binfilesize := ada.directories.Size(strfilename) ;
+      if natural(binfilesize) < PromSize
+      then
+         put_line("File Size is less than the PROM size. Will pad.");
+      elsif natural(binfilesize) > PromSize
+      then
+         put_line("File Size is larger. Will be truncated.");
+      end if ;
+   end LoadBinFile ;
+
 begin
    ProcessCommandLine;
    if Verbose then
@@ -143,6 +186,11 @@ begin
         ("-------------------------------------------------------------------------");
    end if;
    if Length (BinFileName) = 0 then
+      put_line("Need an input binary file name");
+      ShowUsage ;
+      return;
+   end if;
+   if Length (OutputHexFileName) = 0 then
       put_line("Need an Output hex file name");
       ShowUsage ;
       return;
@@ -153,15 +201,19 @@ begin
       ShowUsage ;
       return ;
    end if ;
-   LoadBinFile ;
+
+
+   myprom := Prom_Models.LoadBinFile(To_String(BinFileName),PromSize,WordEraseValue);
 
    if crc16Option or crc32Option then
-      ComputeAndUpdateCRC;
+      Prom_Models.ComputeAndUpdateCRC(myprom,
+                                      computecrc16=> crc16option,
+                                      computecrc32 => crc32option) ;
    end if;
 
 
    if DumpOption then
-      DumpBinFile;
+      Prom_Models.DumpModule(myprom) ;
    end if;
 
    if Length (OutputHexFileName) /= 0 then
