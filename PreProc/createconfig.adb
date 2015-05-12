@@ -18,4 +18,5 @@ begin
 
    ConfigParser.Remove_Option (config, "default", "SectionBracket");
    ConfigParser.Write ("PreProc2.ini", config, False);
+   ConfigParser.Read_File("PreProc.ini" , config ) ;
 end CreateConfig;

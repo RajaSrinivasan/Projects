@@ -1,6 +1,12 @@
 with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 with Ada.Strings.Unbounded.Less_Case_Insensitive;
+with Ada.Strings.Maps; use Ada.Strings.Maps;
+with ada.strings.maps.constants; use ada.strings.maps.constants ;
+
 with Ada.Text_IO; use Ada.Text_IO;
+
+with gnat.spitbol.patterns ; use gnat.spitbol.patterns ;
+
 
 package body ConfigParser is
 
@@ -17,10 +23,61 @@ package body ConfigParser is
    ---------------
    -- Read_File --
    ---------------
+   whitespace : gnat.spitbol.patterns.pattern := gnat.spitbol.patterns.nspan( " " & ascii.ht ) ;
+
+   found_identifier : gnat.spitbol.patterns.VString_Var ;
+   found_letter : gnat.spitbol.patterns.vstring_var ;
+
+   letter : gnat.spitbol.patterns.pattern := gnat.spitbol.patterns.any(Ada.Strings.Maps.Constants.Letter_Set) * found_letter ;
+   Identifier : gnat.spitbol.patterns.pattern := (letter & gnat.spitbol.patterns.span(ada.strings.maps.constants.Alphanumeric_Set)) * found_identifier ;
+
+   found_value : gnat.spitbol.patterns.VString_Var ;
+   values : gnat.spitbol.patterns.pattern := gnat.spitbol.patterns.Rest * found_value ;
+
+   equal : gnat.spitbol.patterns.pattern ;
+
+   found_section : gnat.spitbol.patterns.vstring_var ;
+   section : gnat.spitbol.patterns.pattern :=
+     "[" & Identifier * found_section & "]" ;
+   option : gnat.spitbol.patterns.pattern :=
+     Identifier & whitespace & "=" & whitespace & values ;
 
    procedure Read_File (filename : String; config : in out Config_Type) is
+      cfgfile : ada.text_io.file_type ;
+      textline : string(1..132) ;
+      textlinelen : natural ;
    begin
-      null;
+      gnat.spitbol.patterns.Anchored_Mode := true ;
+      ada.text_io.open(cfgfile,in_file,filename) ;
+      while not end_of_file(cfgfile)
+      loop
+         ada.text_io.get_line(cfgfile,textline,textlinelen) ;
+         if gnat.spitbol.patterns.match(textline(1..textlinelen) , section )
+         then
+            put("Section "); put_line( gnat.spitbol.s(found_section));
+            if Has_Section(config,gnat.spitbol.s(found_section))
+            then
+               put_line("Section already defined");
+            else
+               Add_Section(config,gnat.spitbol.s(found_section)) ;
+            end if ;
+         else
+            if gnat.spitbol.patterns.match(textline(1..textlinelen),option)
+            then
+               put("Option :"); put(gnat.spitbol.s(found_identifier)) ;
+               put(" Value :"); put_line(gnat.spitbol.s(found_value)) ;
+               if Has_Option( config , gnat.spitbol.s(found_section) , gnat.spitbol.s(found_identifier))
+               then
+                  put("Option "); put(gnat.spitbol.s(found_identifier)) ; put_line(" already defined") ;
+               else
+                  add_option( config , gnat.spitbol.s(found_section) ,
+                              gnat.spitbol.s(found_identifier) ,
+                              gnat.spitbol.s(found_value)) ;
+               end if ;
+            end if ;
+         end if ;
+      end loop ;
+      ada.text_Io.close(cfgfile) ;
    end Read_File;
 
    -----------
