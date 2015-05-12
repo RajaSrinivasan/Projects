@@ -221,17 +221,16 @@ package body ConfigParser is
       value   :        String)
    is
       sec  : Sections_Pkg.Cursor := Get (config, section);
-      dict : Dictionary_Pkg.Map  := Sections_Pkg.Element (sec);
+      dictref : Sections_Pkg.Reference_Type :=  Sections_Pkg.Reference(Sections_Pkg.Map(config),sec) ;
    begin
       Put ("Adding option to section ");
       New_Line;
       Dictionary_Pkg.Insert
-        (dict,
+        (dictref,
          To_Unbounded_String (option),
          To_Unbounded_String (value));
-      Sections_Pkg.Replace_Element (Sections_Pkg.Map (config), sec, dict);
       Put ("No of options ");
-      Put (Integer'Image (Integer (Dictionary_Pkg.Length (dict))));
+      Put (Integer'Image (Integer (Dictionary_Pkg.Length (dictref))));
       New_Line;
    end Add_Option;
 
@@ -254,13 +253,11 @@ package body ConfigParser is
       option  :        String)
    is
       sec  : Sections_Pkg.Cursor := Get (config, section);
-      dict : Dictionary_Pkg.Map  := Sections_Pkg.Element (sec);
+      dictref : Sections_Pkg.Reference_Type := Sections_Pkg.Reference( Sections_Pkg.Map(config) , sec ) ;
    begin
       if Has_Option (config, section, option) then
-         Dictionary_Pkg.Delete (dict, To_Unbounded_String (option));
-         Sections_Pkg.Replace_Element (Sections_Pkg.Map (config), sec, dict);
+         Dictionary_Pkg.Delete (dictref, To_Unbounded_String (option));
       end if;
-
    end Remove_Option;
 
    ---------
