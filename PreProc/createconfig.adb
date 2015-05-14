@@ -11,7 +11,6 @@ begin
 
    ConfigParser.Add_Option (config, "default", "CommentLeader", "#");
    ConfigParser.Add_Option (config, "default", "SectionBracket", "[]");
-   ConfigParser.Write ("PreProc.ini", config, True);
 
    Put_Line (ConfigParser.Get (config, "default", "CommentLeader"));
    Put_Line (ConfigParser.Get (config, "default", "SectionBracket"));

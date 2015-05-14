@@ -49,49 +49,87 @@ package body ConfigParser is
    option : GNAT.Spitbol.Patterns.Pattern :=
      Identifier & whitespace & "=" & whitespace & values;
 
+   escapedchar : GNAT.Spitbol.Patterns.VString_Var := GNAT.Spitbol.V ("\#");
+   escaped     : GNAT.Spitbol.Patterns.Pattern     := +escapedchar;
+
    procedure Read_File (filename : String; config : in out Config_Type) is
       cfgfile     : Ada.Text_IO.File_Type;
       textline    : String (1 .. 132);
       textlinelen : Natural;
+
+      commentmatch : GNAT.Spitbol.Patterns.Match_Result_Var;
+      templine     : GNAT.Spitbol.Patterns.VString_Var;
+
+      procedure StripComments is
+         chptr : Integer := 1;
+      begin
+         while chptr <= textlinelen loop
+            case textline (chptr) is
+               when '"' =>
+                  while chptr <= textlinelen loop
+                     if textline (chptr) = '"' then
+                        exit;
+                     end if;
+                  end loop;
+               when '#' =>
+                  Put_Line ("Stripping Comments");
+                  Put_Line (textline (chptr .. textlinelen));
+                  textlinelen := chptr - 1;
+                  exit;
+               when '\' =>
+                  if chptr = textlinelen then
+                     exit;
+                  end if;
+                  chptr := chptr + 2;
+               when others =>
+                  chptr := chptr + 1;
+            end case;
+         end loop;
+      end StripComments;
+
    begin
+
       GNAT.Spitbol.Patterns.Anchored_Mode := True;
       Ada.Text_IO.Open (cfgfile, In_File, filename);
       while not End_Of_File (cfgfile) loop
          Ada.Text_IO.Get_Line (cfgfile, textline, textlinelen);
-         if GNAT.Spitbol.Patterns.Match
-             (textline (1 .. textlinelen),
-              section)
-         then
-            Put ("Section ");
-            Put_Line (GNAT.Spitbol.S (found_section));
-            if Has_Section (config, GNAT.Spitbol.S (found_section)) then
-               Put_Line ("Section already defined");
-            else
-               Add_Section (config, GNAT.Spitbol.S (found_section));
-            end if;
-         else
-            if GNAT.Spitbol.Patterns.Match
-                (textline (1 .. textlinelen),
-                 option)
-            then
-               Put ("Option :");
-               Put (GNAT.Spitbol.S (found_identifier));
-               Put (" Value :");
-               Put_Line (GNAT.Spitbol.S (found_value));
-               if Has_Option
-                   (config,
-                    GNAT.Spitbol.S (found_section),
-                    GNAT.Spitbol.S (found_identifier))
-               then
-                  Put ("Option ");
-                  Put (GNAT.Spitbol.S (found_identifier));
-                  Put_Line (" already defined");
+         StripComments;
+         if textlinelen > 0 then
+            templine := GNAT.Spitbol.V (textline (1 .. textlinelen));
+
+            if GNAT.Spitbol.Patterns.Match (templine, section) then
+               Put ("Section ");
+               Put_Line (GNAT.Spitbol.S (found_section));
+               if Has_Section (config, GNAT.Spitbol.S (found_section)) then
+                  Put_Line ("Section already defined");
                else
-                  Add_Option
-                    (config,
-                     GNAT.Spitbol.S (found_section),
-                     GNAT.Spitbol.S (found_identifier),
-                     GNAT.Spitbol.S (found_value));
+                  Add_Section (config, GNAT.Spitbol.S (found_section));
+               end if;
+            else
+               if GNAT.Spitbol.Patterns.Match
+                   (textline (1 .. textlinelen),
+                    option)
+               then
+                  Put ("Option :");
+                  Put (GNAT.Spitbol.S (found_identifier));
+                  Put (" Value :");
+                  Put_Line (GNAT.Spitbol.S (found_value));
+                  GNAT.Spitbol.Patterns.Match (found_value, escaped, "#");
+                  if Has_Option
+                      (config,
+                       GNAT.Spitbol.S (found_section),
+                       GNAT.Spitbol.S (found_identifier))
+                  then
+                     Put ("Option ");
+                     Put (GNAT.Spitbol.S (found_identifier));
+                     Put_Line (" already defined");
+                  else
+                     Add_Option
+                       (config,
+                        GNAT.Spitbol.S (found_section),
+                        GNAT.Spitbol.S (found_identifier),
+                        GNAT.Spitbol.S (found_value));
+                  end if;
                end if;
             end if;
          end if;
@@ -220,8 +258,9 @@ package body ConfigParser is
       option  :        String;
       value   :        String)
    is
-      sec  : Sections_Pkg.Cursor := Get (config, section);
-      dictref : Sections_Pkg.Reference_Type :=  Sections_Pkg.Reference(Sections_Pkg.Map(config),sec) ;
+      sec     : Sections_Pkg.Cursor         := Get (config, section);
+      dictref : Sections_Pkg.Reference_Type :=
+        Sections_Pkg.Reference (Sections_Pkg.Map (config), sec);
    begin
       Put ("Adding option to section ");
       New_Line;
@@ -252,8 +291,9 @@ package body ConfigParser is
       section :        String;
       option  :        String)
    is
-      sec  : Sections_Pkg.Cursor := Get (config, section);
-      dictref : Sections_Pkg.Reference_Type := Sections_Pkg.Reference( Sections_Pkg.Map(config) , sec ) ;
+      sec     : Sections_Pkg.Cursor         := Get (config, section);
+      dictref : Sections_Pkg.Reference_Type :=
+        Sections_Pkg.Reference (Sections_Pkg.Map (config), sec);
    begin
       if Has_Option (config, section, option) then
          Dictionary_Pkg.Delete (dictref, To_Unbounded_String (option));
