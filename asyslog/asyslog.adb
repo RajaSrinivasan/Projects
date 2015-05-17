@@ -1,6 +1,7 @@
 with logging.client ;
 procedure asyslog is
 begin
+   logging.SelfTest ;
    logging.RegisterAll("Loggers.txt");
 
    logging.client.SetSource("One") ;
@@ -10,6 +11,7 @@ begin
    logging.client.log(logging.INFORMATIONAL,"Message 4") ;
    logging.client.log(logging.WARNING,"Message 5") ;
 
+   logging.client.SetDestination( Logging.client.Create("asyslog.log") ) ;
    logging.client.SetSource("Two") ;
    logging.client.SetFilter( logging.ERROR ) ;
    logging.client.log(logging.WARNING,"Message 1","C") ;

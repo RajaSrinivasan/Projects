@@ -79,4 +79,16 @@ package body logging is
       return Sources_Pkg.To_Index (cursor);
    end Get;
 
+   procedure SelfTest is
+      timenow : aliased timeval_type;
+   begin
+      for i in 1 .. 10 loop
+         GetClock (timenow'Access);
+         Put_Line
+           (Interfaces.C.Strings.Value
+              (Interfaces.C.Strings.To_Chars_Ptr
+                 (Printable (timenow'Access))));
+      end loop;
+   end SelfTest;
+
 end logging;
