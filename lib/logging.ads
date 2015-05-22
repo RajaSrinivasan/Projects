@@ -38,6 +38,7 @@ package logging is
       message    : String (1 .. MAX_MESSAGE_LENGTH);
    end record;
 
+   function Image (packet : LogPacket_Type) return String ;
    type timeval_type is record
       tv_sec  : Interfaces.C.long;
       tv_usec : Interfaces.C.long;

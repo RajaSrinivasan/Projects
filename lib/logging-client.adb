@@ -46,6 +46,38 @@ package body logging.client is
       SendMessage (Current_Destination.all, pkt);
    end log;
 
+   function Create(ipaddress : string ;
+                   port : integer )
+                   return DatagramDestinationAccess_Type is
+      newserver : DatagramDestinationAccess_Type := new DatagramDestination_Type ;
+   begin
+      newserver.server.Addr := gnat.sockets.Inet_Addr( ipaddress ) ;
+      newserver.server.port := gnat.sockets.port_type(port) ;
+      gnat.sockets.create_socket(  newserver.mysocket , mode => gnat.sockets.Socket_Datagram ) ;
+
+      return newserver ;
+   end Create ;
+
+   procedure SendMessage
+     (destination : DatagramDestination_Type;
+      packet      : LogPacket_Type) is
+      img : string := Image(packet) ;
+      imgbytes : Ada.Streams.Stream_Element_Array(1..img'length) ;
+      for imgbytes'address use img'address ;
+      actualsent : ada.streams.Stream_Element_Offset ;
+   begin
+      gnat.sockets.send_socket( destination.mysocket , imgbytes , actualsent , destination.server ) ;
+      if actualsent /= img'length
+      then
+         raise Program_Error with "message truncation" ;
+      else
+         put_line("Message sent");
+      end if ;
+   exception
+      when others =>
+         put_line("Exception sending a log message to a socket");
+   end SendMessage ;
+
 begin
    SetDestination (new StdOutDestination_Type);
 end logging.client;
