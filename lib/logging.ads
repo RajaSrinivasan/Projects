@@ -3,6 +3,10 @@ with System.Storage_Elements;
 with Interfaces.C;
 with Interfaces.C.Strings;
 
+with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
+with Ada.Strings.Fixed;
+with Ada.Streams;              use Ada.Streams;
+
 package logging is
 
    subtype message_level_type is Natural;
@@ -22,11 +26,12 @@ package logging is
    Default_Message_Class : Message_Class_Type := (others => '.');
 
    MAX_MESSAGE_LENGTH : constant := 132;
-   type LogPacketHdr_Type is tagged record
+   type LogPacketHdr_Type is record
       source : Source_type;
    end record;
 
-   type LogPacket_Type is new LogPacketHdr_Type with record
+   type LogPacket_Type is record
+      hdr        : LogPacketHdr_Type;
       level      : message_level_type;
       class      : Message_Class_Type;
       MessageLen : Natural;
@@ -47,7 +52,8 @@ package logging is
    pragma Import (C, Printable, "Printable");
 
    MAX_BINARY_RECORD_LENGTH : constant := 256;
-   type BinaryPacket_Type is new LogPacketHdr_Type with record
+   type BinaryPacket_Type is record
+      hdr       : LogPacketHdr_Type;
       timestamp : timeval_type;
       RecordLen : Integer;
       data      : System.Storage_Elements
@@ -55,5 +61,34 @@ package logging is
       (1 .. MAX_BINARY_RECORD_LENGTH);
    end record;
 
+   type Destination_Type is abstract tagged record
+      null;
+   end record;
+
+   procedure SendMessage
+     (destination : Destination_Type;
+      packet      : LogPacket_Type) is abstract;
+   type Destination_Access_Type is access all Destination_Type'Class;
+
+   type StdOutDestination_Type is new Destination_Type with record
+      null;
+   end record;
+
+   type TextFileDestination_Type is new Destination_Type with record
+      logfile : Stream_Access;
+   end record;
+   type TextFileDestinationAccess_Type is access all TextFileDestination_Type;
+
+   function Create (name : String) return TextFileDestinationAccess_Type ;
+
    procedure SelfTest;
+
+private
+   procedure SendMessage
+     (destination : StdOutDestination_Type;
+      packet      : LogPacket_Type);
+   procedure SendMessage
+     (destination : TextFileDestination_Type;
+      packet      : LogPacket_Type);
+
 end logging;

@@ -1,7 +1,10 @@
-with Ada.Text_IO;           use Ada.Text_IO;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO;              use Ada.Text_IO;
+with Ada.Strings.Unbounded;    use Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
-
+with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
+with Ada.Strings.Fixed;
+with Ada.Streams;              use Ada.Streams;
+with GNAT.Time_Stamp;
 package body logging is
 
    package Sources_Pkg is new Ada.Containers.Vectors
@@ -78,6 +81,52 @@ package body logging is
       end if;
       return Sources_Pkg.To_Index (cursor);
    end Get;
+
+   function Image (packet : LogPacket_Type) return String is
+      destline : constant String :=
+        GNAT.Time_Stamp.Current_Time &
+        " " &
+        Get (packet.hdr.source) &
+        "> " &
+        packet.class &
+        "> " &
+        Image (packet.level) &
+        " " &
+        packet.message (1 .. packet.MessageLen);
+   begin
+      return destline;
+   end Image;
+
+   function Create (name : String) return TextFileDestinationAccess_Type is
+      txtdest : TextFileDestinationAccess_Type := new TextFileDestination_Type;
+      txtfile : Ada.Text_IO.File_Type;
+   begin
+      Create (txtfile, Out_File, name);
+      TextFileDestination_Type (txtdest.all).logfile :=
+        Ada.Text_IO.Text_Streams.Stream (txtfile);
+      return txtdest;
+   end Create;
+
+   procedure SendMessage
+     (destination : StdOutDestination_Type;
+      packet      : LogPacket_Type)
+   is
+   begin
+      Put_Line (Image (packet));
+   end SendMessage;
+
+   procedure SendMessage
+     (destination : TextFileDestination_Type;
+      packet      : LogPacket_Type)
+   is
+      towrite    : String := Image (packet) & ASCII.LF;
+      towritemem : Ada.Streams
+        .Stream_Element_Array
+      (1 .. Stream_Element_Offset (towrite'Length));
+      for towritemem'Address use towrite'Address;
+   begin
+      Ada.Streams.Write (destination.logfile.all, towritemem);
+   end SendMessage;
 
    procedure SelfTest is
       timenow : aliased timeval_type;
