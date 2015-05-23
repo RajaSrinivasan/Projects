@@ -4,7 +4,11 @@ with Ada.Containers.Vectors;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
 with Ada.Strings.Fixed;
 with Ada.Streams;              use Ada.Streams;
+with Ada.Calendar ;            use Ada.Calendar ;
+with Ada.Calendar.Formatting ; use Ada.Calendar.Formatting ;
+
 with GNAT.Time_Stamp;
+
 package body logging is
 
    package Sources_Pkg is new Ada.Containers.Vectors
@@ -84,7 +88,7 @@ package body logging is
 
    function Image (packet : LogPacket_Type) return String is
       destline : constant String :=
-        GNAT.Time_Stamp.Current_Time &
+        Ada.Calendar.Formatting.Image( Ada.Calendar.Clock ) &
         " " &
         Get (packet.hdr.source) &
         "> " &
@@ -129,14 +133,10 @@ package body logging is
    end SendMessage;
 
    procedure SelfTest is
-      timenow : aliased timeval_type;
    begin
       for i in 1 .. 10 loop
-         GetClock (timenow'Access);
-         Put_Line
-           (Interfaces.C.Strings.Value
-              (Interfaces.C.Strings.To_Chars_Ptr
-                 (Printable (timenow'Access))));
+         put_line(Ada.Calendar.Formatting.Image(Ada.CAlendar.Clock)) ;
+         delay 0.5 ;
       end loop;
    end SelfTest;
 

@@ -3,6 +3,7 @@ with System.Storage_Elements;
 with Interfaces.C;
 with Interfaces.C.Strings;
 
+with Ada.Calendar ;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
 with Ada.Strings.Fixed;
 with Ada.Streams;              use Ada.Streams;
@@ -39,23 +40,11 @@ package logging is
    end record;
 
    function Image (packet : LogPacket_Type) return String ;
-   type timeval_type is record
-      tv_sec  : Interfaces.C.long;
-      tv_usec : Interfaces.C.long;
-   end record;
-   pragma Convention (C, timeval_type);
-   procedure GetClock (tv : not null access timeval_type);
-   pragma Import (C, GetClock, "GetClock");
-
-   function Printable
-     (tv : not null access timeval_type)
-      return Interfaces.C.Strings.char_array_access;
-   pragma Import (C, Printable, "Printable");
 
    MAX_BINARY_RECORD_LENGTH : constant := 256;
    type BinaryPacket_Type is record
       hdr       : LogPacketHdr_Type;
-      timestamp : timeval_type;
+      timestamp : Ada.Calendar.Time ;
       RecordLen : Integer;
       data      : System.Storage_Elements
         .Storage_Array
