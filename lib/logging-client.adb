@@ -61,13 +61,14 @@ package body logging.client is
    procedure SendMessage
      (destination : DatagramDestination_Type;
       packet      : LogPacket_Type) is
-      img : string := Image(packet) ;
-      imgbytes : Ada.Streams.Stream_Element_Array(1..img'length) ;
-      for imgbytes'address use img'address ;
-      actualsent : ada.streams.Stream_Element_Offset ;
+
+      imgbytes : Ada.Streams.Stream_Element_Array(1..packet'Size/8) ;
+      for imgbytes'address use packet'address ;
+      actualsize, actualsent : ada.streams.Stream_Element_Offset ;
    begin
-      gnat.sockets.send_socket( destination.mysocket , imgbytes , actualsent , destination.server ) ;
-      if actualsent /= img'length
+      actualsize := Stream_Element_Offset(imgbytes'length - MAX_MESSAGE_LENGTH + packet.MessageLen) ;
+      gnat.sockets.send_socket( destination.mysocket , imgbytes(1..actualsize) , actualsent , destination.server ) ;
+      if actualsent /= actualsize
       then
          raise Program_Error with "message truncation" ;
       else
