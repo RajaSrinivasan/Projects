@@ -19,3 +19,5 @@ ihbff/build/ihbranalyze
 *.out
 *.ini
 *.xml
+
+*.log
