@@ -3,6 +3,8 @@ with Ada.Strings.Unbounded;    use Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
 with Ada.Strings.Fixed;
+with ada.strings.maps ;
+
 with Ada.Streams;              use Ada.Streams;
 with Ada.Calendar ;            use Ada.Calendar ;
 with Ada.Calendar.Formatting ; use Ada.Calendar.Formatting ;
@@ -11,10 +13,33 @@ with GNAT.Time_Stamp;
 
 package body logging is
 
+   procedure SetDestination (destination : Destination_Access_Type) is
+   begin
+      Current_Destination := destination;
+   end SetDestination;
+
    package Sources_Pkg is new Ada.Containers.Vectors
      (Source_type,
       Unbounded_String);
    registered_sources : Sources_Pkg.Vector;
+
+   function Time_Stamp return String is
+      ts : unbounded_string
+        := To_Unbounded_String( gnat.Time_Stamp.Current_Time ) ;
+      pos : natural := 0 ;
+      removeset : ada.strings.maps.Character_Set ;
+   begin
+      removeset := ada.strings.maps.To_Set("-:. ");
+      loop
+         pos := ada.strings.unbounded.index( ts , removeset ) ;
+         if pos = 0
+         then
+            exit ;
+         end if ;
+         ada.strings.unbounded.Delete( ts , pos , pos ) ;
+      end loop ;
+      return to_string(ts) ;
+   end Time_Stamp ;
 
    function Image (level : message_level_type) return String is
    begin
@@ -88,7 +113,7 @@ package body logging is
 
    function Image (packet : LogPacket_Type) return String is
       destline : constant String :=
-        Ada.Calendar.Formatting.Image( Ada.Calendar.Clock ) &
+        gnat.Time_Stamp.Current_Time &
         " " &
         Get (packet.hdr.source) &
         "> " &
@@ -105,11 +130,14 @@ package body logging is
       txtdest : TextFileDestinationAccess_Type := new TextFileDestination_Type;
       txtfile : Ada.Text_IO.File_Type;
    begin
-      Create (txtfile, Out_File, name);
-      TextFileDestination_Type (txtdest.all).logfile :=
-        Ada.Text_IO.Text_Streams.Stream (txtfile);
+      txtdest.logfile := new Ada.Text_IO.File_Type ;
+      Ada.Text_Io.Create (txtdest.logfile.all , Out_File, name);
       return txtdest;
    end Create;
+   procedure Close(dest : TextFileDestinationAccess_Type) is
+   begin
+      Ada.Text_IO.Close( dest.logfile.all ) ;
+   end Close ;
 
    procedure SendMessage
      (destination : StdOutDestination_Type;
@@ -123,13 +151,10 @@ package body logging is
      (destination : TextFileDestination_Type;
       packet      : LogPacket_Type)
    is
-      towrite    : String := Image (packet) & ASCII.LF;
-      towritemem : Ada.Streams
-        .Stream_Element_Array
-      (1 .. Stream_Element_Offset (towrite'Length));
-      for towritemem'Address use towrite'Address;
+      towrite    : String := Image (packet) ;
    begin
-      Ada.Streams.Write (destination.logfile.all, towritemem);
+      Ada.Text_Io.Put_Line(destination.logfile.all, towrite) ;
+      Ada.Text_Io.Flush(destination.logfile.all);
    end SendMessage;
 
    procedure SelfTest is

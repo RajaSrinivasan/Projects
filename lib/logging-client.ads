@@ -4,8 +4,6 @@ with gnat.sockets ;
 
 package logging.client is
 
-   procedure SetDestination (destination : Destination_Access_Type);
-
    procedure SetSource (name : String);
    procedure SetFilter (max : message_level_type);
    procedure log

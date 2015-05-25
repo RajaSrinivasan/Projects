@@ -2,6 +2,8 @@ with calendar ;
 with ada.strings.unbounded ; use ada.strings.unbounded ;
 
 package logging.server is
+
+   procedure SetSource (source : Source_type);
    task type LogServer_Type is
       entry Initialize( port : integer ;
                         logdir : string ;

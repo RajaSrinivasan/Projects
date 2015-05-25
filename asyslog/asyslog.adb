@@ -13,7 +13,7 @@ begin
    logging.client.log(logging.INFORMATIONAL,"Message 4") ;
    logging.client.log(logging.WARNING,"Message 5") ;
 
-   logging.client.SetDestination( Destination_Access_Type(Logging.Create("asyslog.log") ) ) ;
+   logging.SetDestination( Destination_Access_Type(Logging.Create("asyslog.log") ) ) ;
    logging.client.SetSource("Two") ;
    logging.client.SetFilter( logging.ERROR ) ;
    logging.client.log(logging.WARNING,"Message 1","C") ;
@@ -23,14 +23,17 @@ begin
    logging.client.log(logging.WARNING,"Message 5") ;
 
 
-   logging.client.SetDestination( Destination_Access_Type(Logging.client.Create("192.168.1.5",8689) ) ) ;
+   logging.SetDestination( Destination_Access_Type(Logging.client.Create("192.168.1.5",8689) ) ) ;
 
    logging.client.SetSource("Two") ;
    logging.client.SetFilter( logging.ERROR ) ;
-   logging.client.log(logging.WARNING,"Message 1","C") ;
-   logging.client.log(logging.CRITICAL,"Message 2","CL") ;
-   logging.client.log(logging.ERROR,"Message 3","CLASS 1") ;
-   logging.client.log(logging.INFORMATIONAL,"Message 4","CLASS123") ;
-   logging.client.log(logging.WARNING,"Message 5") ;
-
+   for i in 1..10
+   loop
+      logging.client.log(logging.WARNING,"Message 1","C") ;
+      logging.client.log(logging.CRITICAL,"Critical Message " & integer'image(i) ,"CL") ;
+      logging.client.log(logging.ERROR,"Error Message " & integer'image(i) ,"CLASS 1") ;
+      logging.client.log(logging.INFORMATIONAL,"Message 4","CLASS123") ;
+      logging.client.log(logging.WARNING,"Message 5") ;
+      delay 0.1 ;
+   end loop;
 end asyslog ;

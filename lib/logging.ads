@@ -4,6 +4,7 @@ with Interfaces.C;
 with Interfaces.C.Strings;
 
 with Ada.Calendar ;
+with Ada.Text_io ; use Ada.Text_Io ;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
 with Ada.Strings.Fixed;
 with Ada.Streams;              use Ada.Streams;
@@ -38,7 +39,7 @@ package logging is
       MessageLen : Natural;
       message    : String (1 .. MAX_MESSAGE_LENGTH);
    end record;
-
+   function Time_Stamp return String ;
    function Image (packet : LogPacket_Type) return String ;
 
    MAX_BINARY_RECORD_LENGTH : constant := 256;
@@ -55,21 +56,24 @@ package logging is
       null;
    end record;
 
+
    procedure SendMessage
      (destination : Destination_Type;
       packet      : LogPacket_Type) is abstract;
    type Destination_Access_Type is access all Destination_Type'Class;
+   procedure SetDestination (destination : Destination_Access_Type);
 
    type StdOutDestination_Type is new Destination_Type with record
       null;
    end record;
 
    type TextFileDestination_Type is new Destination_Type with record
-      logfile : Stream_Access;
+      logfile : access Ada.text_io.file_type ;
    end record;
    type TextFileDestinationAccess_Type is access all TextFileDestination_Type;
 
    function Create (name : String) return TextFileDestinationAccess_Type ;
+   procedure Close(dest : TextFileDestinationAccess_Type) ;
 
    procedure SelfTest;
 
@@ -81,4 +85,6 @@ private
      (destination : TextFileDestination_Type;
       packet      : LogPacket_Type);
 
+   Current_Destination : Destination_Access_Type;
+   Current_Source            : Source_type        := Source_type'First;
 end logging;

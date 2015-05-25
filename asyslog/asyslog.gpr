@@ -6,7 +6,6 @@ project Asyslog is
    for Languages use ("Ada", "C");
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnata");
    end Compiler;
 
 end Asyslog;

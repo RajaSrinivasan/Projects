@@ -4,15 +4,8 @@ with GNAT.Time_Stamp;
 
 package body logging.client is
 
-   Current_Destination : Destination_Access_Type;
-
-   Current_Source            : Source_type        := Source_type'First;
    Current_Max_Message_Level : message_level_type := message_level_type'Last;
 
-   procedure SetDestination (destination : Destination_Access_Type) is
-   begin
-      Current_Destination := destination;
-   end SetDestination;
 
    procedure SetSource (name : String) is
    begin
@@ -43,7 +36,7 @@ package body logging.client is
       Ada.Strings.Fixed.Move (class, pkt.class, Ada.Strings.Right);
       pkt.MessageLen                    := message'Length;
       pkt.message (1 .. pkt.MessageLen) := message;
-      SendMessage (Current_Destination.all, pkt);
+      SendMessage (Current_Destination.all , pkt);
    end log;
 
    function Create(ipaddress : string ;
@@ -54,25 +47,25 @@ package body logging.client is
       newserver.server.Addr := gnat.sockets.Inet_Addr( ipaddress ) ;
       newserver.server.port := gnat.sockets.port_type(port) ;
       gnat.sockets.create_socket(  newserver.mysocket , mode => gnat.sockets.Socket_Datagram ) ;
-
       return newserver ;
    end Create ;
 
    procedure SendMessage
      (destination : DatagramDestination_Type;
       packet      : LogPacket_Type) is
-
+      sendpacket : LogPacket_Type := packet ;
       imgbytes : Ada.Streams.Stream_Element_Array(1..packet'Size/8) ;
-      for imgbytes'address use packet'address ;
+      for imgbytes'address use sendpacket'address ;
       actualsize, actualsent : ada.streams.Stream_Element_Offset ;
    begin
+      sendpacket.hdr.source := Current_Source ;
       actualsize := Stream_Element_Offset(imgbytes'length - MAX_MESSAGE_LENGTH + packet.MessageLen) ;
       gnat.sockets.send_socket( destination.mysocket , imgbytes(1..actualsize) , actualsent , destination.server ) ;
       if actualsent /= actualsize
       then
          raise Program_Error with "message truncation" ;
       else
-         put_line("Message sent");
+         put_line("Sent " & sendpacket.message(1..sendpacket.messageLen));
       end if ;
    exception
       when others =>
