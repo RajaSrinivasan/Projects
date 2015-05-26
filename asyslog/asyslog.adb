@@ -23,7 +23,7 @@ begin
    logging.client.log(logging.WARNING,"Message 5") ;
 
 
-   logging.SetDestination( Destination_Access_Type(Logging.client.Create("192.168.1.5",8689) ) ) ;
+   logging.SetDestination( Destination_Access_Type(Logging.client.Create("localhost",8689) ) ) ;
 
    logging.client.SetSource("Two") ;
    logging.client.SetFilter( logging.ERROR ) ;

@@ -1,5 +1,5 @@
 with Ada.Text_IO; use Ada.Text_IO;
-
+with Ada.Exceptions ;
 with GNAT.Time_Stamp;
 
 package body logging.client is
@@ -43,11 +43,18 @@ package body logging.client is
                    port : integer )
                    return DatagramDestinationAccess_Type is
       newserver : DatagramDestinationAccess_Type := new DatagramDestination_Type ;
+      he : gnat.Sockets.Host_Entry_Type  := gnat.sockets.Get_Host_By_Name( ipaddress ) ;
    begin
-      newserver.server.Addr := gnat.sockets.Inet_Addr( ipaddress ) ;
+      newserver.server.Addr := gnat.sockets.addresses(he) ;
       newserver.server.port := gnat.sockets.port_type(port) ;
       gnat.sockets.create_socket(  newserver.mysocket , mode => gnat.sockets.Socket_Datagram ) ;
       return newserver ;
+   exception
+         when Error : others =>
+            Ada.Text_IO.Put("Exception: ");
+            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
+         Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
+         raise ;
    end Create ;
 
    procedure SendMessage
@@ -68,8 +75,10 @@ package body logging.client is
          put_line("Sent " & sendpacket.message(1..sendpacket.messageLen));
       end if ;
    exception
-      when others =>
-         put_line("Exception sending a log message to a socket");
+         when Error : others =>
+            Ada.Text_IO.Put("Exception: ");
+            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
+            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
    end SendMessage ;
 
 begin
