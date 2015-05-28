@@ -39,15 +39,18 @@ package body logging.client is
       SendMessage (Current_Destination.all , pkt);
    end log;
 
-   function Create(ipaddress : string ;
+   function Create(host : string ;
                    port : integer )
                    return DatagramDestinationAccess_Type is
       newserver : DatagramDestinationAccess_Type := new DatagramDestination_Type ;
-      he : gnat.Sockets.Host_Entry_Type  := gnat.sockets.Get_Host_By_Name( ipaddress ) ;
+      he : gnat.Sockets.Host_Entry_Type  := gnat.sockets.Get_Host_By_Name( host ) ;
+      bufsize : gnat.sockets.option_type(gnat.sockets.Send_Buffer) ;
    begin
       newserver.server.Addr := gnat.sockets.addresses(he) ;
       newserver.server.port := gnat.sockets.port_type(port) ;
       gnat.sockets.create_socket(  newserver.mysocket , mode => gnat.sockets.Socket_Datagram ) ;
+      bufsize.Size := 1024*1024 ;
+      gnat.sockets.Set_Socket_Option( newserver.mysocket , option => bufsize ) ;
       return newserver ;
    exception
          when Error : others =>

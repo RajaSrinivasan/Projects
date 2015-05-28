@@ -1,6 +1,7 @@
 project Striptabs is
 
-   for Object_Dir use "build";
+   for Object_Dir use "../build";
+   for Main use ("striptabs.adb");
 
    package Ide is
       for Vcs_Kind use "Git";
@@ -13,8 +14,6 @@ project Striptabs is
    package Compiler is
       for Default_Switches ("ada") use ("-O3", "-gnatf");
    end Compiler;
-
-   for Main use ("striptabs.adb");
 
 end Striptabs;
 

@@ -31,8 +31,9 @@ begin
    loop
       logging.client.log(logging.WARNING,"Message 1","C") ;
       logging.client.log(logging.CRITICAL,"Critical Message " & integer'image(i) ,"CL") ;
-      logging.client.log(logging.ERROR,"Error Message " & integer'image(i) ,"CLASS 1") ;
+      delay 0.1 ;
       logging.client.log(logging.INFORMATIONAL,"Message 4","CLASS123") ;
+      logging.client.log(logging.ERROR,"Error Message " & integer'image(i) ,"CLASS 1") ;
       logging.client.log(logging.WARNING,"Message 5") ;
       delay 0.1 ;
    end loop;

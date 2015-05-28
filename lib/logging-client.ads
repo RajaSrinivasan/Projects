@@ -18,7 +18,7 @@ package logging.client is
       end record ;
    type DatagramDestinationAccess_Type is access all DatagramDestination_Type ;
 
-   function Create(ipaddress : string ;
+   function Create(host : string ;
                    port : integer )
                    return DatagramDestinationAccess_Type ;
 
