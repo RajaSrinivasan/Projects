@@ -1,5 +1,5 @@
 
-with logging.client ;
+with logging.client.stream ;
 procedure asyslog is
    use logging ;
 begin
@@ -23,7 +23,7 @@ begin
    logging.client.log(logging.WARNING,"Message 5") ;
 
 
-   logging.SetDestination( Destination_Access_Type(Logging.client.Create("localhost",8689) ) ) ;
+   logging.SetDestination( Destination_Access_Type(Logging.client.stream.Create("localhost",8689) ) ) ;
 
    logging.client.SetSource("Two") ;
    logging.client.SetFilter( logging.ERROR ) ;
@@ -37,4 +37,5 @@ begin
       logging.client.log(logging.WARNING,"Message 5") ;
       delay 0.1 ;
    end loop;
+   delay 15.0 ;
 end asyslog ;
