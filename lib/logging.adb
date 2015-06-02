@@ -105,9 +105,10 @@ package body logging is
       cursor :=
         Sources_Pkg.Find (registered_sources, To_Unbounded_String (name));
       if cursor = Sources_Pkg.No_Element then
-         pragma Debug (Put_Line ("Did not find source " & name));
+         Put_Line ("Did not find source " & name);
          return Source_type'Last;
       end if;
+      Put_Line("Found the source " & Name);
       return Sources_Pkg.To_Index (cursor);
    end Get;
 

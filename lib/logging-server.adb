@@ -59,8 +59,8 @@ package body logging.server is
    begin
 
          accept Initialize( port : integer ;
-                         logdir : string ;
-                         logfileid : string )
+                            logdir : string ;
+                            logfileid : string )
          do
             gnat.sockets.Create_Socket(mysocket,mode=>gnat.sockets.Socket_Datagram) ;
             myaddr.Addr := gnat.sockets.Any_Inet_Addr ;
@@ -148,6 +148,11 @@ package body logging.server is
             end ;
          end select ;
       end loop ;
+   exception
+         when Error : others =>
+            Ada.Text_IO.Put("Exception: ");
+            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
+            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
    end LogStreamServer_Type ;
 
    ClientExited : exception ;
@@ -190,6 +195,7 @@ package body logging.server is
             Receive_Bytes( streamlog.Size'Address , streamlog.Size'size/8 ) ;
             Receive_Bytes( streamlog.pkt'Address , integer(streamlog.size) ) ;
             pragma Debug(put_line("Message received. Size " & short_integer'image(streamlog.size) ));
+	    Logging.Server.SetSource( Streamlog.Pkt.Hdr.Source );
             logging.client.Log( streamlog.Pkt.level , streamlog.Pkt.message(1..streamlog.Pkt.MessageLen) , streamlog.Pkt.class ) ;
          end loop ;
       exception

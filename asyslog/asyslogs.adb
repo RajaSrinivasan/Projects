@@ -11,10 +11,13 @@ begin
    logging.RegisterAll("Loggers.txt") ;
    if ada.command_line.Argument_Count >= 1
    then
-      logging.server.LogStreamServer.Initialize( 8689 , gnat.Directory_Operations.Get_Current_Dir , "oplog.log" ) ;
+      Put_Line("Starting a stream socket server");
+      logging.server.LogStreamServer.Initialize( 8986 , gnat.Directory_Operations.Get_Current_Dir , "oplog.log" ) ;
    else
+      Put_Line("Starting a Datagram socket server");
       logging.server.LogDatagramServer.Initialize( 8689 , gnat.Directory_Operations.Get_Current_Dir , "oplog.log" ) ;
    end if ;
+   Put_Line("Will now periodically change the log file name");
    for i in 1..10
    loop
       delay 10.0 * 60.0 ;
