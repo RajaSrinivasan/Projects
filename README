@@ -1,1 +1,8 @@
 Top Level Dir for my projects
+
+striptabs - replace tabs with spaces.
+PreProc   - preprocessor
+asyslog   - Logger for messages and binary data
+ihbff     - intel hex binary file format utilities ahex2bin, abin2hex ...
+
+
