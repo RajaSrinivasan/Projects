@@ -19,4 +19,8 @@ private
    procedure SendMessage
      (destination : StreamDestination_Type;
       packet      : LogPacket_Type);
+   procedure SendRecord
+     (Destination : StreamDestination_Type;
+      Packet      : BinaryPacket_Type) ;
+
 end logging.client.stream ;

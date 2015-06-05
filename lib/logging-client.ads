@@ -26,4 +26,7 @@ private
    procedure SendMessage
      (destination : DatagramDestination_Type;
       packet      : LogPacket_Type);
+   procedure SendRecord
+     (Destination : DatagramDestination_Type;
+      Packet      : BinaryPacket_Type) ;   
 end logging.client;
