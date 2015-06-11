@@ -83,6 +83,10 @@ package body logging.client is
             Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
             Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
    end SendMessage ;
+   procedure Close(destination : in out DatagramDestination_Type) is
+   begin
+      gnat.sockets.Close_Socket(destination.mysocket) ;
+   end Close ;
 
 begin
    SetDestination (new StdOutDestination_Type);

@@ -19,4 +19,5 @@ private
    procedure SendMessage
      (destination : StreamDestination_Type;
       packet      : LogPacket_Type);
+   procedure Close( destination : in out StreamDestination_Type) ;
 end logging.client.stream ;

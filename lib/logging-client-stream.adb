@@ -22,8 +22,7 @@ package body logging.client.stream is
          Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
          raise ;
    end Create;
-
-   -----------------
+ -----------------
    -- SendMessage --
    -----------------
    streamlog : StreamLogPacket_Type ;
@@ -57,5 +56,9 @@ package body logging.client.stream is
          Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
          raise ;
    end SendMessage;
+   procedure Close( destination : in out StreamDestination_Type) is
+   begin
+      gnat.sockets.close_socket(destination.mysocket) ;
+   end Close ;
 
 end logging.client.stream;

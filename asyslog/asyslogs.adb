@@ -5,6 +5,8 @@ with logging.server ;
 with ada.command_line ;
 with gnat.Directory_Operations ;
 
+with zlib ;
+
 procedure asyslogs is
    nextlog : unbounded_string ;
 begin
@@ -20,8 +22,8 @@ begin
    Put_Line("Will now periodically change the log file name");
    for i in 1..10
    loop
-      delay 10.0 * 60.0 ;
+      delay 1.0 * 60.0 ;
       logging.server.LogStreamServer.StartNewLog(nextlog) ;
-      put("New File "); put_line(to_string(nextlog)) ;
+      put("Old Log file "); put_line(to_string(nextlog)) ;
    end loop ;
 end asyslogs ;

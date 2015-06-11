@@ -60,6 +60,8 @@ package logging is
    procedure SendMessage
      (destination : Destination_Type;
       packet      : LogPacket_Type) is abstract;
+   procedure Close(destination : in out Destination_Type) is abstract ;
+
    type Destination_Access_Type is access all Destination_Type'Class;
    procedure SetDestination (destination : Destination_Access_Type);
 
@@ -81,10 +83,13 @@ private
    procedure SendMessage
      (destination : StdOutDestination_Type;
       packet      : LogPacket_Type);
+   procedure Close(destination : in out StdOutDestination_Type) ;
+
    procedure SendMessage
      (destination : TextFileDestination_Type;
       packet      : LogPacket_Type);
+   procedure Close(destination : in out TextFileDestination_Type) ;
 
    Current_Destination : Destination_Access_Type;
-   Current_Source            : Source_type        := Source_type'First;
+   Current_Source      : Source_type        := Source_type'First;
 end logging;

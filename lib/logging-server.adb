@@ -80,9 +80,13 @@ package body logging.server is
       loop
          pragma Debug(put_line("Wait for another rendezvous"));
          select
-            accept StartNewLog( currentfile : out unbounded_string ) do
-               currentfile := Generate_New_LogFileName (logdirname,logsid);
+            accept StartNewLog( currentfile : out unbounded_string )
+            do
+               currentfile := current_logfilename ;
             end StartNewLog ;
+            current_logfilename := Generate_New_LogFileName (logdirname,logsid);
+            put("Opening File " ); put_line(to_string(current_logfilename)) ;
+            logging.SetDestination( logging.Destination_Access_Type(logging.Create(to_string(current_logfilename)) ) );
          else
             ReceiveAndLogDatagram ;
          end select ;
@@ -128,7 +132,10 @@ package body logging.server is
          pragma Debug(put_line("Wait for another rendezvous"));
          select
             accept StartNewLog( currentfile : out unbounded_string ) do
-               currentfile := Generate_New_LogFileName(logdirname,logsid) ;
+               currentfile := current_logfilename ;
+               current_logfilename := Generate_New_LogFileName(logdirname,logsid) ;
+               put("Opening File " ); put_line(to_string(current_logfilename)) ;
+               logging.SetDestination( logging.Destination_Access_Type(logging.Create(to_string(current_logfilename)) ) );
             end StartNewLog ;
          else
             declare

@@ -15,6 +15,10 @@ package body logging is
 
    procedure SetDestination (destination : Destination_Access_Type) is
    begin
+      if Current_Destination /= null
+      then
+         Close(Current_Destination.all) ;
+      end if ;
       Current_Destination := destination;
    end SetDestination;
 
@@ -133,6 +137,7 @@ package body logging is
    begin
       txtdest.logfile := new Ada.Text_IO.File_Type ;
       Ada.Text_Io.Create (txtdest.logfile.all , Out_File, name);
+      put("Created a destination for "); put_line(name) ;
       return txtdest;
    end Create;
    procedure Close(dest : TextFileDestinationAccess_Type) is
@@ -147,6 +152,10 @@ package body logging is
    begin
       Put_Line (Image (packet));
    end SendMessage;
+   procedure Close(destination : in out StdOutDestination_Type) is
+   begin
+      null ;
+   end Close ;
 
    procedure SendMessage
      (destination : TextFileDestination_Type;
@@ -157,6 +166,10 @@ package body logging is
       Ada.Text_Io.Put_Line(destination.logfile.all, towrite) ;
       Ada.Text_Io.Flush(destination.logfile.all);
    end SendMessage;
+   procedure Close(destination : in out TextFileDestination_Type) is
+   begin
+      Ada.Text_Io.Close(destination.logfile.all) ;
+   end Close ;
 
    procedure SelfTest is
    begin
