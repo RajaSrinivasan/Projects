@@ -41,12 +41,14 @@ package logging is
    end record;
    function Time_Stamp return String ;
    function Image (packet : LogPacket_Type) return String ;
-
+   
+   subtype RecordName_Type is String(1..12) ;
    MAX_BINARY_RECORD_LENGTH : constant := 256;
    type BinaryPacket_Type is record
       hdr       : LogPacketHdr_Type;
+      Name      : RecordName_Type ;
       timestamp : Ada.Calendar.Time ;
-      RecordLen : Integer;
+      RecordLen : Short_Integer;
       data      : System.Storage_Elements
         .Storage_Array
       (1 .. MAX_BINARY_RECORD_LENGTH);
@@ -56,12 +58,18 @@ package logging is
       null;
    end record;
 
-
    procedure SendMessage
      (destination : Destination_Type;
       packet      : LogPacket_Type) is abstract;
+<<<<<<< HEAD
    procedure Close(destination : in out Destination_Type) is abstract ;
 
+=======
+   procedure SendRecord
+     (Destination : Destination_Type;
+      Packet      : BinaryPacket_Type) is abstract ;
+   
+>>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
    type Destination_Access_Type is access all Destination_Type'Class;
    procedure SetDestination (destination : Destination_Access_Type);
 
@@ -88,8 +96,18 @@ private
    procedure SendMessage
      (destination : TextFileDestination_Type;
       packet      : LogPacket_Type);
+<<<<<<< HEAD
    procedure Close(destination : in out TextFileDestination_Type) ;
 
+=======
+   procedure SendRecord
+     (Destination : StdOutDestination_Type;
+      Packet      : BinaryPacket_Type) ;
+   procedure SendRecord
+     (Destination : TextFileDestination_Type;
+      Packet      : BinaryPacket_Type) ;
+   
+>>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
    Current_Destination : Destination_Access_Type;
    Current_Source      : Source_type        := Source_type'First;
 end logging;

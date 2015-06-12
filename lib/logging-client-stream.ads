@@ -19,5 +19,12 @@ private
    procedure SendMessage
      (destination : StreamDestination_Type;
       packet      : LogPacket_Type);
+<<<<<<< HEAD
    procedure Close( destination : in out StreamDestination_Type) ;
+=======
+   procedure SendRecord
+     (Destination : StreamDestination_Type;
+      Packet      : BinaryPacket_Type) ;
+
+>>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
 end logging.client.stream ;

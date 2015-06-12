@@ -26,5 +26,11 @@ private
    procedure SendMessage
      (destination : DatagramDestination_Type;
       packet      : LogPacket_Type);
+<<<<<<< HEAD
    procedure Close(destination : in out DatagramDestination_Type) ;
+=======
+   procedure SendRecord
+     (Destination : DatagramDestination_Type;
+      Packet      : BinaryPacket_Type) ;   
+>>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
 end logging.client;

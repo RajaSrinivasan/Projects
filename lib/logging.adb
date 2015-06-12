@@ -1,4 +1,5 @@
 with Ada.Text_IO;              use Ada.Text_IO;
+with Ada.Short_Integer_Text_Io; use Ada.Short_Integer_Text_Io ;
 with Ada.Strings.Unbounded;    use Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
 with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
@@ -10,6 +11,8 @@ with Ada.Calendar ;            use Ada.Calendar ;
 with Ada.Calendar.Formatting ; use Ada.Calendar.Formatting ;
 
 with GNAT.Time_Stamp;
+
+with Hex ;
 
 package body logging is
 
@@ -166,11 +169,38 @@ package body logging is
       Ada.Text_Io.Put_Line(destination.logfile.all, towrite) ;
       Ada.Text_Io.Flush(destination.logfile.all);
    end SendMessage;
+<<<<<<< HEAD
    procedure Close(destination : in out TextFileDestination_Type) is
    begin
       Ada.Text_Io.Close(destination.logfile.all) ;
    end Close ;
 
+=======
+   
+   procedure ShowRecord( File : File_Type ; Packet : BinaryPacket_Type ) is
+   begin
+      Put( File , Packet.Name ) ; Put( File , " " ) ;
+      Put( File , "Length : " ) ;
+      Put( File , Packet.RecordLen ) ;
+      Put( File , Hex.Image( Packet.Data'Address , Integer(Packet.RecordLen) ) ) ;
+      New_Line(File) ;
+   end ShowRecord ;
+   
+   procedure SendRecord
+     (Destination : StdOutDestination_Type;
+      Packet      : BinaryPacket_Type) is
+   begin
+      ShowRecord( Standard_Output , Packet ) ;
+   end SendRecord ;
+   
+   procedure SendRecord
+     (Destination : TextFileDestination_Type;
+      Packet      : BinaryPacket_Type) is
+   begin
+      ShowRecord( Destination.Logfile.all , Packet ) ;
+   end SendRecord ;
+   
+>>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
    procedure SelfTest is
    begin
       for i in 1 .. 10 loop
