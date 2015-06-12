@@ -21,3 +21,4 @@ ihbff/build/ihbranalyze
 *.xml
 
 *.log
+stm32f4/Hello/build/hello
