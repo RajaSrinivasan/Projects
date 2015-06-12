@@ -1,30 +1,27 @@
 package logging.client.stream is
 
-   type StreamDestination_Type is new Destination_Type with
-      record
-         mysocket : gnat.sockets.socket_Type ;
-         server : gnat.sockets.Sock_Addr_Type ;
-      end record ;
-   type StreamDestinationAccess_Type is access all StreamDestination_Type ;
-   function Create(host : string ;
-                   port : integer )
-                   return StreamDestinationAccess_Type ;
+   type StreamDestination_Type is new Destination_Type with record
+      mysocket : GNAT.Sockets.Socket_Type;
+      server   : GNAT.Sockets.Sock_Addr_Type;
+   end record;
+   type StreamDestinationAccess_Type is access all StreamDestination_Type;
+   function Create
+     (host : String;
+      port : Integer) return StreamDestinationAccess_Type;
 
-   type StreamLogPacket_Type is
-      record
-         Size : Short_Integer ;
-         Pkt : LogPacket_Type ;
-      end record ;
+   type StreamLogPacket_Type is record
+      Size : Short_Integer;
+      Pkt  : LogPacket_Type;
+   end record;
 private
    procedure SendMessage
      (destination : StreamDestination_Type;
       packet      : LogPacket_Type);
-<<<<<<< HEAD
-   procedure Close( destination : in out StreamDestination_Type) ;
-=======
+
+   procedure Close (destination : in out StreamDestination_Type);
+
    procedure SendRecord
      (Destination : StreamDestination_Type;
-      Packet      : BinaryPacket_Type) ;
+      Packet      : BinaryPacket_Type);
 
->>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
-end logging.client.stream ;
+end logging.client.stream;

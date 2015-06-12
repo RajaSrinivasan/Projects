@@ -1,11 +1,10 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Exceptions ;
+with Ada.Exceptions;
 with GNAT.Time_Stamp;
 
 package body logging.client is
 
    Current_Max_Message_Level : message_level_type := message_level_type'Last;
-
 
    procedure SetSource (name : String) is
    begin
@@ -36,57 +35,75 @@ package body logging.client is
       Ada.Strings.Fixed.Move (class, pkt.class, Ada.Strings.Right);
       pkt.MessageLen                    := message'Length;
       pkt.message (1 .. pkt.MessageLen) := message;
-      SendMessage (Current_Destination.all , pkt);
+      SendMessage (Current_Destination.all, pkt);
    end log;
 
-   function Create(host : string ;
-                   port : integer )
-                   return DatagramDestinationAccess_Type is
-      newserver : DatagramDestinationAccess_Type := new DatagramDestination_Type ;
-      he : gnat.Sockets.Host_Entry_Type  := gnat.sockets.Get_Host_By_Name( host ) ;
-      bufsize : gnat.sockets.option_type(gnat.sockets.Send_Buffer) ;
+   function Create
+     (host : String;
+      port : Integer) return DatagramDestinationAccess_Type
+   is
+      newserver : DatagramDestinationAccess_Type :=
+        new DatagramDestination_Type;
+      he : GNAT.Sockets.Host_Entry_Type :=
+        GNAT.Sockets.Get_Host_By_Name (host);
+      bufsize : GNAT.Sockets.Option_Type (GNAT.Sockets.Send_Buffer);
    begin
-      newserver.server.Addr := gnat.sockets.addresses(he) ;
-      newserver.server.port := gnat.sockets.port_type(port) ;
-      gnat.sockets.create_socket(  newserver.mysocket , mode => gnat.sockets.Socket_Datagram ) ;
-      bufsize.Size := 1024*1024 ;
-      gnat.sockets.Set_Socket_Option( newserver.mysocket , option => bufsize ) ;
-      return newserver ;
+      newserver.server.Addr := GNAT.Sockets.Addresses (he);
+      newserver.server.Port := GNAT.Sockets.Port_Type (port);
+      GNAT.Sockets.Create_Socket
+        (newserver.mysocket,
+         Mode => GNAT.Sockets.Socket_Datagram);
+      bufsize.Size := 1024 * 1024;
+      GNAT.Sockets.Set_Socket_Option (newserver.mysocket, Option => bufsize);
+      return newserver;
    exception
-         when Error : others =>
-            Ada.Text_IO.Put("Exception: ");
-            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
-         Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
-         raise ;
-   end Create ;
+      when Error : others =>
+         Ada.Text_IO.Put ("Exception: ");
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Name (Error));
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (Error));
+         raise;
+   end Create;
 
    procedure SendMessage
      (destination : DatagramDestination_Type;
-      packet      : LogPacket_Type) is
-      sendpacket : LogPacket_Type := packet ;
-      imgbytes : Ada.Streams.Stream_Element_Array(1..packet'Size/8) ;
-      for imgbytes'address use sendpacket'address ;
-      actualsize, actualsent : ada.streams.Stream_Element_Offset ;
+      packet      : LogPacket_Type)
+   is
+      sendpacket : LogPacket_Type := packet;
+      imgbytes   : Ada.Streams.Stream_Element_Array (1 .. packet'Size / 8);
+      for imgbytes'Address use sendpacket'Address;
+      actualsize, actualsent : Ada.Streams.Stream_Element_Offset;
    begin
-      sendpacket.hdr.source := Current_Source ;
-      actualsize := Stream_Element_Offset(imgbytes'length - MAX_MESSAGE_LENGTH + packet.MessageLen) ;
-      gnat.sockets.send_socket( destination.mysocket , imgbytes(1..actualsize) , actualsent , destination.server ) ;
-      if actualsent /= actualsize
-      then
-         raise Program_Error with "message truncation" ;
+      sendpacket.hdr.source := Current_Source;
+      actualsize            :=
+        Stream_Element_Offset
+          (imgbytes'Length - MAX_MESSAGE_LENGTH + packet.MessageLen);
+      GNAT.Sockets.Send_Socket
+        (destination.mysocket,
+         imgbytes (1 .. actualsize),
+         actualsent,
+         destination.server);
+      if actualsent /= actualsize then
+         raise Program_Error with "message truncation";
       else
-         put_line("Sent " & sendpacket.message(1..sendpacket.messageLen));
-      end if ;
+         Put_Line ("Sent " & sendpacket.message (1 .. sendpacket.MessageLen));
+      end if;
    exception
-         when Error : others =>
-            Ada.Text_IO.Put("Exception: ");
-            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
-            Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
-   end SendMessage ;
-   procedure Close(destination : in out DatagramDestination_Type) is
+      when Error : others =>
+         Ada.Text_IO.Put ("Exception: ");
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Name (Error));
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (Error));
+   end SendMessage;
+   procedure Close (destination : in out DatagramDestination_Type) is
    begin
-      gnat.sockets.Close_Socket(destination.mysocket) ;
-   end Close ;
+      GNAT.Sockets.Close_Socket (destination.mysocket);
+   end Close;
+   procedure SendRecord
+     (Destination : DatagramDestination_Type;
+      Packet      : BinaryPacket_Type)
+   is
+   begin
+      null;
+   end SendRecord;
 
 begin
    SetDestination (new StdOutDestination_Type);

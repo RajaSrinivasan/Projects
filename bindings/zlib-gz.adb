@@ -2,13 +2,11 @@ with System; use System;
 package body Zlib.Gz is
    function Gzopen
      (Path : Interfaces.C.char_array;
-      Mode : Interfaces.C.char_array)
-      return System.Address;
+      Mode : Interfaces.C.char_array) return System.Address;
    pragma Import (C, Gzopen, "gzopen");
    function Gzdopen
      (Fd   : Interfaces.C.int;
-      Mode : Interfaces.C.char_array)
-      return System.Address;
+      Mode : Interfaces.C.char_array) return System.Address;
    pragma Import (C, Gzdopen, "gzdopen");
 
    function Gzclose (Gzfile : System.Address) return Returncodes;

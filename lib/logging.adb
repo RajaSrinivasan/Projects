@@ -1,27 +1,27 @@
-with Ada.Text_IO;              use Ada.Text_IO;
-with Ada.Short_Integer_Text_Io; use Ada.Short_Integer_Text_Io ;
-with Ada.Strings.Unbounded;    use Ada.Strings.Unbounded;
+with Ada.Text_IO;               use Ada.Text_IO;
+with Ada.Short_Integer_Text_IO; use Ada.Short_Integer_Text_IO;
+with Ada.Strings.Unbounded;     use Ada.Strings.Unbounded;
 with Ada.Containers.Vectors;
-with Ada.Text_IO.Text_Streams; use Ada.Text_IO.Text_Streams;
+with Ada.Text_IO.Text_Streams;  use Ada.Text_IO.Text_Streams;
 with Ada.Strings.Fixed;
-with ada.strings.maps ;
+with Ada.Strings.Maps;
+with Ada.Directories;
 
-with Ada.Streams;              use Ada.Streams;
-with Ada.Calendar ;            use Ada.Calendar ;
-with Ada.Calendar.Formatting ; use Ada.Calendar.Formatting ;
+with Ada.Streams;             use Ada.Streams;
+with Ada.Calendar;            use Ada.Calendar;
+with Ada.Calendar.Formatting; use Ada.Calendar.Formatting;
 
 with GNAT.Time_Stamp;
 
-with Hex ;
+with Hex;
 
 package body logging is
 
    procedure SetDestination (destination : Destination_Access_Type) is
    begin
-      if Current_Destination /= null
-      then
-         Close(Current_Destination.all) ;
-      end if ;
+      if Current_Destination /= null then
+         Close (Current_Destination.all);
+      end if;
       Current_Destination := destination;
    end SetDestination;
 
@@ -31,22 +31,21 @@ package body logging is
    registered_sources : Sources_Pkg.Vector;
 
    function Time_Stamp return String is
-      ts : unbounded_string
-        := To_Unbounded_String( gnat.Time_Stamp.Current_Time ) ;
-      pos : natural := 0 ;
-      removeset : ada.strings.maps.Character_Set ;
+      ts : Unbounded_String :=
+        To_Unbounded_String (GNAT.Time_Stamp.Current_Time);
+      pos       : Natural := 0;
+      removeset : Ada.Strings.Maps.Character_Set;
    begin
-      removeset := ada.strings.maps.To_Set("-:. ");
+      removeset := Ada.Strings.Maps.To_Set ("-:. ");
       loop
-         pos := ada.strings.unbounded.index( ts , removeset ) ;
-         if pos = 0
-         then
-            exit ;
-         end if ;
-         ada.strings.unbounded.Delete( ts , pos , pos ) ;
-      end loop ;
-      return to_string(ts) ;
-   end Time_Stamp ;
+         pos := Ada.Strings.Unbounded.Index (ts, removeset);
+         if pos = 0 then
+            exit;
+         end if;
+         Ada.Strings.Unbounded.Delete (ts, pos, pos);
+      end loop;
+      return To_String (ts);
+   end Time_Stamp;
 
    function Image (level : message_level_type) return String is
    begin
@@ -115,13 +114,13 @@ package body logging is
          Put_Line ("Did not find source " & name);
          return Source_type'Last;
       end if;
-      Put_Line("Found the source " & Name);
+      Put_Line ("Found the source " & name);
       return Sources_Pkg.To_Index (cursor);
    end Get;
 
    function Image (packet : LogPacket_Type) return String is
       destline : constant String :=
-        gnat.Time_Stamp.Current_Time &
+        GNAT.Time_Stamp.Current_Time &
         " " &
         Get (packet.hdr.source) &
         "> " &
@@ -138,15 +137,20 @@ package body logging is
       txtdest : TextFileDestinationAccess_Type := new TextFileDestination_Type;
       txtfile : Ada.Text_IO.File_Type;
    begin
-      txtdest.logfile := new Ada.Text_IO.File_Type ;
-      Ada.Text_Io.Create (txtdest.logfile.all , Out_File, name);
-      put("Created a destination for "); put_line(name) ;
+      txtdest.logfile := new Ada.Text_IO.File_Type;
+      Ada.Text_IO.Create (txtdest.logfile.all, Out_File, name);
+      Ada.Text_IO.Put (txtdest.logfile.all, "*********");
+      Ada.Text_IO.Put (txtdest.logfile.all, Ada.Directories.Base_Name (name));
+      Ada.Text_IO.Put (txtdest.logfile.all, "*********");
+      Ada.Text_IO.Put (txtdest.logfile.all, "Created ");
+      Ada.Text_IO.Put (txtdest.logfile.all, GNAT.Time_Stamp.Current_Time);
+      Ada.Text_IO.Put_Line (txtdest.logfile.all, "*********");
       return txtdest;
    end Create;
-   procedure Close(dest : TextFileDestinationAccess_Type) is
+   procedure Close (dest : TextFileDestinationAccess_Type) is
    begin
-      Ada.Text_IO.Close( dest.logfile.all ) ;
-   end Close ;
+      Ada.Text_IO.Close (dest.logfile.all);
+   end Close;
 
    procedure SendMessage
      (destination : StdOutDestination_Type;
@@ -155,57 +159,57 @@ package body logging is
    begin
       Put_Line (Image (packet));
    end SendMessage;
-   procedure Close(destination : in out StdOutDestination_Type) is
+   procedure Close (destination : in out StdOutDestination_Type) is
    begin
-      null ;
-   end Close ;
+      null;
+   end Close;
 
    procedure SendMessage
      (destination : TextFileDestination_Type;
       packet      : LogPacket_Type)
    is
-      towrite    : String := Image (packet) ;
+      towrite : String := Image (packet);
    begin
-      Ada.Text_Io.Put_Line(destination.logfile.all, towrite) ;
-      Ada.Text_Io.Flush(destination.logfile.all);
+      Ada.Text_IO.Put_Line (destination.logfile.all, towrite);
+      Ada.Text_IO.Flush (destination.logfile.all);
    end SendMessage;
-<<<<<<< HEAD
-   procedure Close(destination : in out TextFileDestination_Type) is
-   begin
-      Ada.Text_Io.Close(destination.logfile.all) ;
-   end Close ;
 
-=======
-   
-   procedure ShowRecord( File : File_Type ; Packet : BinaryPacket_Type ) is
+   procedure Close (destination : in out TextFileDestination_Type) is
    begin
-      Put( File , Packet.Name ) ; Put( File , " " ) ;
-      Put( File , "Length : " ) ;
-      Put( File , Packet.RecordLen ) ;
-      Put( File , Hex.Image( Packet.Data'Address , Integer(Packet.RecordLen) ) ) ;
-      New_Line(File) ;
-   end ShowRecord ;
-   
+      Ada.Text_IO.Close (destination.logfile.all);
+   end Close;
+
+   procedure ShowRecord (File : File_Type; Packet : BinaryPacket_Type) is
+   begin
+      Put (File, Packet.Name);
+      Put (File, " ");
+      Put (File, "Length : ");
+      Put (File, Packet.RecordLen);
+      Put (File, Hex.Image (Packet.data'Address, Integer (Packet.RecordLen)));
+      New_Line (File);
+   end ShowRecord;
+
    procedure SendRecord
      (Destination : StdOutDestination_Type;
-      Packet      : BinaryPacket_Type) is
+      Packet      : BinaryPacket_Type)
+   is
    begin
-      ShowRecord( Standard_Output , Packet ) ;
-   end SendRecord ;
-   
+      ShowRecord (Standard_Output, Packet);
+   end SendRecord;
+
    procedure SendRecord
      (Destination : TextFileDestination_Type;
-      Packet      : BinaryPacket_Type) is
+      Packet      : BinaryPacket_Type)
+   is
    begin
-      ShowRecord( Destination.Logfile.all , Packet ) ;
-   end SendRecord ;
-   
->>>>>>> 542fb369b0cdd16c1dc7d3974d10bc681d89861d
+      ShowRecord (Destination.logfile.all, Packet);
+   end SendRecord;
+
    procedure SelfTest is
    begin
       for i in 1 .. 10 loop
-         put_line(Ada.Calendar.Formatting.Image(Ada.CAlendar.Clock)) ;
-         delay 0.5 ;
+         Put_Line (Ada.Calendar.Formatting.Image (Ada.Calendar.Clock));
+         delay 0.5;
       end loop;
    end SelfTest;
 

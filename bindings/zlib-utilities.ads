@@ -6,24 +6,20 @@ package Zlib.Utilities is
      (Dest      : Bytep;
       Destlen   : Ulongp;
       Source    : Bytep;
-      Sourcelen : Interfaces.C.unsigned_long)
-      return      Returncodes;
+      Sourcelen : Interfaces.C.unsigned_long) return Returncodes;
    function Compress2
      (Dest      : Bytep;
       Destlen   : Ulongp;
       Source    : Bytep;
       Sourcelen : Interfaces.C.unsigned_long;
-      Level     : Interfaces.C.int)
-      return      Returncodes;
+      Level     : Interfaces.C.int) return Returncodes;
    function CompressBound
-     (Sourcelen : Interfaces.C.unsigned_long)
-      return      Returncodes;
+     (Sourcelen : Interfaces.C.unsigned_long) return Returncodes;
    function Uncompress
      (Dest      : Bytep;
       Destlen   : Ulongp;
       Source    : Bytep;
-      Sourcelen : Interfaces.C.unsigned_long)
-      return      Returncodes;
+      Sourcelen : Interfaces.C.unsigned_long) return Returncodes;
 private
    pragma Import (C, Compress, "compress");
    pragma Import (C, Compress2, "compress2");

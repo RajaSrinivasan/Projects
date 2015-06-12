@@ -1,64 +1,84 @@
-with ada.exceptions ;
+with Ada.Exceptions;
 package body logging.client.stream is
 
-
    function Create
-     (host : string;
-      port : integer)
-      return StreamDestinationAccess_Type
+     (host : String;
+      port : Integer) return StreamDestinationAccess_Type
    is
-      newserver : StreamDestinationAccess_Type := new StreamDestination_Type ;
-      he : gnat.Sockets.Host_Entry_Type  := gnat.sockets.Get_Host_By_Name( host ) ;
+      newserver : StreamDestinationAccess_Type := new StreamDestination_Type;
+      he        : GNAT.Sockets.Host_Entry_Type :=
+        GNAT.Sockets.Get_Host_By_Name (host);
    begin
-      gnat.sockets.create_socket(  newserver.mysocket , mode => gnat.sockets.Socket_Stream ) ;
-      newserver.server.Addr := gnat.sockets.addresses(he) ;
-      newserver.server.port := gnat.sockets.port_type(port) ;
-      gnat.sockets.connect_socket( newserver.mysocket , newserver.server ) ;
-      return newserver ;
+      GNAT.Sockets.Create_Socket
+        (newserver.mysocket,
+         Mode => GNAT.Sockets.Socket_Stream);
+      newserver.server.Addr := GNAT.Sockets.Addresses (he);
+      newserver.server.Port := GNAT.Sockets.Port_Type (port);
+      GNAT.Sockets.Connect_Socket (newserver.mysocket, newserver.server);
+      return newserver;
    exception
       when Error : others =>
-         Ada.Text_IO.Put("Exception: ");
-         Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
-         Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
-         raise ;
+         Ada.Text_IO.Put ("Exception: ");
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Name (Error));
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (Error));
+         raise;
    end Create;
- -----------------
+   -----------------
    -- SendMessage --
    -----------------
-   streamlog : StreamLogPacket_Type ;
+   streamlog : StreamLogPacket_Type;
    procedure SendMessage
      (destination : StreamDestination_Type;
       packet      : LogPacket_Type)
    is
 
-      procedure SendBytes( bufferptr : system.address ; bufsize : integer ) is
-         tobesent : Ada.Streams.Stream_Element_Array(1..Stream_Element_Offset(bufsize)) ;
-         for tobesent'address use bufferptr ;
-         firstbytetosend : Ada.Streams.Stream_Element_Offset := 1 ;
-         sentbytelast : Ada.Streams.Stream_Element_Offset := 0 ;
+      procedure SendBytes (bufferptr : System.Address; bufsize : Integer) is
+         tobesent : Ada.Streams
+           .Stream_Element_Array
+         (1 .. Stream_Element_Offset (bufsize));
+         for tobesent'Address use bufferptr;
+         firstbytetosend : Ada.Streams.Stream_Element_Offset := 1;
+         sentbytelast    : Ada.Streams.Stream_Element_Offset := 0;
       begin
-         while sentbytelast < Stream_Element_Offset(bufsize)
-         loop
-            gnat.sockets.send_socket( destination.mysocket , tobesent(firstbytetosend..Stream_Element_Offset(bufsize)), sentbytelast , null ) ;
-         end loop ;
-      end SendBytes ;
+         while sentbytelast < Stream_Element_Offset (bufsize) loop
+            GNAT.Sockets.Send_Socket
+              (destination.mysocket,
+               tobesent (firstbytetosend .. Stream_Element_Offset (bufsize)),
+               sentbytelast,
+               null);
+         end loop;
+      end SendBytes;
 
    begin
-      streamlog.Size := Short_Integer(packet'Size/8 - MAX_MESSAGE_LENGTH + packet.MessageLen) ;
-      pragma Debug(put_line("Will Send " & short_integer'image(streamlog.Size) & " bytes. for Message of length " & natural'image( packet.MessageLen )));
-      streamlog.pkt := packet ;
-      SendBytes(streamlog.Size'address,streamlog.Size'size/8) ;
-      SendBytes(streamlog.pkt'address,integer(streamlog.Size));
+      streamlog.Size :=
+        Short_Integer
+          (packet'Size / 8 - MAX_MESSAGE_LENGTH + packet.MessageLen);
+      pragma Debug
+        (Put_Line
+           ("Will Send " &
+            Short_Integer'Image (streamlog.Size) &
+            " bytes. for Message of length " &
+            Natural'Image (packet.MessageLen)));
+      streamlog.Pkt := packet;
+      SendBytes (streamlog.Size'Address, streamlog.Size'Size / 8);
+      SendBytes (streamlog.Pkt'Address, Integer (streamlog.Size));
    exception
       when Error : others =>
-         Ada.Text_IO.Put("Exception: ");
-         Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Name(Error));
-         Ada.Text_IO.Put_Line(Ada.Exceptions.Exception_Message(Error));
-         raise ;
+         Ada.Text_IO.Put ("Exception: ");
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Name (Error));
+         Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Message (Error));
+         raise;
    end SendMessage;
-   procedure Close( destination : in out StreamDestination_Type) is
+   procedure Close (destination : in out StreamDestination_Type) is
    begin
-      gnat.sockets.close_socket(destination.mysocket) ;
-   end Close ;
+      GNAT.Sockets.Close_Socket (destination.mysocket);
+   end Close;
+   procedure SendRecord
+     (Destination : StreamDestination_Type;
+      Packet      : BinaryPacket_Type)
+   is
+   begin
+      null;
+   end SendRecord;
 
 end logging.client.stream;

@@ -6,18 +6,15 @@ package Zlib.Gz is
    function Setparams
      (File     : File_Type;
       Level    : Level_Type;
-      Strategy : Strategy_Type)
-      return     Returncodes;
+      Strategy : Strategy_Type) return Returncodes;
    function Read
      (Gzfile : File_Type;
       Buf    : System.Address;
-      Len    : Interfaces.C.unsigned_long)
-      return   Interfaces.C.int;
+      Len    : Interfaces.C.unsigned_long) return Interfaces.C.int;
    function Write
      (Gzfile : File_Type;
       Buf    : System.Address;
-      Len    : Interfaces.C.unsigned_long)
-      return   Interfaces.C.int;
+      Len    : Interfaces.C.unsigned_long) return Interfaces.C.int;
 private
    type File_Type is new System.Address;
    pragma Import (C, Setparams, "gzsetparams");
