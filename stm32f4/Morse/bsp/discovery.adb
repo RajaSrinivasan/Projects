@@ -15,5 +15,8 @@ package body discovery is
       red := stm32f4.leds.create( stm32f4.gpiod_base , 14 ) ;
       blue := stm32f4.leds.create( stm32f4.gpiod_base , 15 ) ;
 
+      virtual_led1 := stm32f4.leds.create( stm32f4.gpiod_base , 10 ) ;
+      virtual_led2 := stm32f4.leds.create( stm32f4.gpiod_base , 11 ) ;
+
    end initialize ;
 end discovery ;
