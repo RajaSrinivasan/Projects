@@ -1,8 +1,9 @@
 project Morse is
 
-   for Source_Dirs use ("./**", "..\Hello\bsp");
+   for Source_Dirs use ("src", "..\Hello\bsp", "bsp");
    for Object_Dir use "build";
    for Languages use ("Ada");
+   for Main use ("morse.adb");
 
    -- for Main use ("hello.adb");
 
@@ -22,8 +23,6 @@ project Morse is
       for Program_Host use "localhost:4242";
       for Communication_Protocol use "remote";
    end Ide;
-
-   for Main use ("morse.adb");
 
 end Morse;
 
