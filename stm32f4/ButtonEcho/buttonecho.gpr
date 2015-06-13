@@ -1,0 +1,9 @@
+with "../stm32f4projectlets.gpr" ;
+project Buttonecho is
+
+   for Source_Dirs use ("./**", "..\Hello\bsp", "..\Morse\bsp");
+   for Object_Dir use "build";
+   for Languages use ("Ada");
+
+end Buttonecho;
+
