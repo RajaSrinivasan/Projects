@@ -1,52 +1,12 @@
 with system ;
 with ada.real_time; use ada.real_time ;
-with ada.interrupts.names ;
 
 with registers ;
 with STM32F4.gpio ;
 
 package body stm32f4.buttons is
 
-   protected Button is
-      pragma Interrupt_Priority;
-      function state( pin : pin_no ) return boolean ;
-   private
-      pin_pushed : array (pin_no'range) of boolean := (others => false) ;
-      procedure Interrupt_Handler;
-      pragma Attach_Handler
-         (Interrupt_Handler,
-          Ada.Interrupts.Names.EXTI0_Interrupt);
-      Last_Time : ada.real_time.Time := ada.real_time.Clock ;
-   end Button;
    Debounce_Time : constant Time_Span := Milliseconds (500);
-   protected body Button is
-
-      function state( pin : pin_no ) return boolean is
-      begin
-         return pin_pushed( pin ) ;
-      end state ;
-      procedure Interrupt_Handler is
-         Now : constant Time := Clock;
-         actpin : pin_no := pin_no'first ;
-      begin
-         for pin in pin_no'range
-         loop
-            if EXTI.PR(pin)
-            then
-               EXTI.PR(pin) := 1 ;
-               actpin := pin ;
-               exit ;
-            end if ;
-         end loop ;
-         --  Debouncing
-         if Now - Last_Time >= Debounce_Time then
-            Last_Time := Now;
-            -- toggle pin state
-            pin_pushed( actpin ) := not pin_pushed( actpin ) ;
-         end if;
-      end Interrupt_Handler;
-   end Button;
-
    function create (portbase : stm32f4.word ;
                     pin : pin_no ) return Button_Type is
       btn : Button_Type ;
@@ -57,10 +17,12 @@ package body stm32f4.buttons is
              Volatile,
           Address => System'To_Address (portbase);
       exticr_address : system.address ;
-      extiidx : integer := pin_no mod 4 ;
+      extiidx : integer := integer(pin mod 4) ;
    begin
       btn.base := portbase ;
       btn.pin := pin ;
+            --  Enable clock for GPIO-A
+      registers.RCC.AHB1ENR := registers.RCC.AHB1ENR or 16#01# ;
       --  Configure PA0
       case pin is
          when  0 ..  3 => exticr_address := registers.SYSCFG.EXTICR1'address ;
@@ -87,17 +49,16 @@ package body stm32f4.buttons is
       --  Select PA for EXTI0
       registers.SYSCFG.EXTICR1 (0) := 0;
 
-      --  Interrupt on rising edge and falling edge
-      registers.EXTI.FTSR (pinint) := 1;
-      registers.EXTI.RTSR (pinint) := 1;
-      registers.EXTI.IMR (pinint) := 1;
-
       return btn ;
    end create ;
 
-   function pushed( button : button_type ) return boolean is
+   function Set( button : button_type ) return boolean is
+      gpio : stm32f4.gpio.GPIO_Register
+        with
+          Volatile,
+          Address => System'To_Address (button.base);
    begin
-      return state( button.pin ) ;
-   end pushed ;
+      return ( gpio.IDR and 16#01# ) = 1;
+   end Set ;
 
 end stm32f4.buttons ;

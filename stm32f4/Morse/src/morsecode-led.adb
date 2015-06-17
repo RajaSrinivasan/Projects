@@ -2,7 +2,7 @@ with Ada.Real_Time; use Ada.Real_Time;
 
 package body morsecode.led is
 
-   procedure show( led : in out stm32f4.leds.LED_Type ;
+   procedure Show( led : in out stm32f4.leds.LED_Type ;
                    this : Character ) is
       code : constant Letter_Representation := translate(this) ;
       now : Time := Clock ;
@@ -29,7 +29,7 @@ package body morsecode.led is
       delay until now ;
    end show ;
 
-   procedure show( led : in out stm32f4.leds.LED_Type ;
+   procedure Show( led : in out stm32f4.leds.LED_Type ;
                    this : string ) is
       now : Time := Clock ;
    begin

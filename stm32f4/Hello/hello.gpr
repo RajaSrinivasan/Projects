@@ -9,10 +9,6 @@ project Hello is
       for Default_Switches ("ada") use ("-g", "-gnatwa", "-gnatQ", "-gnat12");
    end Compiler;
 
-   package Builder is
-      for Default_Switches ("ada") use ("-g", "--RTS=/GNAT/2014/lib/gnat/arm-eabi/ravenscar-sfp-stm32f4");
-      --          "--RTS=/GNATPRO/7.2.1/lib/gnat/arm-eabi/ravenscar-sfp-stm32f4");
-   end Builder;
 
    package Ide is
       for Gnat use "arm-eabi-gnat";

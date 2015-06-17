@@ -1,5 +1,9 @@
 project stm32f4projectlets is
 
+   for Source_Dirs use ( "./Hello/bsp", "./Morse/bsp" );
+   for Object_Dir use "build";
+   for Languages use ("Ada");
+
    package Compiler is
       for Default_Switches ("ada") use ("-g", "-gnatwa", "-gnatQ", "-gnat12");
    end Compiler;

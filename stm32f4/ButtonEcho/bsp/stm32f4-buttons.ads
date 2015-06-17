@@ -7,8 +7,8 @@ package stm32f4.buttons is
          pin : pin_no ;
       end record ;
 
-   function create (portbase : stm32f4.word ;
+   function Create (portbase : stm32f4.word ;
                     pin : pin_no ) return Button_Type ;
-   function pushed( button : button_type ) return boolean ;
+   function Set( button : button_type ) return boolean ;
 
 end stm32f4.buttons ;
