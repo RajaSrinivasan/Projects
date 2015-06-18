@@ -1,6 +1,6 @@
 with system ;
 with ada.real_time; use ada.real_time ;
-
+with interfaces ;
 with registers ;
 with STM32F4.gpio ;
 
@@ -57,8 +57,10 @@ package body stm32f4.buttons is
         with
           Volatile,
           Address => System'To_Address (button.base);
+      mask : word ;
    begin
-      return ( gpio.IDR and 16#01# ) = 1;
+      mask := STM32F4.word(interfaces.shift_left(interfaces.unsigned_16(1),integer(button.pin))) ;
+      return ( gpio.IDR and mask ) = 1;
    end Set ;
 
 end stm32f4.buttons ;
