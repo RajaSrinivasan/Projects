@@ -60,13 +60,24 @@ package STM32F4 is
    GPIOC_Base           : constant := AHB1_Peripheral_Base + 16#0800#;
    GPIOD_Base           : constant := AHB1_Peripheral_Base + 16#0C00#;
 
+   GPIOE_Base           : constant := AHB1_Peripheral_Base + 16#1000#;
+   GPIOF_Base           : constant := AHB1_Peripheral_Base + 16#1400#;
+
    FLASH_Base           : constant := AHB1_Peripheral_Base + 16#3C00#;
    RCC_Base             : constant := AHB1_Peripheral_Base + 16#3800#;
 
    PWR_Base             : constant := APB1_Peripheral_Base + 16#7000#;
+   DAC_Base             : constant := APB1_Peripheral_Base + 16#7400#;
 
-   USART1_Base          : constant := APB2_Peripheral_Base + 16#1000#;
-   SYSCFG_Base          : constant := APB2_Peripheral_Base + 16#3800#;
-   EXTI_Base            : constant := APB2_Peripheral_Base + 16#3C00#;
+   ADC1_Base            : constant := APB2_Peripheral_Base + 16#2000# ;
+   USART1_Base          : constant := APB2_Peripheral_Base + 16#1000# ;
+   SYSCFG_Base          : constant := APB2_Peripheral_Base + 16#3800# ;
+   EXTI_Base            : constant := APB2_Peripheral_Base + 16#3C00# ;
+
+   RNG_Base             : constant := AHB2_Peripheral_Base + 16#0006_0800# ;
+   HASH_Base            : constant := AHB2_Peripheral_Base + 16#0006_0400# ;
+   CRYP_Base            : constant := AHB2_Peripheral_Base + 16#0006_0000# ;
+   DCMI_Base            : constant := AHB2_Peripheral_Base + 16#0005_0000# ;
+   USB_OTG_FS_Base      : constant := AHB2_Peripheral_Base ;
 
 end STM32F4;
