@@ -8,8 +8,8 @@ package body stm32f4.crc is
         Address => System'To_Address( stm32f4.CRC_Base ) ;
    pragma Import(Ada,CRCMAP) ;
 
-   procedure initialize is
-      RCC_AHB1ENR_CRCEN : constant word := 16#0000_1000# ;
+   procedure Initialize is
+        RCC_AHB1ENR_CRCEN : constant word := 16#0000_1000# ;
    begin
       registers.RCC.AHB1ENR := registers.RCC.AHB1ENR or RCC_AHB1ENR_CRCEN ;
    end initialize ;
@@ -20,22 +20,15 @@ package body stm32f4.crc is
    begin
       CRRESET.RESET := 1 ;
       CRCMAP.CR := CRRESET ;
-      registers.RCC.AHB1ENR := registers.RCC.AHB1ENR or RCC_AHB1ENR_CRCEN ;
+      Initialize ;
    end Reset ;
 
-   function Compute( from : system.address ;
-                     length : integer )
-                    return word is
-
-
+   procedure Update( from : system.address ;
+                     length : integer ) is
       lengthtodo : integer := length ;
       wordptr : system.address := from ;
       lastword : word := 0 ;
-      result : word ;
    begin
-      -- registers.RCC.AHB1ENR := registers.RCC.AHB1ENR or RCC_AHB1ENR_CRCEN ;
-
-      Reset ;
       while lengthtodo > 3
       loop
          declare
@@ -58,10 +51,27 @@ package body stm32f4.crc is
          lengthtodo := lengthtodo - 1 ;
          wordptr := wordptr + 1 ;
       end loop ;
-        CRCMAP.DR := lastword ;
-      result := CRCMAP.DR ;
+      CRCMAP.DR := lastword ;
+   end Update ;
 
-      return result ;
+
+   function Get return Word is
+   begin
+       return CRCMAP.DR ;
+   end Get ;
+
+   function Compute( from : system.address ;
+                     length : integer )
+                    return word is
+
+
+      lengthtodo : integer := length ;
+      wordptr : system.address := from ;
+      lastword : word := 0 ;
+   begin
+      Reset ;
+      Update(from,length) ;
+      return Get ;
    end compute ;
 
 end stm32f4.crc ;

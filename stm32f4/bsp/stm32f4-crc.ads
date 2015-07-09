@@ -10,9 +10,16 @@ package stm32f4.crc is
    CR_MaskReset : constant := 16#0000_0001# ;
 
    procedure Initialize ;
-   pragma Inline(Initialize) ;
+   --pragma Inline(Initialize) ;
 
    procedure Reset ;
+   --pragma Inline(Reset) ;
+   procedure Update( from : system.address ;
+                     length : integer ) ;
+
+   function Get return Word ;
+  -- pragma Inline ( Get ) ;
+
    function compute( from : system.address ;
                      length : integer )
                     return word ;
