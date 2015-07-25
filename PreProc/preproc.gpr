@@ -2,7 +2,7 @@ project PreProc is
 
    for Source_Dirs use (".", "../lib");
    for Object_Dir use "../build";
-   for Main use ("createconfig.adb");
+   for Main use ("createconfig.adb","createstb.adb");
 
 end PreProc;
 
