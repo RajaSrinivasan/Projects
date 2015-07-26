@@ -11,15 +11,37 @@ package body Preprocessor is
       Posspc : Natural ;
    begin
       Posspc := Ada.Strings.Fixed.Index(Timestamp," ");
-      SymbolTable.Stb_Pkg.Insert( stb , To_Unbounded_String("__VERSION__") ,
-                                To_Unbounded_String("1.0") ) ;
-      SymbolTable.Stb_Pkg.Insert( stb , To_Unbounded_String("__DATE__") ,
-                                To_Unbounded_String(Timestamp(1..Posspc-1)) );
-      SymbolTable.Stb_Pkg.Insert( stb , To_Unbounded_String("__TIME__") ,
-                                                                    To_Unbounded_String(Timestamp(Posspc+1..Posspc+8)) );
+      Define("__VERSION__","1.0");
+      Define("__DATE__" , Timestamp(1..Posspc-1)) ;
+      Define("__TIME__" , Timestamp(Posspc+1..Posspc+8) );
       if Verbose
       then
          SymbolTable.Print(Stb) ;
       end if ;
    end Initialize ;
+   function Defined( Symbol : String ) return Boolean is
+   begin
+      return False ;
+   end Defined ;
+
+   function Value( Symbol : String ) return String is
+   begin
+      return "" ;
+   end Value ;
+
+   function Equal( Symbol : String ;
+                   Value : String ) return Boolean is
+   begin
+      return False ;
+   end Equal ;
+
+   procedure Define( Symbol : String ;
+                     Value : String := "" ) is
+   begin
+      SymbolTable.Stb_Pkg.Insert( stb
+                                    , To_Unbounded_String(Symbol)
+                                    , To_Unbounded_String(Value) );
+   end Define ;
+
+
 end Preprocessor ;
