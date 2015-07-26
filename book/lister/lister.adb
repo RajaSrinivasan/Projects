@@ -6,6 +6,7 @@ procedure Lister is
    Inpfile : Ada.Text_Io.File_Type ;
    Line : String(1..256) ;
    Linelen : Natural ;
+   Lineno : Integer := 0 ;
 begin
    if Ada.Command_Line.Argument_Count < 1
    then
@@ -18,6 +19,9 @@ begin
    while not End_Of_File(InpFile)
    loop
       Get_Line(Inpfile,Line,Linelen) ;
+      Lineno := Lineno + 1 ;
+      Put(Lineno,Width => 4 ) ;
+      Put(" : ");
       Put_Line(Line(1..Linelen)) ;
    end loop ;
    Ada.Text_Io.Close(Inpfile) ;
