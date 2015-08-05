@@ -1,4 +1,4 @@
-project Striptabs is
+project lister is
 
    for Object_Dir use "../../build";
    for Main use ("lister.adb");
@@ -11,5 +11,5 @@ project Striptabs is
       for Default_Switches ("ada") use ("-O3", "-gnatf");
    end Compiler;
 
-end Striptabs;
+end lister;
 
