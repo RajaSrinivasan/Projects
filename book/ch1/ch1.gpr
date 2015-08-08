@@ -2,7 +2,7 @@ project ch1 is
 
    for Source_Dirs use (".", "../../lib");
    for Object_Dir use "../../build";
-   for Main use ("hello.adb");
+   for Main use ("hello.adb","table.adb","hello_attribs.adb");
 
 end ch1 ;
 
