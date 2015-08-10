@@ -6,8 +6,12 @@ with Ada.Float_Text_IO;   use Ada.Float_Text_IO;
 
 procedure hello_attribs is
 begin
-   Put("Integer'first = "); Put( Integer'First ) ; New_Line ;
-   Put("Integer'last = "); Put(Integer'Last) ; New_Line ;
+   Put ("Integer'first = ");
+   Put (Integer'First);
+   New_Line;
+   Put ("Integer'last = ");
+   Put (Integer'Last);
+   New_Line;
 
    Put ("Float'Size = ");
    Put (Float'Size);

@@ -1,13 +1,18 @@
 package PreProcessor is
+
    Verbose : Boolean := True ;
+
    procedure Initialize ;
+
+   procedure process( inputfilename : string ;
+                      outputfilename : string ) ;
 
    function Defined( Symbol : String ) return Boolean ;
    function Value( Symbol : String ) return String ;
    function Equal( Symbol : String ;
-                   Value : String ) return Boolean ;
+                   Val : String ) return Boolean ;
 
    procedure Define( Symbol : String ;
-                     Value : String := "" ) ;
+                     Val : String := "" ) ;
 
 end PreProcessor ;
