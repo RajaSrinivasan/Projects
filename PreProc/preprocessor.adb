@@ -14,9 +14,13 @@ package body Preprocessor is
 
    cmdline : string := "^\s*#" ;
    cmds : string := "\s*(if|ifdef|endif|include|define|else)(\s+|\s*$)" ;
+   Macro : String := "([[:alnum:]_\$]*)(\s+|\s*$)" ;
+   Macrovalue : String := "([[:alnum:]_\$]+)(\s+|\s*$)" ;
 
    pcmdline : gnat.regpat.Pattern_Matcher := gnat.regpat.compile(cmdline) ;
    pcmds : gnat.regpat.pattern_matcher := gnat.regpat.compile(cmds) ;
+   Pmacro : Gnat.Regpat.Pattern_Matcher := Gnat.Regpat.Compile(Macro) ;
+   Pmacrovalue : Gnat.Regpat.Pattern_Matcher := Gnat.Regpat.Compile(Macrovalue) ;
 
    procedure Initialize is
       Timestamp : String := Gnat.Time_Stamp.Current_Time ;
@@ -42,6 +46,32 @@ package body Preprocessor is
       procedure InspectLine( str : string ) is
          cmdindicator : gnat.regpat.match_array(0..0)  ;
          keyword : gnat.regpat.match_array(0..1) ;
+         procedure MacroDefinition is
+            Macromatches : Gnat.Regpat.Match_Array(0..2) ;
+            Macrovalmatches : Gnat.Regpat.Match_Array(0..2) ;
+            Defaultvalue : String := "" ;
+         begin
+            Gnat.Regpat.Match( Pmacro , Str(Keyword(0).Last+1 .. Str'Last) , Macromatches ) ;
+            if Macromatches(0).First = 0
+            then
+               Put_Line("No macro name to define");
+               return ;
+            end if ;
+            Put("Defining the macro :");
+            Put_Line(Str(Macromatches(1).First .. Macromatches(1).Last)) ;
+            Gnat.Regpat.Match( Pmacrovalue , Str(Macromatches(0).Last+1 .. Str'Last) , Macrovalmatches ) ;
+            if Macrovalmatches(0).First = 0
+            then
+               Put_Line("will assign default value");
+               Define( Str(Macromatches(1).First .. Macromatches(1).Last), defaultvalue );
+            else
+               Put("Will assign value : ");
+               Put_Line( Str( Macrovalmatches(1).First .. Macrovalmatches(1).Last ) ) ;
+               Define( Str(Macromatches(1).First .. Macromatches(1).Last),
+                       Str( Macrovalmatches(1).First .. Macrovalmatches(1).Last ) );
+            end if ;
+         end MacroDefinition ;
+
       begin
          gnat.regpat.match( pcmdline , str , cmdindicator ) ;
          if cmdindicator(0).first = 0
@@ -62,6 +92,10 @@ package body Preprocessor is
                put_line("unrecognized keyword");
             else
                put("keyword :"); put_line( str( keyword(1).first .. keyword(1).last ) ) ;
+               if Str(keyword(1).first .. keyword(1).last ) = "define"
+               then
+                  MacroDefinition ;
+               end if ;
             end if ;
          end if ;
       end InspectLine ;
@@ -81,9 +115,14 @@ package body Preprocessor is
          end loop ;
       end process ;
    begin
+      Initialize ;
       srcfile := sources.open(inputfilename) ;
       ada.text_io.create( outfile , out_file , outputfilename ) ;
       Process( srcfile ) ;
+      if Verbose
+      then
+         Symboltable.Print(stb) ;
+      end if ;
       ada.text_io.close(outfile) ;
       ada.text_io.close(srcfile.file.all) ;
    end process ;
@@ -112,6 +151,5 @@ package body Preprocessor is
                                     , To_Unbounded_String(Symbol)
                                     , To_Unbounded_String(Val) );
    end Define ;
-
 
 end Preprocessor ;
