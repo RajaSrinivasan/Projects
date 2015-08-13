@@ -16,11 +16,13 @@ package body Preprocessor is
    cmds : string := "\s*(if|ifdef|endif|include|define|else)(\s+|\s*$)" ;
    Macro : String := "([[:alnum:]_\$]*)(\s+|\s*$)" ;
    Macrovalue : String := "([[:alnum:]_\$]+)(\s+|\s*$)" ;
+   Stringlit : String := """" & "(.*)" & """" ;
 
    pcmdline : gnat.regpat.Pattern_Matcher := gnat.regpat.compile(cmdline) ;
    pcmds : gnat.regpat.pattern_matcher := gnat.regpat.compile(cmds) ;
    Pmacro : Gnat.Regpat.Pattern_Matcher := Gnat.Regpat.Compile(Macro) ;
    Pmacrovalue : Gnat.Regpat.Pattern_Matcher := Gnat.Regpat.Compile(Macrovalue) ;
+   Pstringlit : Gnat.Regpat.Pattern_Matcher := Gnat.Regpat.Compile(StringLit) ;
 
    procedure Initialize is
       Timestamp : String := Gnat.Time_Stamp.Current_Time ;
@@ -36,12 +38,22 @@ package body Preprocessor is
       end if ;
    end Initialize ;
 
-
    procedure process( inputfilename : string ;
                       outputfilename : string ) is
+      procedure process( src : in out sources.file_type ) ;
       srcfile : sources.file_type ;
       outfile : ada.text_io.file_type ;
       inspecting : boolean := true ;
+      procedure SwapInput( Inclfilename : String ) is
+         Newinput : Sources.File_Type ;
+      begin
+         Newinput := Sources.Open(Inclfilename) ;
+         Process( Newinput ) ;
+         Ada.Text_Io.Close( Newinput.File.all ) ;
+      exception
+         when others =>
+            Put("Exception Opening "); Put_Line(Inclfilename) ;
+      end SwapInput ;
 
       procedure InspectLine( str : string ) is
          cmdindicator : gnat.regpat.match_array(0..0)  ;
@@ -72,6 +84,21 @@ package body Preprocessor is
             end if ;
          end MacroDefinition ;
 
+         procedure IncludeFile is
+            FileNameMatches : Gnat.Regpat.Match_Array(0..2) ;
+         begin
+            Gnat.Regpat.Match( pStringLit ,
+                               Str(Keyword(0).Last+1 .. Str'Last) , FileNamematches ) ;
+            if FileNameMatches(0).First = 0
+            then
+               Put_Line("No file name to include");
+            else
+               Put("Include File :");
+               Put_Line(Str(FileNameMatches(1).First .. FileNameMatches(1).Last)) ;
+               SwapInput(Str(FileNameMatches(1).First .. FileNameMatches(1).Last));
+            end if ;
+         end IncludeFile ;
+
       begin
          gnat.regpat.match( pcmdline , str , cmdindicator ) ;
          if cmdindicator(0).first = 0
@@ -95,6 +122,9 @@ package body Preprocessor is
                if Str(keyword(1).first .. keyword(1).last ) = "define"
                then
                   MacroDefinition ;
+               elsif Str(keyword(1).first .. keyword(1).last ) = "include"
+               then
+                 IncludeFile ;
                end if ;
             end if ;
          end if ;
@@ -104,8 +134,16 @@ package body Preprocessor is
          line : string(1..256) ;
          linelen : natural ;
       begin
-         while not Ada.Text_Io.End_Of_File( src.file.all )
+         -- while not Ada.Text_Io.End_Of_File( src.file.all )
          loop
+            if Ada.Text_Io.End_Of_File( Src.File.all )
+            then
+               if Sources.Empty
+               then
+                  exit ;
+               end if ;
+            end if ;
+
             ada.text_io.get_line( src.file.all , line , linelen );
             src.lineNo := src.lineNo + 1 ;
             if inspecting
