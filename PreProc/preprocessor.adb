@@ -8,9 +8,14 @@ with gnat.regpat ;
 
 with SymbolTable ;
 with sources ;
+with stacks ;
 
 package body Preprocessor is
+
    stb : SymbolTable.Stb_Pkg.Map ;
+
+   package InspectStatus_Pkg is new stacks( boolean ) ;
+   InspectStack : InspectStatus_Pkg.Stk_Pkg.Vector ;
 
    cmdline : string := "^\s*#" ;
    cmds : string := "\s*(if|ifdef|endif|include|define|else)(\s+|\s*$)" ;
@@ -36,6 +41,7 @@ package body Preprocessor is
       then
          SymbolTable.Print(Stb) ;
       end if ;
+      InspectStack := InspectStatus_Pkg.Create ;
    end Initialize ;
 
    procedure process( inputfilename : string ;
@@ -99,11 +105,39 @@ package body Preprocessor is
             end if ;
          end IncludeFile ;
 
+         procedure EndIf is
+         begin
+            if InspectStatus_Pkg.Empty(InspectStack)
+            then
+               put_line("EndIf without a matching if clause?");
+            else
+               InspectStatus_Pkg.Pop(InspectStack,inspecting) ;
+            end if ;
+         end EndIf ;
+
+         procedure ElseCommand is
+         begin
+            put_line("Inverting the Inspecting Status");
+            if InspectStatus_Pkg.Empty(InspectStack)
+            then
+               put_line("Else without a matching if clause?");
+            else
+               inspecting := not inspecting ;
+            end if ;
+         end ElseCommand ;
+         procedure IfDefined is
+         begin
+            put_line("If Defined");
+         end IfDefined ;
+
       begin
          gnat.regpat.match( pcmdline , str , cmdindicator ) ;
          if cmdindicator(0).first = 0
          then
-            ada.text_io.put_line(outfile,str) ;
+            if inspecting then
+               ada.text_io.put_line(outfile,str) ;
+               return ;
+            end if ;
          else
             if verbose
             then
@@ -119,10 +153,19 @@ package body Preprocessor is
                put_line("unrecognized keyword");
             else
                put("keyword :"); put_line( str( keyword(1).first .. keyword(1).last ) ) ;
-               if Str(keyword(1).first .. keyword(1).last ) = "define"
+               if inspecting and Str(keyword(1).first .. keyword(1).last ) = "define"
                then
                   MacroDefinition ;
-               elsif Str(keyword(1).first .. keyword(1).last ) = "include"
+               elsif  inspecting and Str(keyword(1).first .. keyword(1).last ) = "ifdef"
+               then
+                  IfDefined ;
+               elsif inspecting and Str(keyword(1).first .. keyword(1).last ) = "endif"
+               then
+                  EndIf ;
+               elsif inspecting and Str(keyword(1).first .. keyword(1).last ) = "else"
+               then
+                  ElseCommand ;
+               elsif  inspecting and Str(keyword(1).first .. keyword(1).last ) = "include"
                then
                  IncludeFile ;
                end if ;
@@ -143,13 +186,9 @@ package body Preprocessor is
                   exit ;
                end if ;
             end if ;
-
             ada.text_io.get_line( src.file.all , line , linelen );
             src.lineNo := src.lineNo + 1 ;
-            if inspecting
-            then
-               InspectLine(line(1..linelen)) ;
-            end if ;
+            InspectLine(line(1..linelen)) ;
          end loop ;
       end process ;
    begin

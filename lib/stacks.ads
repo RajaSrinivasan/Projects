@@ -1,7 +1,7 @@
 with Ada.Containers.Indefinite_Vectors ;
 generic
    type Item_Type (<>) is private ;
-   with function "-" (Left, Right : Item_Type) return Boolean is <> ;
+   with function "=" (Left, Right : Item_Type) return Boolean is <> ;
 package Stacks is
    package Stk_Pkg is new Ada.Containers.Indefinite_Vectors(
                                                             Index_Type => Positive ,
