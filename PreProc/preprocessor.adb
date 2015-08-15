@@ -18,7 +18,7 @@ package body Preprocessor is
    InspectStack : InspectStatus_Pkg.Stk_Pkg.Vector ;
 
    cmdline : string := "^\s*#" ;
-   cmds : string := "\s*(if|ifdef|endif|include|define|else)(\s+|\s*$)" ;
+   cmds : string := "\s*(if|ifdef|ifndef|endif|include|define|else)(\s+|\s*$)" ;
    Macro : String := "([[:alnum:]_\$]*)(\s+|\s*$)" ;
    Macrovalue : String := "([[:alnum:]_\$]+)(\s+|\s*$)" ;
    Stringlit : String := """" & "(.*)" & """" ;
@@ -125,11 +125,49 @@ package body Preprocessor is
                inspecting := not inspecting ;
             end if ;
          end ElseCommand ;
+
          procedure IfDefined is
+            Macromatches : Gnat.Regpat.Match_Array(0..2) ;
+            newval : boolean ;
          begin
             put_line("If Defined");
+            Gnat.Regpat.Match( Pmacro , Str(Keyword(0).Last+1 .. Str'Last) , Macromatches ) ;
+            if Macromatches(0).First = 0
+            then
+               Put_Line("No macro name to check");
+               return ;
+            end if ;
+            newval := Defined(Str(Macromatches(1).First .. Macromatches(1).Last)) ;
+            if newval
+            then
+               put_line("is defined");
+            else
+               put_line("not defined");
+            end if ;
+            InspectStatus_Pkg.Push(InspectStack,inspecting) ;
+            inspecting := newval ;
          end IfDefined ;
-
+        procedure IfNotDefined is
+            Macromatches : Gnat.Regpat.Match_Array(0..2) ;
+            newval : boolean ;
+         begin
+            put_line("If not Defined");
+            Gnat.Regpat.Match( Pmacro , Str(Keyword(0).Last+1 .. Str'Last) , Macromatches ) ;
+            if Macromatches(0).First = 0
+            then
+               Put_Line("No macro name to check");
+               return ;
+            end if ;
+            newval := Defined(Str(Macromatches(1).First .. Macromatches(1).Last)) ;
+            if newval
+            then
+               put_line("is defined");
+            else
+               put_line("not defined");
+            end if ;
+            InspectStatus_Pkg.Push(InspectStack,inspecting) ;
+            inspecting := not newval ;
+         end IfNotDefined ;
       begin
          gnat.regpat.match( pcmdline , str , cmdindicator ) ;
          if cmdindicator(0).first = 0
@@ -159,6 +197,9 @@ package body Preprocessor is
                elsif  inspecting and Str(keyword(1).first .. keyword(1).last ) = "ifdef"
                then
                   IfDefined ;
+               elsif  inspecting and Str(keyword(1).first .. keyword(1).last ) = "ifndef"
+               then
+                  IfNotDefined ;
                elsif inspecting and Str(keyword(1).first .. keyword(1).last ) = "endif"
                then
                   EndIf ;
