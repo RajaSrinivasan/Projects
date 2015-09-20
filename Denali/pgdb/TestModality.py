@@ -16,7 +16,7 @@ databasecon = ConnecttoDB()
 
 print("------------------------")
 m = Modality.Modality()
-m.Name = "Sitar"
+m.Name = "Flute"
 m.SaveToDatabase(databasecon)
 m.Show()
 print("------------------------")
