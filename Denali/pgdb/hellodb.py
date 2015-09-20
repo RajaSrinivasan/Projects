@@ -7,6 +7,7 @@ password='kW8VJAcjYmPBA2'
 port=5432
 database='tutor'
 
+
 db=pg_driver.connect( user=user, password=password, host=host, port=port, database=database)
 print(db.version)
 print(db.version_info)

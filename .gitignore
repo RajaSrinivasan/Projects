@@ -23,3 +23,5 @@ ihbff/build/ihbranalyze
 
 *.log
 stm32f4/Hello/build/hello
+
+*.pyc
