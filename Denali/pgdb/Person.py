@@ -21,10 +21,9 @@ class Person:
     def Show(self):
         #If n < len(self):
         print("---------------------")
-        print("ID=",self.ID," Name=", self.FirstName , self.LastName, "City " , self.City , "Phone1 " , self.Ph1, "Phone2" , self.Ph2 , "EMail1 " , self.Email1 )
+        print("ID=",self.ID," Name=", self.FirstName , self.LastName )
 
-
-    def SaveToDatabase(self,db):
+    def GetNextID(self,db):
         nextidstmt='SELECT max("ID") from people'
         nextid=db.prepare(nextidstmt)
         maxid='0'
@@ -33,7 +32,10 @@ class Person:
         #print(maxid)
         newid=int(maxid)+1
         self.ID=newid
-        sqlstmt="INSERT INTO people (" + '"ID" , "Name"' + ") values (" + str(self.ID) + ', ' + "'" + self.Name  + "' )"
+
+    def SaveToDatabase(self,db):
+        #insert into people ("ID", "Name") values ('5', '{{Durga}, {Krishnan}}')
+        sqlstmt="INSERT INTO people (" + '"ID" , "Name" ' + ") values (" + str(self.ID) + ",'{" + self.FirstName  + "," + self.LastName + "}' )"
         print(sqlstmt)
         db.execute(sqlstmt)
 
@@ -63,7 +65,7 @@ class Persons:
             else:
                 newperson.Ph1 = phone
                 newperson.Ph2 = phone
-            
+
             newperson.Email1=row["Email"]
             self.all.append(newperson)
 

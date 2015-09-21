@@ -12,9 +12,18 @@ def ConnecttoDB():
     db=pg_driver.connect( user=user, password=password, host=host, port=port, database=database)
     return db
 
+
 databasecon = ConnecttoDB()
-persons=Person.Persons()
-persons.LoadFromDatabase(databasecon)
-persons.ShowAll()
+
+p= Person.Person()
+p.FirstName = "Tara"
+p.LastName = "Anand"
+p.GetNextID(databasecon)
+p.SaveToDatabase(databasecon)
+p.Show()
+
+#persons=Person.Persons()
+#persons.LoadFromDatabase(databasecon)
+#persons.ShowAll()
 databasecon.close()
 
