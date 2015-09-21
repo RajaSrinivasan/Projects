@@ -21,8 +21,7 @@ class Person:
     def Show(self):
         #If n < len(self):
         print("---------------------")
-        print("ID=",self.ID," Name=", self.FirstName , self.LastName, "City " , self.City , "Phone1 " , self.Ph1)
-        print("--------------------")
+        print("ID=",self.ID," Name=", self.FirstName , self.LastName, "City " , self.City , "Phone1 " , self.Ph1, "Phone2" , self.Ph2 , "EMail1 " , self.Email1 )
 
 
     def SaveToDatabase(self,db):
@@ -59,9 +58,12 @@ class Persons:
                     newperson.Ph1 = phone[0]
                 if len(phone) > 1:
                     newperson.Ph2 = phone[1]
+                else:
+                    newperson.Ph2 = None
             else:
                 newperson.Ph1 = phone
                 newperson.Ph2 = phone
+            
             newperson.Email1=row["Email"]
             self.all.append(newperson)
 
