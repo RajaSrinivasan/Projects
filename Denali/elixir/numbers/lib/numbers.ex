@@ -18,45 +18,53 @@ defmodule Numbers do
         _digits(num)
     end
 
-    def displaydigs([h|t]) do
-        IO.puts(h)
-        displaydigs(t)
-    end
-    
-    def displaydigs([]) do
+    def displaydigs(digs) do
+		Enum.each(digs, fn(x) -> IO.puts(x) end)
     end
     
     # given a list with each decimal digit as an element
-    # compute the value
+    # compute the value    
     def decimal(num) do
-        if length(num) == 1 do
-           Enum.at(num,0)
-        else
-            [h|t] = num
-            n1=h
-            n2=decimal(t)
-            trunc(n1*:math.pow(10,length(t)) + n2)
-        end
+        Enum.reduce(num, fn(n,acc) -> acc*10 + n end)
     end
-
+    
+    
     # Is the given number a Kaprekar number?
     # Ref: https://en.wikipedia.org/wiki/Kaprekar_number
     def is_kaprekar(num) do
         numsq = num * num
         numsqdigs = digits(numsq)
-        lsqdigs = Enum.slice( numsqdigs , 0 , trunc(length(numsqdigs)/2))
-        rsqdigs = Enum.slice( numsqdigs , trunc(length(numsqdigs)/2) , round(length(numsqdigs)/2) )
-        lsnum=decimal(lsqdigs)
-        rsnum=decimal(rsqdigs)
-        if (rsnum > 0) and (lsnum > 0) do
-           if (rsnum+lsnum) == num do
-           	  :true
-           else
-              :false
-           end   
+        count=0
+        Enum.any?(1..length(numsqdigs)-1 , fn(x) -> 
+                                              if :true == _kaprekar(num,numsqdigs,x) do 
+                                                 IO.puts("Kaprekar")
+                                                 :true
+                                              else
+                                                 :false
+                                              end 
+                                                 end)
+    end
+    
+    def _kaprekar(num,numdigs,n) do
+        {a,b}=Enum.split(numdigs,n)
+        IO.puts("------")
+        IO.puts("a")
+        displaydigs(a)
+        IO.puts("b")
+        displaydigs(b)
+        anum=decimal(a)
+        bnum=decimal(b)
+        IO.puts("anum")
+        IO.puts(anum)
+        IO.puts("bnum")
+        IO.puts(bnum)
+        IO.puts(anum+bnum)
+        if anum+bnum == num do
+           IO.puts("Returning true")
+           :true
         else
-        	:false
-        end	
+           :false
+        end
     end
     
     # Private Implementation functions
