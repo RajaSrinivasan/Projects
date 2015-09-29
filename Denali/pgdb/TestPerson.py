@@ -16,14 +16,14 @@ def ConnecttoDB():
 databasecon = ConnecttoDB()
 
 p= Person.Person()
-p.FirstName = "Tara"
-p.LastName = "Anand"
-p.GetNextID(databasecon)
-p.SaveToDatabase(databasecon)
+newid=p.GetNextID(databasecon)
+p.setID(newid)
+p.setName("Raman","VK")
 p.Show()
+p.SaveToDatabase(databasecon)
 
-#persons=Person.Persons()
-#persons.LoadFromDatabase(databasecon)
-#persons.ShowAll()
+persons=Person.Persons()
+persons.LoadFromDatabase(databasecon)
+persons.ShowAll()
 databasecon.close()
 

@@ -4,24 +4,38 @@ import postgresql.driver as pg_driver
 class Person:
 
     def __init__(self):
-        pass
+        self._ID=0
+        self._FirstName="Unknown"
+        self._LastName="Unknown"
+        self._Phone="Unknown"
+        self._Email="Unknown"
+        self._Address="Unknown"
+        self._City="Unknown"
 
-    def __get__(self, obj, objtype):
-    #    print('retrieving ', self.name)
-        return self.val
+    def setID(self,ID):
+        self._ID=ID
 
-    def __set__(self,obj,val):
-        print('Updating')
+    def getID(self):
+        return self._ID
 
-    def __delete__(self,obj):
-        if self.fdel is None:
-            raise AttributeError("Cant delete attribute")
-        self.fdel(obj)
+    def setName(self,firstname,lastname):
+        self._FirstName=firstname
+        self._LastName=lastname
+
+    def getName(self):
+        return self._FirstName,self._LastName
+
+    def setDetails(self,phone="Unknown",email="Unknown",address="Unknown",city="Unknown"):
+        self._Phone=phone
+        self._Email=email
+        self._Address=address
+        self._City=city
 
     def Show(self):
         #If n < len(self):
         print("---------------------")
-        print("ID=",self.ID," Name=", self.FirstName , self.LastName )
+        print("ID=",self._ID," Name=", self._FirstName , self._LastName )
+        print("---------City=",self._City, "Address=",self._Address,"Email=",self._Email)
 
     def GetNextID(self,db):
         nextidstmt='SELECT max("ID") from people'
@@ -31,11 +45,11 @@ class Person:
             maxid=row[0]
         #print(maxid)
         newid=int(maxid)+1
-        self.ID=newid
+        return newid
 
     def SaveToDatabase(self,db):
         #insert into people ("ID", "Name") values ('5', '{{Durga}, {Krishnan}}')
-        sqlstmt="INSERT INTO people (" + '"ID" , "Name" ' + ") values (" + str(self.ID) + ",'{" + self.FirstName  + "," + self.LastName + "}' )"
+        sqlstmt="INSERT INTO people (" + '"ID" , "Name" ' + ") values (" + str(self._ID) + ",'{" + self._FirstName  + "," + self._LastName + "}' )"
         print(sqlstmt)
         db.execute(sqlstmt)
 
@@ -49,24 +63,9 @@ class Persons:
         preps=db.prepare(allpersonssql)
         for row in preps:
             newperson=Person()
-            newperson.ID=row["ID"]
-            newperson.FirstName=row["Name"][0]
-            newperson.LastName=row["Name"][1]
-            newperson.Addr=row["Address"]
-            newperson.City=row["City"]
-            phone=row["Phone"]
-            if not phone is None:
-                if len(phone) > 0:
-                    newperson.Ph1 = phone[0]
-                if len(phone) > 1:
-                    newperson.Ph2 = phone[1]
-                else:
-                    newperson.Ph2 = None
-            else:
-                newperson.Ph1 = phone
-                newperson.Ph2 = phone
-
-            newperson.Email1=row["Email"]
+            newperson.setID(row["ID"])
+            newperson.setName(row["Name"][0],row["Name"][1])
+            newperson.setDetails(address=row["Address"],city=row["City"],email=row["Email"])
             self.all.append(newperson)
 
 
