@@ -17,10 +17,8 @@ class Teacher(Person.Person):
         print("---------Modality=",self._Modality, "Bio=",self._Bio,"Website=",self._Website, "TeachOverInternet=",self._TeachOverInternet)
 
     def SaveToDatabase(self,db):
-        super(Teacher,self).SavetoDatabase(db)
-        #insert into people ("ID", "Name") values ('5', '{{Durga}, {Krishnan}}')
-        #insert into teacher ("ID", "Instrumentid") values ('5', '{{Durga}, {Krishnan}}')
-        sqlstmt="INSERT INTO teacher (" + '"ID" , "Name" ' + ") values (" + str(self.ID) + ",'{" + self.FirstName  + "," + self.LastName + "}' )"
+        super(Teacher,self).SaveToDatabase(db)
+        sqlstmt= "INSERT INTO teacher (" + '"ID" , "Modality" ' + ") values (" +str(self.getID())+ ", "+ str(self._Modality) + ")"
         print(sqlstmt)
         db.execute(sqlstmt)
 
