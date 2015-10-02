@@ -37,7 +37,6 @@ defmodule Numbers do
         count=0
         Enum.any?(1..length(numsqdigs)-1 , fn(x) -> 
                                               if :true == _kaprekar(num,numsqdigs,x) do 
-                                                 IO.puts("Kaprekar")
                                                  :true
                                               else
                                                  :false
@@ -47,20 +46,9 @@ defmodule Numbers do
     
     def _kaprekar(num,numdigs,n) do
         {a,b}=Enum.split(numdigs,n)
-        IO.puts("------")
-        IO.puts("a")
-        displaydigs(a)
-        IO.puts("b")
-        displaydigs(b)
         anum=decimal(a)
         bnum=decimal(b)
-        IO.puts("anum")
-        IO.puts(anum)
-        IO.puts("bnum")
-        IO.puts(bnum)
-        IO.puts(anum+bnum)
         if anum+bnum == num do
-           IO.puts("Returning true")
            :true
         else
            :false
