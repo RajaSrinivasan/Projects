@@ -7,6 +7,7 @@ defmodule Numbers.Mixfile do
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     escript: escript ,
      deps: deps]
   end
 
@@ -28,5 +29,9 @@ defmodule Numbers.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     []
+  end
+  
+  defp escript do
+      [ main_module: Numbers.CLI ]
   end
 end

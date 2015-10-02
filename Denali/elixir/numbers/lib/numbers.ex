@@ -63,5 +63,11 @@ defmodule Numbers do
     def _digits(argdig) when argdig > 9 do
         List.flatten([ _digits(div(argdig,10)) ,rem(argdig,10)])
     end
+      
+    def main(argv) do
+        IO.puts("Numbers module tester")
+        res = is_kaprekar( String.to_integer( Enum.at(argv,0) ) )
+        IO.puts(res)
+    end
 end
 
