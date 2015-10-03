@@ -30,14 +30,15 @@ defmodule Numbers do
     
     # Factorize a number
     def factorize(num) do
-        r=Enum.reduce(1..trunc(num/2) ,
+        r=Enum.reduce(1..trunc(:math.sqrt(num)) ,
                            fn(x,fac) ->
                              if :true == is_factor(num,x) do
-                                fac = List.flatten( [fac , x ] )
+                                y = div(num,x)
+                                fac = List.flatten( [fac , x , y] )
                              end
                              fac
                            end  )
-        List.flatten( [r , num] )
+        Enum.sort(List.flatten( [r , num] ))
     end
     
     def is_factor(num,x) do
