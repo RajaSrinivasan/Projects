@@ -28,13 +28,46 @@ defmodule Numbers do
         Enum.reduce(num, fn(n,acc) -> acc*10 + n end)
     end
     
+    # Factorize a number
+    def factorize(num) do
+        r=Enum.reduce(1..trunc(num/2) ,
+                           fn(x,fac) ->
+                             if :true == is_factor(num,x) do
+                                fac = List.flatten( [fac , x ] )
+                             end
+                             fac
+                           end  )
+        List.flatten( [r , num] )
+    end
     
+    def is_factor(num,x) do
+        if rem(num,x) == 0 do
+           :true
+        else
+           :false
+        end
+    end
+
+    # Is this a perfect number?
+
+    def is_perfect(num) do
+        fac=factorize(num)
+        acc=0
+        sumoffactors = Enum.reduce(fac , acc , fn(x,acc) ->
+                                    acc = acc + x
+                                    acc
+                                end )
+        if num*2 == sumoffactors do
+           :true
+        else
+           :false
+        end
+    end
     # Is the given number a Kaprekar number?
     # Ref: https://en.wikipedia.org/wiki/Kaprekar_number
     def is_kaprekar(num) do
         numsq = num * num
         numsqdigs = digits(numsq)
-        count=0
         Enum.any?(1..length(numsqdigs)-1 , fn(x) -> 
                                               if :true == _kaprekar(num,numsqdigs,x) do 
                                                  :true
@@ -64,10 +97,6 @@ defmodule Numbers do
         List.flatten([ _digits(div(argdig,10)) ,rem(argdig,10)])
     end
       
-    def main(argv) do
-        IO.puts("Numbers module tester")
-        res = is_kaprekar( String.to_integer( Enum.at(argv,0) ) )
-        IO.puts(res)
-    end
+
 end
 
