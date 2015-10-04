@@ -29,7 +29,7 @@ defmodule Numbers do
     end
     
     # Factorize a number
-    def factorize(num) do
+    def factorize(num) when num > 1 do
         r=Enum.reduce(1..trunc(num/2) ,
                            fn(x,fac) ->
                              if :true == is_factor(num,x) do
@@ -38,6 +38,10 @@ defmodule Numbers do
                              fac
                            end  )
         List.flatten( [r , num] )
+    end
+
+    def factorize(num) when num == 1 do
+        [1]
     end
     
     def is_factor(num,x) do
@@ -48,8 +52,26 @@ defmodule Numbers do
         end
     end
 
-    # Is this a perfect number?
+    def number_table(num) do
+        acc=0
+        Enum.reduce( 1..num ,
+                     acc ,
+                     fn(x , acc) ->
+                         IO.write("#{x}\t")
+                         if (:true == is_prime(x)) do
+                            IO.write("\tprime")
+                         else
+                            IO.write("\t\t")
+                         end
+                         if (:true == is_perfect(x)) do
+                              IO.write("\tperfect")
+                         end
+                         IO.puts("")
+                     end
+                     )
+    end
 
+    # Is this a perfect number?
     def is_perfect(num) do
         fac=factorize(num)
         acc=0
@@ -62,6 +84,25 @@ defmodule Numbers do
         else
            :false
         end
+    end
+
+    # Is this a prime number
+    def is_prime(num) when num > 2 do
+        if even(num) do
+           :false
+        end
+        fac = factorize(num)
+        if length(fac) == 2 do
+           :true
+        else
+           :false
+        end
+    end
+    def is_prime(num) when num == 1 do
+       :false
+    end
+    def is_prime(num) when num == 2 do
+       :true
     end
     # Is the given number a Kaprekar number?
     # Ref: https://en.wikipedia.org/wiki/Kaprekar_number
