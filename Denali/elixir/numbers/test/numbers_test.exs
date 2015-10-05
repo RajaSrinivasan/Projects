@@ -25,4 +25,9 @@ defmodule NumbersTest do
       assert :false = is_perfect(25)
       assert :true = is_perfect(33550336)
   end
+  test "Prime Numbers" do
+      assert :true = is_prime(13)
+      assert :true = is_prime(32582657)
+      assert :false = is_prime(32582659)
+  end
 end
