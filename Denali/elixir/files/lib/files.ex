@@ -17,15 +17,15 @@ defmodule Files do
           fname ->
 
                        mydigest = digest(fname,alg)
-                       IO.puts("File #{fname} Algorithm #{alg} Digest: #{mydigest}")
+                       IO.puts("Algorithm #{alg} Digest: #{mydigest}")
        end
    end
 
    def digest_tasks(fname) do
-       algorithms=[:md5,:ripemd160,:sha,:sha224,:sha256,:sha384,:sha512]
+       algorithms = :crypto.supports()[:hashs]
        alg=0
-       Enum.reduce(:crypto.supports, alg ,
-                               fn(x,acc) ->
+       Enum.reduce(algorithms, alg ,
+                               fn(x,_) ->
                                    pid=spawn(Files,:digest_task,[x])
                                    send(pid,fname)
                                end
@@ -35,6 +35,7 @@ defmodule Files do
    def digest(filename) do
        digest(filename,:md5)
    end
+   
    def digest(filename,alg) do
        fcontents=File.read!(filename)
        mydigest = :crypto.hash_init(alg)
