@@ -1,4 +1,28 @@
 defmodule Files do
+
+   def linecount(filename) do
+       f=File.stream!(filename,[:read],:line)
+       lines=0
+       lines=Enum.reduce( f , lines ,
+                    fn(x,lc) ->
+                        lc=lc+1
+                        lc
+                        end)
+       File.close f
+       lines
+   end
+
+   def linecount(filename, table) do
+       lc=linecount(filename)
+       ext=Path.extname(filename)
+       if Dict.has_key?(table,ext) do
+          IO.puts(ext)
+          IO.puts("already exists")
+       else
+          Dict.put(table,ext,lc)
+       end
+   end
+
    def show(filename) do
        f=File.stream!(filename,[:read],:line)
        linenum=0
