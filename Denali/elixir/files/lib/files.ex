@@ -4,7 +4,7 @@ defmodule Files do
        f=File.stream!(filename,[:read],:line)
        lines=0
        lines=Enum.reduce( f , lines ,
-                    fn(x,lc) ->
+                    fn(_,lc) ->
                         lc=lc+1
                         lc
                         end)
@@ -45,7 +45,7 @@ defmodule Files do
    def linecountdir(dirname) do
        table=HashDict.new()
        table=Enum.sort(linecountdir(dirname,table))
-       Enum.reduce(table,[],fn(x,acc) ->
+       Enum.reduce(table,[],fn(x,_) ->
                           {name,stats}=x
                           {filecount,lines}=stats
                           IO.puts("#{name}\t\t: #{filecount} \t #{lines}")
@@ -58,10 +58,10 @@ defmodule Files do
                                        List.flatten([Path.join(Path.absname(dirname),x) , acc])
                                  end
                             )
-        tbl=linecount( filelist , table )
+        linecount( filelist , table )
      else
         IO.puts("Error for #{dirname} - #{status}")
-        tbl=table
+        table
      end
    end
 
