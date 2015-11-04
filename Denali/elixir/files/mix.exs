@@ -7,6 +7,7 @@ defmodule Files.Mixfile do
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     escript: escript_config,
      deps: deps]
   end
 
@@ -14,7 +15,7 @@ defmodule Files.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger , :tzdata]]
+    [applications: [:logger] ]
   end
 
   # Dependencies can be Hex packages:
@@ -27,6 +28,11 @@ defmodule Files.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:timex, "~> 1.0.0-pre"}]
+    []
   end
+
+  defp escript_config do
+       [ main_module: Files.CLI ]
+  end
+
 end
