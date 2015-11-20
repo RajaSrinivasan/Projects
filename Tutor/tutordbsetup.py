@@ -92,6 +92,12 @@ def listmodalitiesJSON():
      allm = listmodalities()
      return jsonify(Modalities=[i.serialize for i in allm])
 
+def editmodality(id, name):
+    item = session.query(Modality).filter_by(id=id).one()
+    item.name = name
+    session.add(item)
+    session.commit()
+
 def deletemodality(id):
     try:
         item = session.query(Modality).filter_by(id=id).one()
@@ -101,3 +107,6 @@ def deletemodality(id):
     except:
         pass
 
+def getmodname(id):
+    item = session.query(Modality).filter_by(id=id).one()
+    return item.name
