@@ -17,7 +17,7 @@ def rt_modJSON():
 
 
 @app.route('/modalities/new',methods = ['GET','POST'])
-def rt_addmodolity():
+def rt_addmodality():
     if request.method == 'POST':
         name = request.form['t_mnam']
         tutordbsetup.addmodality(name)
