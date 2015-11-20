@@ -12,8 +12,8 @@ def rt_modalities():
 
 @app.route("/modalities/JSON")
 def rt_modJSON():
-     allrest = RestaurantSite.rawlistofrestaurants()
-     return jsonify(Restaurants=[i.serialize for i in allrest])
+     allm = tutordbsetup.listmodalities()
+     return jsonify(Modalities=[i.serialize for i in allm])
 
 
 @app.route('/modalities/new',methods = ['GET','POST'])
