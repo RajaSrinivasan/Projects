@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<h1>Add New Tutor</h1>
+
+    <form method='POST' enctype='multipart/form-data'>
+        <table>
+            <tr>
+                <th>Item Name</th>
+                <th>Item Value</th>
+            </tr>
+
+            <tr>
+                <td>First Name (Reqd): </td>
+                <td><input type="text" name="firstname" value=""></td>
+            </tr>
+            <tr>
+                <td>Last Name (Reqd): </td>
+                <td><input type="text" name="lastname" value=""></td>
+            </tr>
+            <tr>
+                <td>Address Line 1: </td>
+                <td><input type="text" name="address1" value=""></td>
+            </tr>
+            <tr>
+                <td>Address Line 2: </td>
+                <td><input type="text" name="address2" value=""></td>
+            </tr>
+            <tr>
+                <td>City: </td>
+                <td><input type="text" name="city" value=""></td>
+            </tr>
+            <tr>
+                <td>State (Reqd): </td>
+                <td>
+                <select name="state">
+                    <option value="AL">AL</option>
+                    <option value="AK">AK</option>
+                    <option value="AZ">AZ</option>
+                    <option value="AR">AR</option>
+                    <option value="CA">CA</option>
+                    <option value="CO">CO</option>
+                    <option value="CT">CT</option>
+                    <option value="DE">DE</option>
+                    <option value="DC">DC</option>
+                    <option value="FL">FL</option>
+                    <option value="GA">GA</option>
+                    <option value="HI">HI</option>
+                    <option value="ID">ID</option>
+                    <option value="IL">IL</option>
+                    <option value="IN">IN</option>
+                    <option value="IA">IA</option>
+                    <option value="KS">KS</option>
+                    <option value="KY">KY</option>
+                    <option value="LA">LA</option>
+                    <option value="ME">ME</option>
+                    <option value="MD">MD</option>
+                    <option value="MA">MA</option>
+                    <option value="MI">MI</option>
+                    <option value="MN">MN</option>
+                    <option value="MS">MS</option>
+                    <option value="MO">MO</option>
+                    <option value="MT">MT</option>
+                    <option value="NE">NE</option>
+                    <option value="NV">NV</option>
+                    <option value="NH">NH</option>
+                    <option value="NJ">NJ</option>
+                    <option value="NM">NM</option>
+                    <option value="NY">NY</option>
+                    <option value="NC">NC</option>
+                    <option value="ND">ND</option>
+                    <option value="OH">OH</option>
+                    <option value="OK">OK</option>
+                    <option value="OR">OR</option>
+                    <option value="PA">PA</option>
+                    <option value="RI">RI</option>
+                    <option value="SC">SC</option>
+                    <option value="SD">SD</option>
+                    <option value="TN">TN</option>
+                    <option value="TX">TX</option>
+                    <option value="UT">UT</option>
+                    <option value="VT">VT</option>
+                    <option value="VA">VA</option>
+                    <option value="WA">WA</option>
+                    <option value="WV">WV</option>
+                    <option value="WI">WI</option>
+                    <option value="WY">WY</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>Zip: </td>
+                <td><input type="text" name="zip" value=""></td>
+            </tr>
+             <tr>
+                <td>Phone1: </td>
+                <td><input type="tel" name="phone1" value=""></td>
+            </tr>
+             <tr>
+                <td>Phone2: </td>
+                <td><input type="tel" name="phone2" value=""></td>
+            </tr>
+             <tr>
+                <td>Email (Reqd): </td>
+                <td><input type="email" name="email" value=""></td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <th>Item Name</th>
+                <th>Item Value</th>
+            </tr>
+            <tr>
+                <td>Instrument1(Reqd):</td>
+                <td><input type="text" name="modality1" value="Veena"></td>
+            </tr>
+            <tr>
+                <td>Instrument2(Reqd):</td>
+                <td><input type="text" name="modality2" value="Flute"></td>
+            </tr>
+            <tr>
+                <td>Genre:</td>
+                <td><input type="text" name="genre" value="Carnatic"></td>
+            </tr>
+            <tr>
+                <td>Teach Over Internet?:</td>
+                <td><input type="text" name="tchoverinternet" value="Yes"></td>
+            </tr>
+            <tr>
+                <td>Web Page: </td>
+                <td><input type="text" name="website" value="website.com"></td>
+            </tr>
+
+        </table>
+
+        <input type="submit" value="Add" />
+    </form>
+</body>
+</html>
