@@ -51,6 +51,9 @@ class Person(Base):
     phone1 = Column(String(15), nullable = True)
     phone2 = Column(String(15), nullable = True)
 
+    def __str__(self):
+        return "firstname = %s lastname = %s " %  (self.firstname, self.lastname)
+
     def setProperties(self,props):
         self.firstname=props["firstname"]
         self.lastname=props["lastname"]
@@ -99,7 +102,11 @@ class Tutor(Base):
     modalityrel1 = relationship("Modality", foreign_keys=[modalityid1])
     modalityrel2 = relationship("Modality", foreign_keys=[modalityid2])
 
+    def __str__(self):
+        return "id = %d modalityid1 = %d genre = %s " % (self.id,self.modalityid1,self.genre)
+
     def setPerson(self,person):
+
         session.flush()
         self.personid=person.id
         print("set personid complete ", self.personid)
@@ -129,7 +136,10 @@ class Tutor(Base):
         print("set tutor props complete")
 
 def listtutors():
-    items = session.query(Tutor).all()
+    items = (session.query(Person, Tutor)
+            .filter(Person.id == Tutor.personid)
+            .order_by(Person.id)
+            ).all()
     return items
 
 '''

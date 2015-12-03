@@ -5,5 +5,8 @@ from tutordbsetup import Modality, Person, Tutor, listtutors
 
 tutors = listtutors()
 print(len(tutors))
+
 for t in tutors:
-    print(t.id, " ", t.personid, t.modalityid1)
+    print(t[0], t[1])
+
+    #print(t[0].firstname, t[1].modalityid1)
