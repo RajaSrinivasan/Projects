@@ -9,7 +9,8 @@ app = Flask(__name__)
 #***************************Tutors**************************
 @app.route("/tutors")
 def rt_tutors():
-    return render_template('tutors.html')
+    alltutors = tutordbsetup.listtutors()
+    return render_template('tutors.html',alltutors=alltutors)
 
 @app.route('/tutors/new',methods = ['GET','POST'])
 def rt_addtutor():

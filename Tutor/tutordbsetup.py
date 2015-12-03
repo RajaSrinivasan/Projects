@@ -136,8 +136,9 @@ class Tutor(Base):
         print("set tutor props complete")
 
 def listtutors():
-    items = (session.query(Person, Tutor)
+    items = (session.query(Person, Tutor, Modality)
             .filter(Person.id == Tutor.personid)
+            .filter(Tutor.modalityid1==Modality.id)
             .order_by(Person.id)
             ).all()
     return items
