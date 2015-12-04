@@ -46,7 +46,8 @@ def rt_addtutor():
             print ("Error")
             return redirect(url_for('rt_tutors',external=True))
     else:
-        return render_template('tutor.html')
+        allm=tutordbsetup.listmodalities()
+        return render_template('tutor.html', allm=allm)
 
 #***************************Modalities**************************
 @app.route("/modalities")

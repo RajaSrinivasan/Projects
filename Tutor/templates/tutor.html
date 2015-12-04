@@ -114,13 +114,20 @@
                 <th>Item Name</th>
                 <th>Item Value</th>
             </tr>
-            <tr>
                 <td>Instrument1(Reqd):</td>
-                <td><input type="text" name="modality1" value="Veena"></td>
+                <td><select name="modality1">
+                     {% for m in allm %}
+                        <option value="{{m.name}}">{{m.name}}</option>
+                     {% endfor %}
+                </select></td>
             </tr>
             <tr>
-                <td>Instrument2(Reqd):</td>
-                <td><input type="text" name="modality2" value="Flute"></td>
+                <td>Instrument2:</td>
+                <td><select name="modality2">
+                     {% for m in allm %}
+                        <option value="{{m.name}}">{{m.name}}</option>
+                     {% endfor %}
+                </select></td>
             </tr>
             <tr>
                 <td>Genre:</td>
@@ -132,7 +139,7 @@
             </tr>
             <tr>
                 <td>Web Page: </td>
-                <td><input type="text" name="website" value="website.com"></td>
+                <td><input type="url" name="website" value="website.com"></td>
             </tr>
 
         </table>

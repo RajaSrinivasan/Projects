@@ -130,7 +130,7 @@ class Tutor(Base):
         else:
             self.modalityid1=0
         if "modality2" in tprops:
-            self.modalityid1 = getmodid(tprops["modality2"])
+            self.modalityid2 = getmodid(tprops["modality2"])
         else:
             self.modalityid2=0
         print("set tutor props complete")
@@ -143,6 +143,14 @@ def listtutors():
             ).all()
     return items
 
+def searchtutors(city, state, modalityid1, modalityid2):
+    items = (session.query(Person, Tutor, Modality)
+            .filter(Person.id == Tutor.personid)
+            .filter(Tutor.modalityid1==Modality.id)
+            .filter(Person.city==city)|(Person.state==state)|(Tutor.modalityid1==modalityid1)|(Tutor.modalityid2==modalityid2)
+            .order_by(Person.id)
+            ).all()
+    return items
 '''
     @property
     def serialize(self):
@@ -188,9 +196,13 @@ def getmodname(id):
     return item.name
 
 def getmodid(name):
-    item = session.query(Modality).filter_by(name=name).one()
-    print("modid= ", item.id, name)
-    return item.id
+    try:
+        item = session.query(Modality).filter_by(name=name).one()
+        print("modid= ", item.id, name)
+        return item.id
+    except:
+        print("no Modality called ", name)
+        return 0
 
 engine = create_engine('sqlite:///tutor.db')
 Base.metadata.bind = engine
