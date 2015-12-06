@@ -49,6 +49,11 @@ def rt_addtutor():
         allm=tutordbsetup.listmodalities()
         return render_template('tutor.html', allm=allm)
 
+@app.route("/tutors/edit/<int:t_id>/",methods = ['GET','POST'])
+def rt_edittutor(t_id):
+        print("Edit Tutor function ", t_id)
+        return t_id
+
 #***************************Modalities**************************
 @app.route("/modalities")
 def rt_modalities():
@@ -64,35 +69,36 @@ def rt_modJSON():
 @app.route('/modalities/new',methods = ['GET','POST'])
 def rt_addmodality():
     if request.method == 'POST':
-        name = request.form['t_mnam']
+        name = request.form['name']
         tutordbsetup.addmodality(name)
         flash("New Modality %s Added" % name)
         return redirect(url_for('rt_modalities',external=True))
     else:
-        return render_template('addnewmodality.html')
+        return render_template('modality.html',func="add")
 
-@app.route("/modalities/edit/<int:m_id>/",methods = ['GET','POST'])
-def rt_editmodality(m_id):
+@app.route("/modalities/edit/<int:id>/",methods = ['GET','POST'])
+def rt_editmodality(id):
     if request.method == 'POST':
-        m_name = request.form['editmod']
-        m_id = request.form['mid']
-        tutordbsetup.editmodality(m_id,m_name)
+        name = request.form['name']
+        id = request.form['id']
+        tutordbsetup.editmodality(id,name)
         return redirect(url_for('rt_modalities',external=True))
     else:
-        mname = tutordbsetup.getmodname(m_id)
-        return render_template('editmodality.html',eid=m_id,ename=mname)
+        name = tutordbsetup.getmodname(id)
+        return render_template('modality.html',func="edit", id=id,name=name)
 
-@app.route("/modalities/delete/<int:m_id>/",methods = ['GET','POST'])
-def rt_deletemodality(m_id):
+@app.route("/modalities/delete/<int:id>/",methods = ['GET','POST'])
+def rt_deletemodality(id):
     if request.method == 'POST':
-        m_name = request.form['delmod']
-        m_id = request.form['mid']
-        tutordbsetup.deletemodality(m_id)
-        flash("Modality %s Deleted" % m_name)
+        #name = request.form['name']
+        print(id)
+        id = request.form['id']
+        tutordbsetup.deletemodality(id)
+        #flash("Modality %s Deleted" % name)
         return redirect(url_for('rt_modalities',external=True))
     else:
-        mname = tutordbsetup.getmodname(m_id)
-        return render_template('deletemodality.html',eid=m_id,ename=mname)
+        name = tutordbsetup.getmodname(id)
+        return render_template('modality.html',fun="del", id=id,name=name)
 
 if __name__ == "__main__":
     app.secret_key = "supersecretkey"

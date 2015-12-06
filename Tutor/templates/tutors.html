@@ -14,7 +14,9 @@
         <td>{{i[0].firstname}}</td>
         <td>{{i[0].lastname}}</td>
         <td>{{i[2].name}}</td>
+        <td>{{i[1].id}}</td>
         <td>{{i[1].genre}}</td>
+        <td><a href="{{url_for('rt_edittutor',t_id=i[1].id, _external=True)}}">Edit</a></td>
     </tr>
     {% endfor %}
 </table>

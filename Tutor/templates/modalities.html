@@ -28,8 +28,8 @@
     <tr>
         <td>{{i.id}}</td>
         <td>{{i.name}}</td>
-        <td><a href="{{url_for('rt_editmodality',m_id=i.id, _external=True)}}">Edit</a></td>
-        <td><a href="{{url_for('rt_deletemodality',m_id=i.id, _external=True)}}">Delete</a></td>
+        <td><a href="{{url_for('rt_editmodality',id=i.id, _external=True)}}">Edit</a></td>
+        <td><a href="{{url_for('rt_deletemodality',id=i.id, _external=True)}}">Delete</a></td>
     </tr>
     {% endfor %}
 </table>
