@@ -26,6 +26,12 @@ class Modality(Base):
     id = Column(Integer, primary_key = True)
     name = Column(String(80), nullable = False)
 
+    def __str__(self):
+        return "name = %s" %  (self.name)
+
+    def show(self):
+        print("id: ", self.id)
+        print("name: ", self.name)
 
     @property
     def serialize(self):
@@ -52,7 +58,13 @@ class Person(Base):
     phone2 = Column(String(15), nullable = True)
 
     def __str__(self):
-        return "firstname = %s lastname = %s " %  (self.firstname, self.lastname)
+        return "firstname = %s lastname = %s" %  (self.firstname, self.lastname)
+
+    def show(self):
+        print("id: ", self.id)
+        print("firstname: ", self.firstname)
+        print("lastname: ", self.lastname)
+        print("state: ", self.state)
 
     def setProperties(self,props):
         self.firstname=props["firstname"]
@@ -105,8 +117,12 @@ class Tutor(Base):
     def __str__(self):
         return "id = %d modalityid1 = %d genre = %s " % (self.id,self.modalityid1,self.genre)
 
-    def setPerson(self,person):
+    def show(self):
+        print("modid1: ", getmodname(self.modalityid1))
+        print("modid2: ", getmodname(self.modalityid2))
 
+
+    def setPerson(self,person):
         session.flush()
         self.personid=person.id
         print("set personid complete ", self.personid)
@@ -142,6 +158,14 @@ def listtutors():
             .order_by(Person.id)
             ).all()
     return items
+
+def findtutor(tutorid):
+    item = (session.query(Person, Tutor, Modality)
+            .filter(Tutor.id == tutorid)
+            .filter(Person.id == Tutor.personid)
+            .filter(Tutor.modalityid1==Modality.id)
+            ).one()
+    return item
 
 def searchtutors(city, state, modalityid1, modalityid2):
     items = (session.query(Person, Tutor, Modality)

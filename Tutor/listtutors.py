@@ -7,6 +7,6 @@ tutors = listtutors()
 print(len(tutors))
 
 for t in tutors:
-    print(t[0], t[1], t[2].name)
+    print(t[0], t[1], t[2])
 
     #print(t[0].firstname, t[1].modalityid1)

@@ -16,28 +16,28 @@
 
             <tr>
                 <td>First Name (Reqd): </td>
-                <td><input type="text" name="firstname" value=""></td>
+                <td><input type="text" name="firstname" value="{{person.firstname}}"></td>
             </tr>
             <tr>
                 <td>Last Name (Reqd): </td>
-                <td><input type="text" name="lastname" value=""></td>
+                <td><input type="text" name="lastname" value="{{person.lastname}}"></td>
             </tr>
             <tr>
                 <td>Address Line 1: </td>
-                <td><input type="text" name="address1" value=""></td>
+                <td><input type="text" name="address1" value="{{person.address1}}"></td>
             </tr>
             <tr>
                 <td>Address Line 2: </td>
-                <td><input type="text" name="address2" value=""></td>
+                <td><input type="text" name="address2" value="{{person.address2}}"></td>
             </tr>
             <tr>
                 <td>City: </td>
-                <td><input type="text" name="city" value=""></td>
+                <td><input type="text" name="city" value="{{person.city}}"></td>
             </tr>
             <tr>
                 <td>State (Reqd): </td>
                 <td>
-                <select name="state">
+                <select name="state" value="{{person.state}}">
                     <option value="AL">AL</option>
                     <option value="AK">AK</option>
                     <option value="AZ">AZ</option>
@@ -93,19 +93,19 @@
             </tr>
             <tr>
                 <td>Zip: </td>
-                <td><input type="text" name="zip" value=""></td>
+                <td><input type="text" name="zip" value="{{person.zip}}"></td>
             </tr>
              <tr>
                 <td>Phone1: </td>
-                <td><input type="tel" name="phone1" value=""></td>
+                <td><input type="tel" name="phone1" value="{{person.phone1}}"></td>
             </tr>
              <tr>
                 <td>Phone2: </td>
-                <td><input type="tel" name="phone2" value=""></td>
+                <td><input type="tel" name="phone2" value="{{person.phone2}}"></td>
             </tr>
              <tr>
                 <td>Email (Reqd): </td>
-                <td><input type="email" name="email" value=""></td>
+                <td><input type="email" name="email" value="{{person.email}}"></td>
             </tr>
         </table>
         <br>
@@ -117,7 +117,11 @@
                 <td>Instrument1(Reqd):</td>
                 <td><select name="modality1">
                      {% for m in allm %}
-                        <option value="{{m.name}}">{{m.name}}</option>
+                        {% if m.name == mod.name %}
+                            <option value="{{m.name}}" selected>{{m.name}} </option>
+                        {% else %}
+                            <option value="{{m.name}}">{{m.name}} </option>
+                        {% endif %}
                      {% endfor %}
                 </select></td>
             </tr>
@@ -131,15 +135,15 @@
             </tr>
             <tr>
                 <td>Genre:</td>
-                <td><input type="text" name="genre" value="Carnatic"></td>
+                <td><input type="text" name="genre" value="{{tutor.genre}}"></td>
             </tr>
             <tr>
                 <td>Teach Over Internet?:</td>
-                <td><input type="text" name="tchoverinternet" value="Yes"></td>
+                <td><input type="text" name="tchoverinternet" value="{{tutor.tchoverinternet}}"></td>
             </tr>
             <tr>
                 <td>Web Page: </td>
-                <td><input type="url" name="website" value="website.com"></td>
+                <td><input type="url" name="website" value="{{tutor.website}}"></td>
             </tr>
 
         </table>

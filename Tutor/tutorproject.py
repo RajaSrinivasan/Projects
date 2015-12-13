@@ -47,12 +47,26 @@ def rt_addtutor():
             return redirect(url_for('rt_tutors',external=True))
     else:
         allm=tutordbsetup.listmodalities()
-        return render_template('tutor.html', allm=allm)
+        person = tutordbsetup.Person()
+        tutor = tutordbsetup.Tutor()
+        mod = tutordbsetup.Modality()
+        return render_template('tutor.html', allm=allm, person=person, tutor=tutor, mod=mod)
 
 @app.route("/tutors/edit/<int:t_id>/",methods = ['GET','POST'])
 def rt_edittutor(t_id):
-        print("Edit Tutor function ", t_id)
-        return t_id
+    if request.method == 'POST':
+        try:
+            print("Edit Tutor function ", t_id)
+            #name = request.form['name']
+            #tutordbsetup.findtutor(t_id)
+            return redirect(url_for('rt_tutors',external=True))
+        except:
+            print ("Error")
+            return redirect(url_for('rt_tutors',external=True))
+    else:
+        tutor = tutordbsetup.findtutor(t_id)
+        allm=tutordbsetup.listmodalities()
+        return render_template('tutor.html', allm=allm, person=tutor[0], tutor=tutor[1], mod=tutor[2])
 
 #***************************Modalities**************************
 @app.route("/modalities")
