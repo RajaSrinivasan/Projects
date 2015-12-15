@@ -3,10 +3,20 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, f
 import tutordbsetup
 
 app = Flask(__name__)
+states = ["AK", "AZ", "AR" ,
+          "CA", "CO", "CT", "DE", "DC",
+          "FL", "GA", "HI", "ID", "IL", "IN", "IA",
+          "KS", "KY", "LA", "ME", "MD", "MA", "MI","MN", "MS", "MO", "MT",
+          "NE", "NV", "NH", "NJ","NM", "NY", "NC", "ND",
+          "OH", "OK", "OR", "PA", "RI", "SC", "SD",
+          "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
-@app.route("/")
+personpropnames=['firstname','lastname','address1','address2','city','state','zip','phone1','phone2','email']
+tutorpropnames=['modality1','modality2', 'genre','tchoverinternet','website']
 
 #***************************Tutors**************************
+
+@app.route("/")
 @app.route("/tutors")
 def rt_tutors():
     alltutors = tutordbsetup.listtutors()
@@ -16,8 +26,6 @@ def rt_tutors():
 def rt_addtutor():
     if request.method == 'POST':
         try:
-            personpropnames=['firstname','lastname','address1','address2','city','state','zip','phone1','phone2','email']
-            tutorpropnames=['modality1','modality2', 'genre','tchoverinternet','website']
             props={}
             tprops={}
             for pp in personpropnames:
@@ -50,15 +58,30 @@ def rt_addtutor():
         person = tutordbsetup.Person()
         tutor = tutordbsetup.Tutor()
         mod = tutordbsetup.Modality()
-        return render_template('tutor.html', allm=allm, person=person, tutor=tutor, mod=mod)
+        return render_template('tutor.html', allm=allm, person=person, tutor=tutor, mod=mod, states=states, func="add")
 
 @app.route("/tutors/edit/<int:t_id>/",methods = ['GET','POST'])
 def rt_edittutor(t_id):
     if request.method == 'POST':
         try:
             print("Edit Tutor function ", t_id)
-            #name = request.form['name']
-            #tutordbsetup.findtutor(t_id)
+            props={}
+            tprops={}
+            for pp in personpropnames:
+                props[pp] = request.form[pp]
+                print(props[pp])
+
+            for tp in tutorpropnames:
+                tprops[tp] = request.form[tp]
+                print(tp, ": ",tprops[tp])
+            item = tutordbsetup.findtutor(t_id)
+            item[0].show()
+            item[1].show()
+            item[0].setProperties(props)
+            item[1].setProperties(tprops)
+            item[0].addtoDB()
+            item[1].addtoDB()
+            tutordbsetup.session.commit()
             return redirect(url_for('rt_tutors',external=True))
         except:
             print ("Error")
@@ -66,7 +89,7 @@ def rt_edittutor(t_id):
     else:
         tutor = tutordbsetup.findtutor(t_id)
         allm=tutordbsetup.listmodalities()
-        return render_template('tutor.html', allm=allm, person=tutor[0], tutor=tutor[1], mod=tutor[2])
+        return render_template('tutor.html', allm=allm, person=tutor[0], tutor=tutor[1], mod=tutor[2], states=states, func="edit")
 
 #***************************Modalities**************************
 @app.route("/modalities")

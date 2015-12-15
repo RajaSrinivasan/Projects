@@ -64,7 +64,9 @@ class Person(Base):
         print("id: ", self.id)
         print("firstname: ", self.firstname)
         print("lastname: ", self.lastname)
-        print("state: ", self.state)
+        print("address1: ", self.address1)
+        print("address2: ", self.address2)
+        print("state: /%s/"% self.state)
 
     def setProperties(self,props):
         self.firstname=props["firstname"]
