@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 def splitlist(projlist,splitat):
 	if splitat in projlist:
 		proj1=projlist[:projlist.index(splitat)]
