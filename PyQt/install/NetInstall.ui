@@ -91,11 +91,14 @@
    <property name="inputMask">
     <string/>
    </property>
+   <property name="text">
+    <string>172.16.5.46</string>
+   </property>
    <property name="cursorPosition">
-    <number>0</number>
+    <number>11</number>
    </property>
    <property name="placeholderText">
-    <string>172.16.5.</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label">
