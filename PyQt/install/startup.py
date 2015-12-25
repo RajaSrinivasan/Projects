@@ -11,10 +11,10 @@ from PyQt5 import uic
 class ConsoleIP(QDialog):
     def __init__(self):
         super().__init__()
-        ipadrrexp = QRegExp("\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}")
+        ipadrrexp = QRegExp("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
         ipadrvalidator = QRegExpValidator(ipadrrexp)
 
-        self.ui = uic.loadUi("NetInstall.ui")
+        self.ui = uic.loadUi("startup.ui")
         self.ui.txtConsoleIPAddress.setValidator(ipadrvalidator)
 
         self.ui.btnCancel.clicked.connect(self.CancelClicked)
