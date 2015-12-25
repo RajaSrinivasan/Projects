@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QWidget,
                              QDialog)
 import startup
 import status
+import swinstall
 
 if __name__ == '__main__':
     import sys
@@ -23,8 +24,12 @@ if __name__ == '__main__':
             app.exec_()
             stat = w.ui.result()
             if stat == 1:
-                print("Proceeding")
-                break
+                w = swinstall.SwInstall()
+                app.exec_()
+                stat=w.ui.result()
+                if stat == 1:
+                    print("Exiting")
+                    break
         else:
             break
 
