@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>411</width>
-    <height>312</height>
+    <width>426</width>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
   <widget class="QPushButton" name="btnConnect">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>220</y>
+     <x>290</x>
+     <y>280</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -38,8 +38,8 @@
   <widget class="QPushButton" name="btnCancel">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>220</y>
+     <x>180</x>
+     <y>280</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -101,12 +101,12 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="lblInstruction">
    <property name="geometry">
     <rect>
      <x>66</x>
      <y>130</y>
-     <width>321</width>
+     <width>291</width>
      <height>51</height>
     </rect>
    </property>
@@ -124,6 +124,22 @@
    </property>
    <property name="wordWrap">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="pbTransferFiles">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>190</y>
+     <width>291</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>24</number>
    </property>
   </widget>
  </widget>

@@ -129,16 +129,6 @@
     <bool>true</bool>
    </attribute>
   </widget>
-  <widget class="QLCDNumber" name="lcdNumber">
-   <property name="geometry">
-    <rect>
-     <x>603</x>
-     <y>50</y>
-     <width>91</width>
-     <height>23</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>
