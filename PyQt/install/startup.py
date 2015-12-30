@@ -42,7 +42,7 @@ class ConsoleIP(QDialog):
             self.ui.pbTransferFiles.show()
             self.ui.lblInstruction.setText("Please wait for file Uploads")
             self.ui.btnConnect.setEnabled(False)
-            self.timer.start(1000)
+            self.timer.start(100)
 
     @pyqtSlot()
     def TimerTicks(self):
