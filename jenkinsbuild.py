@@ -1,1 +1,4 @@
-print("Hello. This is a jenkins build file")
+#!/usr/bin/python3
+import os
+
+print ("Build " , os.environ['BUILD_NUMBER'])
