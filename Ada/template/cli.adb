@@ -3,23 +3,6 @@ with gnat.command_line ;
 
 package body cli is
 
-    procedure ShowSwitch (sw : String; argind : String; help : String) is
-    begin
-        Put (ASCII.HT);
-        Put ('-');
-        Put (sw);
-        Put (ASCII.HT);
-        Put (argind);
-        Put (ASCII.HT);
-        Put_Line (help);
-    end ShowSwitch ;
-
-    procedure ShowUsage is
-    begin
-        ShowSwitch( "-h" , "--help"    , "print command line help") ;
-        ShowSwitch( "-v" , "--verbose" , "set verbosity") ;
-    end ShowUsage ;
-
     procedure SwitchHandler
       (Switch    : String;
        Parameter : String;
