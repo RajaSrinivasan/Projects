@@ -41,7 +41,6 @@ package body Hex.dump is
       end CharImage;
 
    begin
-      New_Line;
 
       for B in 1 .. No_Blocks loop
          Blockstart := (B - 1) * Blocklen + 1;
@@ -62,10 +61,12 @@ package body Hex.dump is
          for b in 1 .. Lengthtodump loop
             Put (CharImage (bigBlock (Blockstart + b - 1)));
          end loop;
+         Set_Col (Outfile, Count (piccol + blocklen + 3 ));
          Put (" * ");
          for b in 1 .. Lengthtodump loop
             Put (Hex.Image (bigBlock (Blockstart + b - 1)));
          end loop;
+         Set_Col (Outfile, Count (piccol + blocklen + 3 + blocklen * 2 + 3 ));               
          Put_Line (" *");
          blockadr   := blockadr + Storage_Offset (Lengthtodump);
          Lengthleft := Lengthleft - Lengthtodump;
