@@ -1,24 +1,7 @@
 with Ada.Text_Io; use Ada.Text_Io;
 with gnat.command_line ;
 
-package body cli is
-
-    procedure ShowSwitch (sw : String; argind : String; help : String) is
-    begin
-        Put (ASCII.HT);
-        Put ('-');
-        Put (sw);
-        Put (ASCII.HT);
-        Put (argind);
-        Put (ASCII.HT);
-        Put_Line (help);
-    end ShowSwitch ;
-
-    procedure ShowUsage is
-    begin
-        ShowSwitch( "-h" , "--help"    , "print command line help") ;
-        ShowSwitch( "-v" , "--verbose" , "set verbosity") ;
-    end ShowUsage ;
+package body dump_cli is
 
     procedure SwitchHandler
       (Switch    : String;
@@ -52,4 +35,4 @@ package body cli is
        put_line("Verbosity " & boolean'Image(Verbose)) ;
     end ProcessCommandLine;
 
-end cli ;
+end dump_cli ;
