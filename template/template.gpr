@@ -1,0 +1,13 @@
+project template is
+
+   for Source_Dirs use (".");
+   for Object_Dir use "../obj";
+
+   for Languages use ("Ada");
+   package Compiler is
+      for Switches ("Ada")
+          use ("-O2","-gnat05");
+   end Compiler;
+
+   for Main use ("clitest.adb") ;
+end template ;
