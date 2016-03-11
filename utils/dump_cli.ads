@@ -6,4 +6,5 @@ package dump_cli is
    Arg : unbounded_string := null_unbounded_string ;
    outputname : aliased gnat.strings.string_access ;
    procedure ProcessCommandLine ;
+   function GetNextArgument return String ;
 end dump_cli ;

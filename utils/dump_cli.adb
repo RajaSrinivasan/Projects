@@ -27,12 +27,15 @@ package body dump_cli is
                                       Switch => "-o:",
                                       Long_Switch => "--output:",
                                       Help => "Output Name");
+       GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
-        GNAT.Command_Line.Getopt(config,SwitchHandler'access);
-       Arg := To_Unbounded_String (GNAT.Command_Line.Get_Argument);
-       put_line("Argument " & to_string(Arg));
        put_line("Output Name " & outputname.all ) ;
        put_line("Verbosity " & boolean'Image(Verbose)) ;
     end ProcessCommandLine;
+
+    function GetNextArgument return String is
+    begin
+       return GNAT.Command_Line.Get_Argument(Do_Expansion => True) ;
+    end GetNextArgument ;
 
 end dump_cli ;
