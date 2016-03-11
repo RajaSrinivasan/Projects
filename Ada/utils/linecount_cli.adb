@@ -1,7 +1,7 @@
 with Ada.Text_Io; use Ada.Text_Io;
 with gnat.command_line ;
 
-package body cli is
+package body linecount_cli is
 
     procedure SwitchHandler
       (Switch    : String;
@@ -12,6 +12,10 @@ package body cli is
        put (" Parameter " & Parameter) ;
        put (" Section " & Section);
        new_line ;
+       if switch = "-f"
+       then
+          filetype := to_unbounded_string(parameter) ;
+       end if ;
     end SwitchHandler ;
 
     procedure ProcessCommandLine is
@@ -22,17 +26,21 @@ package body cli is
                        Switch => "-v?",
                        Long_Switch => "--verbose?",
                        Help => "Output extra verbose information");
+
         GNAT.Command_Line.Define_Switch (Config,
-                                      output => outputname'access,
-                                      Switch => "-o:",
-                                      Long_Switch => "--output:",
-                                      Help => "Output Name");
+                                      recursive'access ,
+                                      Switch => "-r",
+                                      Long_Switch => "--recursive",
+                                      Help => "Process directory arguments and recurse");
+
+        GNAT.Command_Line.Define_Switch (Config,
+                                         Switch => "-f:",
+                                         Long_Switch => "--file-type:",
+                                         Help => "File types");
 
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
-       put_line("Output Name " & outputname.all ) ;
-       put_line("Verbosity " & boolean'Image(Verbose)) ;
-       put_line("Argument " & GetNextArgument ) ;
+        put_line("Verbosity " & boolean'Image(Verbose)) ;
     end ProcessCommandLine;
 
     function GetNextArgument return String is
@@ -40,4 +48,4 @@ package body cli is
         return GNAT.Command_Line.Get_Argument(Do_Expansion => True) ;
     end GetNextArgument ;
 
-end cli ;
+end linecount_cli ;
