@@ -7,5 +7,7 @@ package linecount_pkg is
                                         unbounded_string ,
                                         Integer) ;
    procedure Count( filename : string ) ;
+   procedure Count( dirname : string ;
+                    pattern : string ) ;
    procedure ShowSummary ;
 end linecount_pkg ;
