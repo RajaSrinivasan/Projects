@@ -1,4 +1,4 @@
-project template is
+project template is                           -- [template/$]
 
    for Source_Dirs use (".");
    for Object_Dir use "../build";
@@ -9,5 +9,5 @@ project template is
           use ("-O2","-gnat05");
    end Compiler;
 
-   for Main use ("clitest.adb") ;
-end template ;
+   for Main use ("clitest.adb") ;              -- [clitest/$]
+end template ;                                 -- [template/$]
