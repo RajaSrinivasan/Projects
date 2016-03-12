@@ -32,7 +32,7 @@ begin
          end if ;
          if linecount_cli.recursive
          then
-             null ;
+             linecount_pkg.Count( arg , to_string(linecount_cli.filetype) ) ;
          else
              linecount_pkg.Count( arg ) ;
          end if ;
