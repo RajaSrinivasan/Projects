@@ -1,7 +1,7 @@
 with Ada.Text_Io; use Ada.Text_Io;
 with gnat.command_line ;
 
-package body cli is
+package body cli is                          -- [cli/$_cli]
 
     procedure SwitchHandler
       (Switch    : String;
@@ -40,4 +40,4 @@ package body cli is
         return GNAT.Command_Line.Get_Argument(Do_Expansion => True) ;
     end GetNextArgument ;
 
-end cli ;
+end cli ;                                   -- [cli/$_cli]
