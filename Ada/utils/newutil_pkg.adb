@@ -8,6 +8,7 @@ with GNAT.regpat ;
 
 with gnatcoll.json ;
 
+with newutil_cli ;
 package body newutil_pkg is
     currentconfig : unbounded_string := to_unbounded_string(defaultconfig) ;
     configobj : gnatcoll.json.JSON_Value ;
@@ -157,6 +158,18 @@ end Handler;
         startsubst : integer ;
         use GNAT.Regpat ;
     begin
+        if Ada.Directories.Exists( outputfilename )
+        then
+           Put(outputfilename) ;
+           Put(" already exists.") ;
+           if newutil_cli.overwrite
+           then
+               put_line(" Will overwrite.") ;
+           else
+               put_line(" Will not overwrite. Use -O to overwrite.");
+               return ;
+           end if ;
+        end if ;
         ada.text_io.open(file,ada.text_io.in_file,filename) ;
         ada.text_io.create(ofile , ada.text_io.out_file , outputfilename );
         while not ada.text_io.end_of_file(file)

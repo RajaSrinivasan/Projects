@@ -32,9 +32,18 @@ package body newutil_cli is
                                          Switch => "-c:",
                                          Long_Switch => "--config-file:",
                                          Help => "Configuration file (json)");
+        GNAT.Command_Line.Define_Switch (Config,
+                                         overwrite'access ,
+                                         Switch => "-O",
+                                         Long_Switch => "--Overwrite",
+                                         Help => "Overwrite output files");
+        GNAT.Command_Line.Define_Switch (Config,
+                                         output => projectroot'access,
+                                         Switch => "-R:",
+                                         Long_Switch => "--Root:",
+                                         Help => "Project Root");
 
-        GNAT.Command_Line.Getopt(config,SwitchHandler'access);
-
+       GNAT.Command_Line.Getopt(config,SwitchHandler'access);
        put_line("Output Name " & outputname.all ) ;
        put_line("Verbosity " & boolean'Image(Verbose)) ;
 
