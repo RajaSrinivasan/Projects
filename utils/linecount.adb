@@ -1,42 +1,37 @@
-with Text_Io; use Text_Io;
-with ada.strings.unbounded; use ada.strings.unbounded;
-with linecount_cli ;
-with linecount_pkg ;
+with Text_IO;               use Text_IO;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with linecount_cli;
+with linecount_pkg;
 procedure linecount is
 begin
-   linecount_cli.ProcessCommandLine ;
-   if linecount_cli.Verbose
-   then
-      if linecount_cli.recursive
-      then
-         Text_Io.Put("Recursive linecount ");
-         Text_Io.Put(" File type filter ") ;
-         Text_Io.Put( to_string(linecount_cli.filetype) ) ;
+   linecount_cli.ProcessCommandLine;
+   if linecount_cli.verbose then
+      if linecount_cli.recursive then
+         Text_IO.Put ("Recursive linecount ");
+         Text_IO.Put (" File type filter ");
+         Text_IO.Put (To_String (linecount_cli.filetype));
       else
-         Text_Io.Put("File linecount ") ;
-      end if ;
-      Text_Io.New_Line ;
-  end if ;
+         Text_IO.Put ("File linecount ");
+      end if;
+      Text_IO.New_Line;
+   end if;
 
    loop
       declare
-          arg : string := linecount_cli.GetNextArgument ;
+         arg : String := linecount_cli.GetNextArgument;
       begin
-         if arg'length = 0
-         then
-            exit ;
+         if arg'Length = 0 then
+            exit;
          end if;
-         if linecount_cli.Verbose
-         then
-            Text_Io.put_line(arg) ;
-         end if ;
-         if linecount_cli.recursive
-         then
-             linecount_pkg.Count( arg , to_string(linecount_cli.filetype) ) ;
+         if linecount_cli.verbose then
+            Text_IO.Put_Line (arg);
+         end if;
+         if linecount_cli.recursive then
+            linecount_pkg.Count (arg, To_String (linecount_cli.filetype));
          else
-             linecount_pkg.Count( arg ) ;
-         end if ;
-      end ;
-   end loop ;
-   linecount_pkg.ShowSummary ;
-end linecount ;
+            linecount_pkg.Count (arg);
+         end if;
+      end;
+   end loop;
+   linecount_pkg.ShowSummary;
+end linecount;
