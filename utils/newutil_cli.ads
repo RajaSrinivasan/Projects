@@ -9,6 +9,9 @@ package newutil_cli is
    outputname : aliased gnat.strings.string_access ;
    configfilename : aliased gnat.strings.string_access ;
 
+   overwrite : aliased boolean := false ;
+   projectroot : aliased gnat.strings.string_access ;
+   
    procedure ProcessCommandLine ;
    function GetNextArgument return String ;
 
