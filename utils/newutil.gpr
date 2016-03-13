@@ -1,3 +1,4 @@
+with "../gplimports/gplimports" ;
 project newutil is                     -- [newutil]
 
    for Source_Dirs use (".");
@@ -6,7 +7,7 @@ project newutil is                     -- [newutil]
    for Languages use ("Ada");
    package Compiler is
       for Switches ("Ada")
-          use ("-O2","-gnat05");
+          use ("-O2","-gnat05","-gnata");
    end Compiler;
 
    for Main use ("newutil.adb") ;        -- [newutil.adb]
