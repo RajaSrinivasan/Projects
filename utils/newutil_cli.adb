@@ -21,8 +21,8 @@ package body newutil_cli is
       GNAT.Command_Line.Define_Switch
         (Config,
          verbose'Access,
-         Switch      => "-v?",
-         Long_Switch => "--verbose?",
+         Switch      => "-v",
+         Long_Switch => "--verbose",
          Help        => "Output extra verbose information");
       GNAT.Command_Line.Define_Switch
         (Config,
