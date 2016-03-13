@@ -5,11 +5,15 @@ with Ada.Strings.fixed ;     use Ada.strings.fixed ;
 with Ada.Streams.Stream_IO;
 with ada.directories ;
 with GNAT.regpat ;
+with GNAT.strings ;
+with GNAT.Directory_Operations ;
 
 with gnatcoll.json ;
 
 with newutil_cli ;
 package body newutil_pkg is
+
+    projectroot : unbounded_string := null_unbounded_string ;
     currentconfig : unbounded_string := to_unbounded_string(defaultconfig) ;
     configobj : gnatcoll.json.JSON_Value ;
 
@@ -83,11 +87,32 @@ package body newutil_pkg is
 end Handler;
 
     procedure ParseConfig is
+        use type GNAT.strings.string_access ;
     begin
         configobj := gnatcoll.json.Read( to_string(currentconfig) ,
                                          Filename => "");
         gnatcoll.json.Map_JSON_Object (Val   => configobj ,
                                        CB    => Handler'Access);
+        if newutil_cli.projectroot /= null and then
+           newutil_cli.projectroot.all'length = 0
+        then
+           put_line("Project Root not specified. Use -R to provide the root") ;
+           raise Program_Error ;
+        end if ;
+
+        if not Ada.Directories.Exists( newutil_cli.projectroot.all )
+        then
+           put_line( newutil_cli.projectroot.all & " does not exist");
+           raise Program_Error ;
+        end if ;
+
+        projectroot := to_unbounded_string( Ada.Directories.Full_Name(newutil_cli.projectroot.all)
+                                            & GNAT.Directory_Operations.Dir_Separator) ;
+        if newutil_cli.Verbose
+        then
+           put("Project Root: ");
+           put_line(to_string(projectroot));
+        end if ;
     end ParseConfig ;
 
     procedure load_config( filename : string ) is
@@ -170,7 +195,9 @@ end Handler;
                return ;
            end if ;
         end if ;
-        ada.text_io.open(file,ada.text_io.in_file,filename) ;
+        ada.text_io.open(file,
+                         ada.text_io.in_file,
+                         to_string(projectroot) & filename) ;
         ada.text_io.create(ofile , ada.text_io.out_file , outputfilename );
         while not ada.text_io.end_of_file(file)
         loop

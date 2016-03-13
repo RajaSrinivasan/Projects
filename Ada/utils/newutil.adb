@@ -50,5 +50,4 @@ begin
           put_line("Output file Name - incorrect format");
       end if ;
    end loop ;
-   -- newutil_pkg.process_file("../template/cli.adb","output.txt" , "newutil") ;
 end newutil ;
