@@ -1,18 +1,19 @@
-with Ada.Strings.Unbounded ; use Ada.Strings.Unbounded ;
-with gnat.strings ;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with GNAT.Strings;
 
 package newutil_cli is
-   verbose : aliased boolean := false ;              -- Option:     -v or --verbose
-   version : string := "newutil V01" ;
+   verbose : aliased Boolean :=
+     False;              -- Option:     -v or --verbose
+   version : String := "newutil V01";
 
-   Arg : unbounded_string := null_unbounded_string ;
-   outputname : aliased gnat.strings.string_access ;
-   configfilename : aliased gnat.strings.string_access ;
+   Arg            : Unbounded_String := Null_Unbounded_String;
+   outputname     : aliased GNAT.Strings.String_Access;
+   configfilename : aliased GNAT.Strings.String_Access;
 
-   overwrite : aliased boolean := false ;
-   projectroot : aliased gnat.strings.string_access ;
-   
-   procedure ProcessCommandLine ;
-   function GetNextArgument return String ;
+   overwrite   : aliased Boolean := False;
+   projectroot : aliased GNAT.Strings.String_Access;
 
-end newutil_cli ;
+   procedure ProcessCommandLine;
+   function GetNextArgument return String;
+
+end newutil_cli;
