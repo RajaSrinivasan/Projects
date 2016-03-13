@@ -28,13 +28,11 @@ package body Hex.dump is
       function CharImage (ci : Interfaces.Unsigned_8) return Character is
          c : Character := Character'Val (Integer (ci));
       begin
-         if not ada.Characters.Handling.Is_ISO_646(c)
-         then
-            return '.' ;
-         end if ;
-         if Ada.Characters.Handling.Is_Alphanumeric(c)
-         then
-            return c ;
+         if not Ada.Characters.Handling.Is_ISO_646 (c) then
+            return '.';
+         end if;
+         if Ada.Characters.Handling.Is_Alphanumeric (c) then
+            return c;
          end if;
 
          return '.';
@@ -61,12 +59,12 @@ package body Hex.dump is
          for b in 1 .. Lengthtodump loop
             Put (CharImage (bigBlock (Blockstart + b - 1)));
          end loop;
-         Set_Col (Outfile, Count (piccol + blocklen + 3 ));
+         Set_Col (Outfile, Count (piccol + Blocklen + 3));
          Put (" * ");
          for b in 1 .. Lengthtodump loop
             Put (Hex.Image (bigBlock (Blockstart + b - 1)));
          end loop;
-         Set_Col (Outfile, Count (piccol + blocklen + 3 + blocklen * 2 + 3 ));               
+         Set_Col (Outfile, Count (piccol + Blocklen + 3 + Blocklen * 2 + 3));
          Put_Line (" *");
          blockadr   := blockadr + Storage_Offset (Lengthtodump);
          Lengthleft := Lengthleft - Lengthtodump;
