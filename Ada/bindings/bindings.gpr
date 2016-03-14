@@ -10,4 +10,5 @@ project bindings is
       for Switches ("Ada")
           use ("-O2","-gnat05");
    end Compiler;
+   
 end bindings ;
