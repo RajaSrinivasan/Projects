@@ -56,6 +56,15 @@ begin
            end ;
        end loop ;
    else
-       null ;
+       if digest_cli.md5_alg
+       then
+           digest_pkg.digest_md5( digest_cli.GetNextArgument , to_string(digest_cli.filepattern) ) ;
+       end if ;
+       if digest_cli.sha_alg
+       then
+           digest_pkg.digest_sha( digest_cli.GetNextArgument
+                                , to_string(digest_cli.filepattern)
+                                , digest_cli.sha_level);
+       end if ;
    end if ;
 end digest ;                         -- [clitest/$]

@@ -1,3 +1,4 @@
+with "../adalib/adalib" ;
 project digest is                           -- [template/$]
 
    for Source_Dirs use (".");
