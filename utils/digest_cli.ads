@@ -10,6 +10,9 @@ package digest_cli is                                       -- [cli/$_cli]
    sha_alg : aliased boolean := false ;
    sha_level : aliased integer := 0 ;
 
+   adler_alg : aliased boolean := false ;
+   crc32_alg : aliased boolean := false ;
+   
    filepattern : unbounded_string := null_unbounded_string ;
 
    procedure ProcessCommandLine ;

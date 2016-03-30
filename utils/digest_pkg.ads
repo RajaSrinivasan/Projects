@@ -8,4 +8,12 @@ package digest_pkg is
     procedure digest_sha( dirname : string ;
                           pattern : string ;
                           level : integer := 1) ;
+
+    function adler32_csum( filename : string ) return string ;
+    procedure adler32_csum( dirname : string ;
+                            pattern : string ) ;
+
+    function crc32_csum( filename : string ) return string ;
+    procedure crc32_csum( dirname : string ;
+                          pattern : string ) ;
 end digest_pkg ;

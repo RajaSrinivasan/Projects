@@ -59,6 +59,18 @@ package body digest_cli is                          -- [cli/$_cli]
                                          Switch => "-s:",
                                          Long_Switch => "--sha:",
                                          Help => "Use sha algorithm" );
+         GNAT.Command_Line.Define_Switch (Config,
+                                          output => adler_alg'access,
+                                          Switch => "-a",
+                                          Long_Switch => "--adler32",
+                                          Help => "generate adler32 checksum" );
+
+          GNAT.Command_Line.Define_Switch (Config,
+                                           output => crc32_alg'access,
+                                           Switch => "-c",
+                                           Long_Switch => "--crc32",
+                                           Help => "generate crc32 checksum" );
+
         GNAT.Command_Line.Define_Switch( Config ,
                                          output => Recursive'access ,
                                          Switch => "-r" ,
