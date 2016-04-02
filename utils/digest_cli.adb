@@ -79,7 +79,7 @@ package body digest_cli is                          -- [cli/$_cli]
         GNAT.Command_Line.Define_Switch( Config ,
                                          Switch => "-p!" ,
                                          Long_Switch => "--pattern!" ,
-                                         Help => "File name pattern to search for") ;
+                                         Help => "File name pattern to search for. Example -p*.adb ") ;
 
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
         put_line("Verbosity " & boolean'Image(Verbose)) ;

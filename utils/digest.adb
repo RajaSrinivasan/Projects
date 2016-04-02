@@ -57,6 +57,10 @@ begin
 	       then
 		  Put("CRC32 : ") ;Put_Line( Digest_Pkg.Crc32_csum(File) ) ;
 	       end if ;
+	       if Digest_Cli.Adler_Alg
+	       then
+		  Put("Adler32 : ") ;Put_Line( Digest_Pkg.Adler32_csum(File) ) ;
+	       end if ;
            end ;
        end loop ;
    else
@@ -73,6 +77,12 @@ begin
        if Digest_Cli.Crc32_Alg
        then
 	  Digest_Pkg.Crc32_csum( Digest_Cli.GetNextArgument
+				     , To_String(Digest_Cli.Filepattern) ) ;
+	  
+       end if ;			     
+       if Digest_Cli.Adler_Alg
+       then
+	  Digest_Pkg.Adler32_csum( Digest_Cli.GetNextArgument
 				     , To_String(Digest_Cli.Filepattern) ) ;
 	  
        end if ;			     
