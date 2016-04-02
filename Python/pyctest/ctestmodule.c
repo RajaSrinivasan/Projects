@@ -31,7 +31,7 @@ PyMODINIT_FUNC
 PyInit_ctest(void)
 {
     PyObject *m;
-
+    printf("Initializing the module\n");
     m = PyModule_Create(&ctestmodule);
     return m;
 }
