@@ -1,3 +1,5 @@
+with System ;
+with Interfaces.C ;
 with Ada.Streams ;
 with Ada.Streams.Stream_Io ;
 with Ada.Text_Io ; use Ada.Text_Io ;
@@ -8,13 +10,17 @@ with GNAT.SHA256 ;
 with GNAT.SHA384 ;
 with GNAT.SHA512 ;
 
+with Hex ;
+with Zlib.Checksums ;
+
 with dirwalk ;
 
 package body digest_pkg is
 
    procedure dirwalk_md5 is new dirwalk( integer ) ;
    procedure dirwalk_sha is new dirwalk( integer ) ;
-
+   procedure Dirwalk_Crc32 is new Dirwalk( Integer ) ;
+   
    function digest_md5( filename : string ) return String is
        use Ada.Streams ;
        f : ada.Streams.Stream_IO.File_Type ;
@@ -211,4 +217,56 @@ package body digest_pkg is
     begin
         dirwalk_sha( level , dirname , pattern , digest_sha'access) ;
     end digest_sha ;
+    
+    function adler32_csum( filename : string ) return string is
+    begin
+       return "" ;
+    end Adler32_Csum ;
+    
+    procedure adler32_csum( dirname : string ;
+                            pattern : string ) is
+    begin
+       null ;
+    end Adler32_cSum ;
+
+
+    function crc32_csum( filename : string ) return string is
+       use Ada.Streams ;
+       f : ada.Streams.Stream_IO.File_Type ;
+       buffer : ada.Streams.Stream_Element_Array(1..BLOCKSIZE) ;
+       bufbytes : ada.Streams.Stream_Element_Count ;
+       bytes : ada.Streams.Stream_Element_Count := 0 ;
+
+       Csum : Interfaces.C.Unsigned_Long := 0 ;
+    begin
+       Csum := Zlib.Checksums.Crc32( Csum , System.Null_Address , 0 );
+       ada.Streams.stream_io.Open(f , ada.streams.Stream_IO.In_File , filename ) ;
+       while not ada.Streams.Stream_IO.End_Of_File(f)
+       loop
+          ada.Streams.stream_io.Read(f,buffer,bufbytes) ;
+          Csum := Zlib.Checksums.Crc32( Csum , Buffer'Address , Interfaces.C.Unsigned_Long(Bufbytes)) ;
+          bytes := bytes + bufbytes ;
+       end loop ;
+       ada.Streams.Stream_IO.Close(f) ;
+       return Hex.Image( Interfaces.Unsigned_32(Csum) ) ;
+        exception
+           when others =>
+              put("Unable to generate md5 digest for ");
+              put_line(filename) ;
+              return "" ;
+    end Crc32_Csum ;
+    
+    procedure Crc32_Csum( Context : Integer ;
+			  Filename : String ) is
+    begin
+       Put("File : ") ; Put( Filename ) ; Put(" : "); Put_Line( Crc32_Csum( Filename ) ) ;
+    end Crc32_Csum ;
+    
+    procedure crc32_csum( dirname : string ;
+                          pattern : string ) is
+       Context : Integer := 0 ;
+    begin
+       dirwalk_crc32( Context , dirname , pattern , Crc32_csum'access) ;
+    end Crc32_Csum ;
+    
 end digest_pkg ;
