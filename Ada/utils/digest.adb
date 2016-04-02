@@ -53,6 +53,10 @@ begin
                     put("SHA") ; put(digest_cli.sha_level) ; put( " : ");
                     put_line(digest_pkg.digest_sha(file , digest_cli.sha_level )) ;
                end if ;
+	       if Digest_Cli.Crc32_Alg
+	       then
+		  Put("CRC32 : ") ;Put_Line( Digest_Pkg.Crc32_csum(File) ) ;
+	       end if ;
            end ;
        end loop ;
    else
@@ -66,5 +70,11 @@ begin
                                 , to_string(digest_cli.filepattern)
                                 , digest_cli.sha_level);
        end if ;
+       if Digest_Cli.Crc32_Alg
+       then
+	  Digest_Pkg.Crc32_csum( Digest_Cli.GetNextArgument
+				     , To_String(Digest_Cli.Filepattern) ) ;
+	  
+       end if ;			     
    end if ;
 end digest ;                         -- [clitest/$]

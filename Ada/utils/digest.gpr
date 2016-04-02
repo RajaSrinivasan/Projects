@@ -1,4 +1,6 @@
 with "../adalib/adalib" ;
+with "../bindings/bindings" ;
+
 project digest is                           -- [template/$]
 
    for Source_Dirs use (".");
