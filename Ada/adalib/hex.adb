@@ -96,7 +96,7 @@ package body Hex is
       img (3 .. 4) :=
         Image
           (Interfaces.Unsigned_8 (Shift_Right (bin and 16#00ff_0000#, 16)));
-      img (3 .. 4) :=
+      img (5 .. 6) :=
         Image (Interfaces.Unsigned_8 (Shift_Right (bin and 16#0000_ff00#, 8)));
       img (7 .. 8) := Image (Interfaces.Unsigned_8 (bin and 16#0000_00ff#));
       return img;
