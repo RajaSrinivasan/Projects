@@ -20,6 +20,7 @@ package body digest_pkg is
    procedure dirwalk_md5 is new dirwalk( integer ) ;
    procedure dirwalk_sha is new dirwalk( integer ) ;
    procedure Dirwalk_Crc32 is new Dirwalk( Integer ) ;
+   procedure Dirwalk_Adler32 is new Dirwalk( Integer ) ;
    
    function digest_md5( filename : string ) return String is
        use Ada.Streams ;
@@ -219,14 +220,43 @@ package body digest_pkg is
     end digest_sha ;
     
     function adler32_csum( filename : string ) return string is
+
+       use Ada.Streams ;
+       f : ada.Streams.Stream_IO.File_Type ;
+       buffer : ada.Streams.Stream_Element_Array(1..BLOCKSIZE) ;
+       bufbytes : ada.Streams.Stream_Element_Count ;
+       bytes : ada.Streams.Stream_Element_Count := 0 ;
+
+       Csum : Interfaces.C.Unsigned_Long := 0 ;
     begin
-       return "" ;
+       Csum := Zlib.Checksums.Adler32( Csum , System.Null_Address , 0 );
+       ada.Streams.stream_io.Open(f , ada.streams.Stream_IO.In_File , filename ) ;
+       while not ada.Streams.Stream_IO.End_Of_File(f)
+       loop
+          ada.Streams.stream_io.Read(f,buffer,bufbytes) ;
+          Csum := Zlib.Checksums.Adler32( Csum , Buffer'Address , Interfaces.C.int(Bufbytes)) ;
+          bytes := bytes + bufbytes ;
+       end loop ;
+       ada.Streams.Stream_IO.Close(f) ;
+       return Hex.Image( Interfaces.Unsigned_32(Csum) ) ;
+    exception
+       when others =>
+	  put("Unable to generate Adler checksum for ");
+	  put_line(filename) ;
+	  return "" ;
     end Adler32_Csum ;
     
-    procedure adler32_csum( dirname : string ;
-                            pattern : string ) is
+    procedure Adler32_Csum( Context : Integer ;
+			    Filename : String ) is
     begin
-       null ;
+       Put("File : ") ; Put( Filename ) ; Put(" Adler32 csum : "); Put_Line( Adler32_Csum( Filename ) ) ;
+    end Adler32_Csum ;
+    
+    procedure Adler32_csum( dirname : string ;
+                            pattern : string ) is
+       Context : Integer := 0 ;
+    begin
+       dirwalk_adler32( Context , dirname , pattern , Adler32_csum'access) ;
     end Adler32_cSum ;
 
 
@@ -251,7 +281,7 @@ package body digest_pkg is
        return Hex.Image( Interfaces.Unsigned_32(Csum) ) ;
         exception
            when others =>
-              put("Unable to generate md5 digest for ");
+              put("Unable to generate crc32 checksum for ");
               put_line(filename) ;
               return "" ;
     end Crc32_Csum ;
@@ -259,7 +289,7 @@ package body digest_pkg is
     procedure Crc32_Csum( Context : Integer ;
 			  Filename : String ) is
     begin
-       Put("File : ") ; Put( Filename ) ; Put(" : "); Put_Line( Crc32_Csum( Filename ) ) ;
+       Put("File : ") ; Put( Filename ) ; Put(" CRC32 csum : "); Put_Line( Crc32_Csum( Filename ) ) ;
     end Crc32_Csum ;
     
     procedure crc32_csum( dirname : string ;
