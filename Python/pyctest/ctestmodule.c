@@ -13,7 +13,6 @@ ctest_system(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef ctestMethods[] = {
-    ...
     {"system",  ctest_system, METH_VARARGS,
      "Execute a shell command."},
     {NULL, NULL, 0, NULL}        /* Sentinel */
