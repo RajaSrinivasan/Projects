@@ -1,7 +1,7 @@
 from distutils.core import setup, Extension
 
-module1 = Extension('demo',
-                    sources = ['demo.c'])
+module1 = Extension('ctest',
+                    sources = ['ctestmodule.c'])
 
 setup (name = 'PackageName',
        version = '1.0',
