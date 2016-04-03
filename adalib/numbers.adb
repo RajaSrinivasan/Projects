@@ -1,8 +1,11 @@
 with ada.numerics.long_elementary_functions ; use Ada.Numerics.Long_Elementary_Functions ;
+with Ada.Text_Io; use Ada.Text_Io ;
 
 package body numbers is
+   
    package Sorting_Pkg is new Vector_Pkg.Generic_Sorting ;
-    
+   package Digits_Text_Io is new Ada.Text_Io.Integer_Io( Decimal_Digits_Type ) ;
+   use Digits_Text_Io;
     function IsPrime( number : number_type )
 		    return boolean is
        Number_Float : Long_Float := Long_Float(Number) ;
@@ -63,7 +66,7 @@ package body numbers is
        vec : vector_pkg.Vector ;
        Number_Float : Long_Float := Long_Float(Number) ;
        Sqrt_Float : Long_Float := Sqrt( Number_Float ) ;
-       Sqrt : Number_Type := Number_Type(Sqrt_Float) ;
+        Sqrt : Number_Type := Number_Type(Sqrt_Float) ;
        Numfac : Number_Type ;
        Numbernow : Number_Type := Number ;
     begin
@@ -119,5 +122,38 @@ package body numbers is
        end loop ;
        return vec ;
     end digitize ;
+    procedure Show( Vec : Digits_Pkg.Vector ) is
+       use type Ada.Containers.Count_Type ;
+    begin
+       for D in 0..Digits_Pkg.Length(Vec)-1
+       loop
+	  Put(Digits_Pkg.Element(Vec,Integer(D)));
+	  Put( " " ) ;
+       end loop ;
+       New_Line ;
+    end Show ;
+    
+    function IsTrimorphic( Number : Number_Type ) return Boolean is
+       Numdigits : Digits_Pkg.Vector ;
+       Numcubedigits : Digits_Pkg.Vector ;
+       Numcubed : Number_Type := Number ** 3 ;
+       Lennumdigits, Lennumcubedigits : Integer ;
+    begin
+       Numdigits := Digitize( Number ) ;
+       Numcubedigits := Digitize( Numcubed ) ;
+       Lennumdigits := Integer(Digits_Pkg.Length(Numdigits)) ;
+       Lennumcubedigits := Integer(Digits_Pkg.Length( Numcubedigits )) ;
+       Show( Numdigits ) ;
+       Show( Numcubedigits ) ;
+       for Idx in 0..Lennumdigits-1
+       loop
+	  if Digits_Pkg.Element( Numdigits , Idx ) /=
+	    Digits_Pkg.Element( Numcubedigits , Lennumcubedigits - lennumdigits + Idx )
+	  then
+	     return False;
+	  end if ;
+       end loop ;
+       return True ;
+    end IsTrimorphic ;
     
 end numbers ;

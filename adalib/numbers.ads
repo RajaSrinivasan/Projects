@@ -35,4 +35,6 @@ package numbers is
     function Digitize( Number : Number_Type )
 		   return Digits_Pkg.Vector ;
     
+    function IsTrimorphic( Number : Number_Type ) return Boolean ;
+    
 end numbers ;
