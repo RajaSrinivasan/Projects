@@ -65,5 +65,20 @@ begin
               new_line ;
            end loop ;
         end ;	
+        declare
+           fac : long_long_numbers.Digits_Pkg.Vector ;
+           curs : long_long_numbers.Digits_Pkg.Cursor ;
+        begin
+           fac := long_long_numbers.Digitize( num ) ;
+           put("All Digits of ");
+           put( num ) ;
+           new_line ;
+           for fn in 0..long_long_numbers.Digits_Pkg.length(fac)-1
+           loop
+              curs := long_long_numbers.Digits_Pkg.To_Cursor( fac , integer(fn) ) ;
+              put( Long_Long_Integer(Long_Long_Numbers.Digits_Pkg.Element( curs )) ) ;
+              new_line ;
+           end loop ;
+        end ;	
     end if ;
 end factors_test ;
