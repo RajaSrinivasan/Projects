@@ -80,5 +80,13 @@ begin
               new_line ;
            end loop ;
         end ;	
+	
+	if Long_Long_Numbers.IsTrimorphic( Num )
+	then
+	   Put_Line("Is Trimorphic") ;
+    else
+       Put_Line("Is not Trimorphic") ;
+    end if ;
+    
     end if ;
 end factors_test ;
