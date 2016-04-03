@@ -2,15 +2,6 @@ with ada.numerics.long_elementary_functions ; use Ada.Numerics.Long_Elementary_F
 
 package body numbers is
    package Sorting_Pkg is new Vector_Pkg.Generic_Sorting ;
-   
-    package body digits_pkg is
-        function digitize( number : number_type ) return digits_vector_pkg.vector is
-            vec : digits_vector_pkg.vector ;
-        begin
-            return vec ;
-        end digitize ;
-    end digits_pkg ;
-    
     
     function IsPrime( number : number_type )
 		    return boolean is
@@ -76,7 +67,6 @@ package body numbers is
        Numfac : Number_Type ;
        Numbernow : Number_Type := Number ;
     begin
-       Vec.Append( 1 ) ;
        Numfac := 2 ;
        loop
 	  if Numbernow rem Numfac = 0
@@ -110,9 +100,24 @@ package body numbers is
 	     Vec.Append( Number / Numfac ) ;
 	  end if ;
        end loop ;
-       	Sorting_Pkg.Sort( Vec ) ;
+       Vec.Append( Number ) ;
+       Sorting_Pkg.Sort( Vec ) ;
        return Vec ;
     end Divisors ;
     
+    function digitize( number : number_type ) return digits_pkg.vector is
+       vec : digits_pkg.vector ;
+       Digitmax : Number_Type := Number_Type( Decimal_Digits_Type'Last + 1 );
+       Numbernow : Number_Type := Number ;
+       Nextdigit : Decimal_Digits_Type ;
+    begin
+       while Numbernow > 0
+       loop
+	  Nextdigit := Decimal_Digits_Type(Numbernow rem Digitmax) ;
+	  Digits_Pkg.Prepend( Vec , Nextdigit ) ;
+	  Numbernow := Numbernow / Digitmax ;
+       end loop ;
+       return vec ;
+    end digitize ;
     
 end numbers ;

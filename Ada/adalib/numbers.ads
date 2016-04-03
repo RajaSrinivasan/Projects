@@ -12,15 +12,11 @@ package numbers is
         Element_Type => number_type
     ) ;
 
-    generic
-        type digits_type is (<>) ;
-    package digits_pkg is
-        package digits_vector_pkg is new Ada.Containers.Vectors(
-            Index_Type => Natural ,
-            Element_Type => digits_type) ;
-        function digitize( number : number_type ) return digits_vector_pkg.vector ;
-    end digits_pkg ;
+    package Digits_Pkg is new Ada.Containers.Vectors(
+						     Index_Type => Natural ,
+						     Element_Type => Decimal_Digits_Type);
     
+
     function IsPrime( Number : Number_Type ) return Boolean ;
     -- Prime_Factors
     --      - prime numbers which are factors of the given number
@@ -35,5 +31,8 @@ package numbers is
     --     - divisors of the number.
     function Divisors( Number : Number_Type )
 		    return Vector_Pkg.Vector ;
+    
+    function Digitize( Number : Number_Type )
+		   return Digits_Pkg.Vector ;
     
 end numbers ;
