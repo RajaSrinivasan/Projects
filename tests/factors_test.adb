@@ -33,5 +33,37 @@ begin
               new_line ;
            end loop ;
         end ;
+	
+        declare
+           fac : long_long_numbers.Vector_Pkg.Vector ;
+           curs : long_long_numbers.Vector_Pkg.Cursor ;
+        begin
+           fac := long_long_numbers.Factors( num ) ;
+           put("All Factors of ");
+           put( num ) ;
+           new_line ;
+           for fn in 0..long_long_numbers.Vector_Pkg.length(fac)-1
+           loop
+              curs := long_long_numbers.Vector_Pkg.To_Cursor( fac , integer(fn) ) ;
+              put( long_long_numbers.Vector_Pkg.Element( curs ) ) ;
+              new_line ;
+           end loop ;
+        end ;	
+
+        declare
+           fac : long_long_numbers.Vector_Pkg.Vector ;
+           curs : long_long_numbers.Vector_Pkg.Cursor ;
+        begin
+           fac := long_long_numbers.Divisors( num ) ;
+           put("All Divisors of ");
+           put( num ) ;
+           new_line ;
+           for fn in 0..long_long_numbers.Vector_Pkg.length(fac)-1
+           loop
+              curs := long_long_numbers.Vector_Pkg.To_Cursor( fac , integer(fn) ) ;
+              put( long_long_numbers.Vector_Pkg.Element( curs ) ) ;
+              new_line ;
+           end loop ;
+        end ;	
     end if ;
 end factors_test ;

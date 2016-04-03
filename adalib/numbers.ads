@@ -22,7 +22,18 @@ package numbers is
     end digits_pkg ;
     
     function IsPrime( Number : Number_Type ) return Boolean ;
+    -- Prime_Factors
+    --      - prime numbers which are factors of the given number
+    --        (no duplicates of the factors)
     function Prime_Factors( number : number_type )
-             return vector_pkg.Vector ;
-
+			  return vector_pkg.Vector ;
+    -- Factors
+    --     - factorize the number with primes. (product of all these = number)
+    function Factors( Number : Number_Type )
+		    return Vector_Pkg.Vector ;
+    -- Divisors
+    --     - divisors of the number.
+    function Divisors( Number : Number_Type )
+		    return Vector_Pkg.Vector ;
+    
 end numbers ;
