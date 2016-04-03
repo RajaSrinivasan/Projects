@@ -66,4 +66,53 @@ package body numbers is
 	Sorting_Pkg.Sort( Vec ) ;
         return vec ;
     end Prime_Factors ;
+    
+    function Factors( Number : Number_Type )
+		    return Vector_Pkg.Vector is
+       vec : vector_pkg.Vector ;
+       Number_Float : Long_Float := Long_Float(Number) ;
+       Sqrt_Float : Long_Float := Sqrt( Number_Float ) ;
+       Sqrt : Number_Type := Number_Type(Sqrt_Float) ;
+       Numfac : Number_Type ;
+       Numbernow : Number_Type := Number ;
+    begin
+       Vec.Append( 1 ) ;
+       Numfac := 2 ;
+       loop
+	  if Numbernow rem Numfac = 0
+	  then
+	     Vec.Append( Numfac ) ;
+	     Numbernow := Numbernow / Numfac ;
+	     if Numbernow = 1
+	     then
+		exit ;	     
+	     end if ;
+	  else
+	     Numfac := Numfac + 1 ;
+	  end if ;
+       end loop ;
+       return Vec ;
+    end Factors ;
+    
+    function Divisors( Number : Number_Type )
+		    return Vector_Pkg.Vector is
+       vec : vector_pkg.Vector ;
+       Number_Float : Long_Float := Long_Float(Number) ;
+       Sqrt_Float : Long_Float := Sqrt( Number_Float ) ;
+       Sqrt : Number_Type := Number_Type(Sqrt_Float) ;
+    begin
+       Vec.Append( 1 ) ;
+       for Numfac in 2 .. Sqrt 
+       loop
+	  if Number rem Numfac = 0
+	  then
+	     Vec.Append( Numfac ) ;
+	     Vec.Append( Number / Numfac ) ;
+	  end if ;
+       end loop ;
+       	Sorting_Pkg.Sort( Vec ) ;
+       return Vec ;
+    end Divisors ;
+    
+    
 end numbers ;
