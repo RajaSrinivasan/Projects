@@ -20,8 +20,9 @@ package numbers is
             Element_Type => digits_type) ;
         function digitize( number : number_type ) return digits_vector_pkg.vector ;
     end digits_pkg ;
-
-    function factorize( number : number_type )
+    
+    function IsPrime( Number : Number_Type ) return Boolean ;
+    function Prime_Factors( number : number_type )
              return vector_pkg.Vector ;
 
 end numbers ;
