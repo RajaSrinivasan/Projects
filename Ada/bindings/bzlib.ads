@@ -3,15 +3,18 @@ pragma Style_Checks (Off);
 
 with Interfaces.C; use Interfaces.C;
 with Interfaces.C.Strings;
+with Interfaces.C_Streams ;
+
 with System;
 
 
 package bzlib is
 
-   BZ_RUN : constant := 0 ;
-   BZ_FLUSH  : constant := 1 ;
-   BZ_FINISH  : constant := 2 ;
-     
+   type action_type is new int ;
+   BZ_RUN : constant action_type := 0 ;
+   BZ_FLUSH  : constant action_type := 1 ;
+   BZ_FINISH  : constant action_type:= 2 ;
+
    BZ_OK  : constant := 0 ;
    BZ_RUN_OK  : constant := 1 ;
    BZ_FLUSH_OK  : constant := 2 ;
@@ -26,25 +29,25 @@ package bzlib is
    BZ_UNEXPECTED_EOF  : constant := (-7) ;
    BZ_OUTBUFF_FULL  : constant := (-8) ;
    BZ_CONFIG_ERROR  : constant := (-9) ;
-     
+
    --  arg-macro: procedure BZ_API (func)
    --    func
    --  unsupported macro: BZ_EXTERN extern
    --  unsupported macro: BZ_MAX_UNUSED 5000
-  --------------------------------------------------------------- 
-  ----- Public header file for the library.                   --- 
-  -----                                               bzlib.h --- 
-  --------------------------------------------------------------- 
+  ---------------------------------------------------------------
+  ----- Public header file for the library.                   ---
+  -----                                               bzlib.h ---
+  ---------------------------------------------------------------
   -- ------------------------------------------------------------------
   --   This file is part of bzip2/libbzip2, a program and library for
   --   lossless, block-sorting data compression.
   --   bzip2/libbzip2 version 1.0.6 of 6 September 2010
   --   Copyright (C) 1996-2010 Julian Seward <jseward@bzip.org>
-  --   Please read the WARNING, DISCLAIMER and PATENTS sections in the 
+  --   Please read the WARNING, DISCLAIMER and PATENTS sections in the
   --   README file.
   --   This program is released under the terms of the license contained
   --   in the file LICENSE.
-  --   ------------------------------------------------------------------  
+  --   ------------------------------------------------------------------
 
    type bz_stream is record
       next_in : Interfaces.C.Strings.chars_ptr;  -- /usr/local/include/bzlib.h:50
@@ -61,53 +64,52 @@ package bzlib is
             arg2 : int;
             arg3 : int) return System.Address;  -- /usr/local/include/bzlib.h:62
       bzfree : access procedure (arg1 : System.Address; arg2 : System.Address);  -- /usr/local/include/bzlib.h:63
-      opaque : System.Address;  -- /usr/local/include/bzlib.h:64
+      opaque : System.Address := System.Null_Address ;  -- /usr/local/include/bzlib.h:64
    end record;
    pragma Convention (C_Pass_By_Copy, bz_stream);  -- /usr/local/include/bzlib.h:66
+   subtype verbosity_level is int range 0..4 ;
+   subtype blockSize_Type is int range 0..9 ;
+   subtype workFactor_Type is int range 0..250 ;
+   function CompressInit
+     (stream : access bz_stream;
+      blockSize100k : blockSize_Type ;
+      verbosity : verbosity_level ;
+      workFactor : workFactor_Type ) return int;  -- /usr/local/include/bzlib.h:100
+   pragma Import (C, CompressInit, "BZ2_bzCompressInit");
 
-  -- Need a definitition for FILE  
-  -- windows.h define small to char  
-  -- import windows dll dynamically  
-  ---- Core (low-level) library functions -- 
-   function BZ2_bzCompressInit
-     (arg1 : access bz_stream;
-      arg2 : int;
-      arg3 : int;
-      arg4 : int) return int;  -- /usr/local/include/bzlib.h:100
-   pragma Import (C, BZ2_bzCompressInit, "BZ2_bzCompressInit");
+   function Compress (stream : access bz_stream;
+                            action : action_type ) return int;  -- /usr/local/include/bzlib.h:107
+   pragma Import (C, Compress, "BZ2_bzCompress");
 
-   function BZ2_bzCompress (arg1 : access bz_stream; arg2 : int) return int;  -- /usr/local/include/bzlib.h:107
-   pragma Import (C, BZ2_bzCompress, "BZ2_bzCompress");
+   function CompressEnd (arg1 : access bz_stream) return int;  -- /usr/local/include/bzlib.h:112
+   pragma Import (C, CompressEnd, "BZ2_bzCompressEnd");
 
-   function BZ2_bzCompressEnd (arg1 : access bz_stream) return int;  -- /usr/local/include/bzlib.h:112
-   pragma Import (C, BZ2_bzCompressEnd, "BZ2_bzCompressEnd");
+   function DecompressInit
+     (stream : access bz_stream;
+      verbosity : verbosity_level ;
+      small : int) return int;  -- /usr/local/include/bzlib.h:116
+   pragma Import (C, DecompressInit, "BZ2_bzDecompressInit");
 
-   function BZ2_bzDecompressInit
-     (arg1 : access bz_stream;
-      arg2 : int;
-      arg3 : int) return int;  -- /usr/local/include/bzlib.h:116
-   pragma Import (C, BZ2_bzDecompressInit, "BZ2_bzDecompressInit");
+   function Decompress (stream : access bz_stream) return int;  -- /usr/local/include/bzlib.h:122
+   pragma Import (C, Decompress, "BZ2_bzDecompress");
 
-   function BZ2_bzDecompress (arg1 : access bz_stream) return int;  -- /usr/local/include/bzlib.h:122
-   pragma Import (C, BZ2_bzDecompress, "BZ2_bzDecompress");
+   function DecompressEnd (stream : access bz_stream) return int;  -- /usr/local/include/bzlib.h:126
+   pragma Import (C, DecompressEnd, "BZ2_bzDecompressEnd");
 
-   function BZ2_bzDecompressEnd (arg1 : access bz_stream) return int;  -- /usr/local/include/bzlib.h:126
-   pragma Import (C, BZ2_bzDecompressEnd, "BZ2_bzDecompressEnd");
+  ---- High(er) level library functions --
+   subtype BZFILE is System.Address ;  -- /usr/local/include/bzlib.h:137
 
-  ---- High(er) level library functions -- 
-   subtype BZFILE is System.Address;  -- /usr/local/include/bzlib.h:137
+   function ReadOpen
+     (bzerror : access int;
+      f : Interfaces.C_Streams.FILEs ;
+      verbosity : verbosity_level ;
+      small : int;
+      unused_1 : int := 0 ;
+      unused_2 : int := 0 ) return BZFILE ;  -- /usr/local/include/bzlib.h:139
+   pragma Import (C, ReadOpen, "BZ2_bzReadOpen");
 
-   function BZ2_bzReadOpen
-     (arg1 : access int;
-      arg2 : access stdio_h.FILE;
-      arg3 : int;
-      arg4 : int;
-      arg5 : System.Address;
-      arg6 : int) return System.Address;  -- /usr/local/include/bzlib.h:139
-   pragma Import (C, BZ2_bzReadOpen, "BZ2_bzReadOpen");
-
-   procedure BZ2_bzReadClose (arg1 : access int; arg2 : System.Address);  -- /usr/local/include/bzlib.h:148
-   pragma Import (C, BZ2_bzReadClose, "BZ2_bzReadClose");
+   procedure ReadClose (arg1 : access int; arg2 : System.Address);  -- /usr/local/include/bzlib.h:148
+   pragma Import (C, ReadClose, "BZ2_bzReadClose");
 
    procedure BZ2_bzReadGetUnused
      (arg1 : access int;
@@ -116,16 +118,16 @@ package bzlib is
       arg4 : access int);  -- /usr/local/include/bzlib.h:153
    pragma Import (C, BZ2_bzReadGetUnused, "BZ2_bzReadGetUnused");
 
-   function BZ2_bzRead
-     (arg1 : access int;
-      arg2 : System.Address;
-      arg3 : System.Address;
-      arg4 : int) return int;  -- /usr/local/include/bzlib.h:160
-   pragma Import (C, BZ2_bzRead, "BZ2_bzRead");
+   function Read
+     (bzerror : access int;
+      b : BZFILE ;
+      buf : System.Address;
+      len : int) return int;  -- /usr/local/include/bzlib.h:160
+   pragma Import (C, Read, "BZ2_bzRead");
 
    function BZ2_bzWriteOpen
-     (arg1 : access int;
-      arg2 : access stdio_h.FILE;
+     (bzerror : access int;
+      f : access Interfaces.C_Streams.FILEs ;
       arg3 : int;
       arg4 : int;
       arg5 : int) return System.Address;  -- /usr/local/include/bzlib.h:167
@@ -156,7 +158,7 @@ package bzlib is
       arg7 : access unsigned);  -- /usr/local/include/bzlib.h:190
    pragma Import (C, BZ2_bzWriteClose64, "BZ2_bzWriteClose64");
 
-  ---- Utility functions -- 
+  ---- Utility functions --
    function BZ2_bzBuffToBuffCompress
      (arg1 : Interfaces.C.Strings.chars_ptr;
       arg2 : access unsigned;
@@ -183,7 +185,7 @@ package bzlib is
   --   I haven't tested it, documented it, or considered the
   --   threading-safeness of it.
   --   If this code breaks, please contact both Yoshioka and me.
-  ---- 
+  ----
 
    function BZ2_bzlibVersion return Interfaces.C.Strings.chars_ptr;  -- /usr/local/include/bzlib.h:233
    pragma Import (C, BZ2_bzlibVersion, "BZ2_bzlibVersion");
@@ -215,7 +217,7 @@ package bzlib is
    function BZ2_bzerror (arg1 : System.Address; arg2 : access int) return Interfaces.C.Strings.chars_ptr;  -- /usr/local/include/bzlib.h:268
    pragma Import (C, BZ2_bzerror, "BZ2_bzerror");
 
-  --------------------------------------------------------------- 
-  ----- end                                           bzlib.h --- 
-  --------------------------------------------------------------- 
+  ---------------------------------------------------------------
+  ----- end                                           bzlib.h ---
+  ---------------------------------------------------------------
 end Bzlib ;
