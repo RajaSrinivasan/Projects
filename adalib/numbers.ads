@@ -11,11 +11,11 @@ package numbers is
         Index_Type => Natural ,
         Element_Type => number_type
     ) ;
-
+    procedure Show( Context : String ; Vec : Vector_Pkg.Vector ) ;
     package Digits_Pkg is new Ada.Containers.Vectors(
 						     Index_Type => Natural ,
 						     Element_Type => Decimal_Digits_Type);
-    
+    procedure Show( Context : String ; Vec : Digits_Pkg.Vector ) ;
 
     function IsPrime( Number : Number_Type ) return Boolean ;
     -- Prime_Factors
@@ -35,6 +35,7 @@ package numbers is
     function Digitize( Number : Number_Type )
 		   return Digits_Pkg.Vector ;
     
+    function IsPerfect( Number : Number_Type ) return Boolean ;
     function IsTrimorphic( Number : Number_Type ) return Boolean ;
     
 end numbers ;
