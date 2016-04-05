@@ -7,7 +7,6 @@ with Interfaces.C_Streams ;
 
 with System;
 
-
 package bzlib is
 
    type action_type is new int ;
@@ -125,13 +124,13 @@ package bzlib is
       len : int) return int;  -- /usr/local/include/bzlib.h:160
    pragma Import (C, Read, "BZ2_bzRead");
 
-   function BZ2_bzWriteOpen
+   function WriteOpen
      (bzerror : access int;
       f : access Interfaces.C_Streams.FILEs ;
-      arg3 : int;
-      arg4 : int;
-      arg5 : int) return System.Address;  -- /usr/local/include/bzlib.h:167
-   pragma Import (C, BZ2_bzWriteOpen, "BZ2_bzWriteOpen");
+      Small : int;
+      Unused_1 : Int := 0 ;
+      Unused_2 : Int := 0 ) return System.Address;  -- /usr/local/include/bzlib.h:167
+   pragma Import (C, WriteOpen, "BZ2_bzWriteOpen");
 
    procedure BZ2_bzWrite
      (arg1 : access int;
