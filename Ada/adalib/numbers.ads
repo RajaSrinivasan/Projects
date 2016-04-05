@@ -37,5 +37,8 @@ package numbers is
     
     function IsPerfect( Number : Number_Type ) return Boolean ;
     function IsTrimorphic( Number : Number_Type ) return Boolean ;
+    function IsKaprekar( Number : Number_Type ) return Boolean ;
+    
+    function Value( Digs : Digits_Pkg.Vector ) return Number_Type ;
     
 end numbers ;
