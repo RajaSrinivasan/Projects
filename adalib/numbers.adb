@@ -193,4 +193,45 @@ package body numbers is
        return True ;
     end IsTrimorphic ;
     
+    function IsKaprekar( Number : Number_Type ) return Boolean is
+       use Ada.Containers ;
+       Numsq : Number_Type := Number ** 2 ;       
+       Numsqdigits : Digits_Pkg.Vector ;
+       Numleft, Numright : Number_Type ;
+       Tempdig : Number_Type ;
+    begin
+       Numsqdigits := Digitize( Numsq ) ;
+       for Partlen in 1..Digits_Pkg.Length( Numsqdigits )
+       loop
+	  Numleft := 0 ;
+	  Numright := 0 ;
+	  for Dig in 1..Digits_Pkg.Length( Numsqdigits )
+	  loop
+	     Tempdig := Number_Type(Digits_Pkg.Element(Numsqdigits,Integer(Dig)-1)) ;
+	     if Dig <= Partlen
+	     then
+		Numleft := Numleft * 10 + tempdig ;
+	     else
+		NumRight := NumRight * 10 + Tempdig ;
+	     end if ;
+	     if Numleft + NumRight = Number
+	     then
+		return True ;
+	     end if ;
+	  end loop;
+       end loop ;       
+       return False ;
+    end IsKaprekar ;
+    
+    function Value( Digs : Digits_Pkg.Vector ) return Number_Type is
+       Val : Number_Type := 0 ;
+    begin
+       for D in 1 .. Digits_Pkg.Length( Digs )
+       loop
+	  Val := Val * 10 + Number_Type( Digits_Pkg.Element(Digs,Integer(D)-1)) ;
+       end loop ;
+       return Val ;
+    end Value ;
+    
+
 end numbers ;
