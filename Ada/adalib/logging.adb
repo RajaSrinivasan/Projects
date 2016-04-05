@@ -84,7 +84,14 @@ package body logging is
             To_Unbounded_String (sourceline (1 .. sourcelinelen)));
       end loop;
       Close (sourcesfile);
-   end RegisterAll;
+   end RegisterAll ;
+   
+   procedure Register( Source_Name : String ) is
+   begin
+      Sources_Pkg.Append
+	(registered_sources,
+	 To_Unbounded_String (Source_Name));
+   end Register ;
 
    ---------
    -- Get --
