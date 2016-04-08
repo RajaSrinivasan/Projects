@@ -1,0 +1,16 @@
+with "aunit" ;
+with "../adalib/adalib" ;
+project complex_test is
+
+   for Object_Dir use "../build";
+   for Main use ("complex_test.adb" );
+
+   package Pretty_Printer is
+      for Default_Switches ("ada") use ("-M100", "-i4", "-aU");
+   end Pretty_Printer;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-O3", "-gnatf");
+   end Compiler;
+
+end complex_test ;
