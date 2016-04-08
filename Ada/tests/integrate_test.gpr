@@ -1,3 +1,4 @@
+with "aunit" ;
 with "../adalib/adalib" ;
 project integrate_test is
 
