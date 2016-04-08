@@ -62,5 +62,42 @@ package body Complex_Tests is
 	 Ada.Complex_Text_Io.Put(C1) ;
 	 New_Line ;
       end Test_Conjugate ;
-
+      
+      procedure Test_Add is
+	 use type Ada.Numerics.Complex_Types.Complex ;
+	 C1 : Ada.Numerics.Complex_Types.Complex := ( Re => 1.0 ,
+						      Im => 1.0 ) ;
+	 C2 : Ada.Numerics.Complex_Types.Complex := ( Re => 1.0 ,
+						      Im => 1.0 ) ;
+      begin
+	 C1 := C1 + C2 ;
+	 Put("Addition test ");
+	 Ada.Complex_Text_Io.Put(C1) ;
+	 New_Line ;
+      end Test_Add ;
+      procedure Test_Multiply is
+	 use type Ada.Numerics.Complex_Types.Complex ;
+	 C1 : Ada.Numerics.Complex_Types.Complex := ( Re => 1.0 ,
+						      Im => 1.0 ) ;
+	 C2 : Ada.Numerics.Complex_Types.Complex := ( Re => 1.0 ,
+						      Im => 1.0 ) ;
+      begin
+	 C1 := C1 * C2 ;
+	 Put("Multiply test ");
+	 Ada.Complex_Text_Io.Put(C1) ;
+	 New_Line ;
+      end Test_Multiply ;
+      procedure Test_Divide is
+	 use type Ada.Numerics.Complex_Types.Complex ;
+	 C1 : Ada.Numerics.Complex_Types.Complex := ( Re => 1.0 ,
+						      Im => 1.0 ) ;
+	 C2 : Ada.Numerics.Complex_Types.Complex := ( Re => 1.0 ,
+						      Im => 1.0 ) ;
+      begin
+	 C1 := C1 / C2 ;
+	 Put("Division test ");
+	 Ada.Complex_Text_Io.Put(C1) ;
+	 New_Line ;
+      end Test_Divide ;
+      
 end Complex_Tests ;

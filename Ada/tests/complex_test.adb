@@ -6,5 +6,7 @@ begin
    Complex_Tests.Test_Argument ;   
    Complex_Tests.Test_Polar ;
    Complex_Tests.Test_Conjugate ;
-   
+   Complex_Tests.Test_Add ;
+   Complex_Tests.Test_Multiply ;
+   Complex_Tests.Test_Divide ;
 end Complex_Test;
