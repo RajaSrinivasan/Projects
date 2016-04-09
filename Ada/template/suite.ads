@@ -1,0 +1,4 @@
+with AUnit.Test_Suites ; use AUnit.Test_Suites ;
+package template_suite is                       -- [template/$]
+    function Suite return Access_Test_Suite ;
+end template_suite ;                              -- [template/$]

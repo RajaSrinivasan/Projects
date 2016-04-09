@@ -1,0 +1,16 @@
+
+  {
+      "newutil" :
+         {
+           "templatedir" : "template/" ,
+           "templates" :
+             {
+                "suite.ads" : "/$NEWPROJ/_suite.ads" ,
+                "suite.adb" : "/$NEWPROJ/_suite.adb" ,
+                "tests.ads" : "/$NEWPROJ/_tests.ads" ,
+                "tests.adb" : "/$NEWPROJ/_tests.adb" ,
+                "unit_test.adb" : "/$NEWPROJ/_unit_test.adb" ,
+                "unit_test.gpr" : "/$NEWPROJ/_unit_test.gpr"
+        }
+     }
+  }
