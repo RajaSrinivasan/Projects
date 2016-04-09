@@ -47,9 +47,15 @@ package body newutil_pkg is
                numtemplates                   := numtemplates + 1;
                templates (numtemplates)       := To_Unbounded_String (Name);
                template_values (numtemplates) := Get (Value);
-               Put_Line ("Found another template file");
+               if newutil_cli.verbose
+               then
+                  Put_Line ("Found another template file");
+               end if ;
             end if;
-            Put_Line (Name & "(string):" & Get (Value));
+            if newutil_cli.verbose
+            then
+                Put_Line (Name & "(string):" & Get (Value));
+            end if ;
          when JSON_Array_Type =>
             if Name = "templates" then
                declare
@@ -154,7 +160,8 @@ package body newutil_pkg is
          Ada.Text_IO.Get_Line (file, line, linelen);
          linenum := linenum + 1;
          GNAT.Regpat.Match (linemarker_matcher, line (1 .. linelen), Matches);
-         if Matches (0) /= GNAT.Regpat.No_Match then
+         if newutil_cli.Verbose and then
+            Matches (0) /= GNAT.Regpat.No_Match then
             Put (linenum);
             Put (" : ");
             Put_Line (line (1 .. linelen));
@@ -206,14 +213,17 @@ package body newutil_pkg is
          if Matches (0) = GNAT.Regpat.No_Match then
             Ada.Text_IO.Put_Line (ofile, line (1 .. linelen));
          else
-            Put (linenum);
-            Put (" : ");
-            Put_Line (line (1 .. linelen));
-            Put ("Will Subsitute ");
-            Put (line (Matches (1).First .. Matches (1).Last));
-            Put (" by PROGNAME");
-            Put (line (Matches (2).First .. Matches (2).Last));
-            New_Line;
+            if newutil_cli.verbose
+            then
+               Put (linenum);
+               Put (" : ");
+               Put_Line (line (1 .. linelen));
+               Put ("Will Subsitute ");
+               Put (line (Matches (1).First .. Matches (1).Last));
+               Put (" by PROGNAME");
+               Put (line (Matches (2).First .. Matches (2).Last));
+               New_Line;
+            end if ;
             startsearch := 1;
             while startsearch < Matches (1).First loop
                startsubst :=

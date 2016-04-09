@@ -22,7 +22,7 @@ begin
          newutil_pkg.show_config;
       end if;
    end if;
-   newutil_pkg.ParseConfig;
+
    for t in 1 .. newutil_pkg.numtemplates loop
       if Index (newutil_pkg.template_values (t), "/$NEWPROJ/") = 1 then
          declare
@@ -39,7 +39,7 @@ begin
             newutil_pkg.process_file
               (To_String (newutil_pkg.templatedir) &
                To_String (newutil_pkg.templates (t)),
-               To_String (utilname) & finalname (11 .. finalname'Last),
+               newutil_cli.outputname.all & To_String (utilname) & finalname (11 .. finalname'Last),
                To_String (utilname));
          end;
       else
