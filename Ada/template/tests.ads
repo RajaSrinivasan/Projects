@@ -1,11 +1,10 @@
 with AUnit ; use AUnit ;
 with AUnit.Test_Cases ; use AUnit.Test_Cases ;
-package Complex_Tests is
-    type Complex_Test is new Test_Cases.Test_Case with null record ;
-    procedure Register_Tests( T : in out Complex_Test );
-    function Name( T : Complex_Test ) return Message_String ;
-    procedure Test_Abs( T : in out Test_Cases.Test_Case'Class ) ;
-    procedure Test_Argument( T : in out Test_Cases.Test_Case'Class ) ;
-    procedure Test_Polar( T : in out Test_Cases.Test_Case'Class ) ;
+package template_Tests is            -- [template/$]
+    type template_Test is new Test_Cases.Test_Case with null record ;   -- [template/$]
+    procedure Register_Tests( T : in out template_Test );               -- [template/$]
+    function Name( T : template_Test ) return Message_String ;          -- [template/$]
+    procedure Test_template( T : in out Test_Cases.Test_Case'Class ) ; -- [template/$]
 
-end Complex_Tests ;
+
+end template_Tests ;                 -- [template/$]
