@@ -28,17 +28,22 @@ package numbers is
     function Factors( Number : Number_Type )
 		    return Vector_Pkg.Vector ;
     -- Divisors
-    --     - divisors of the number.
+    --     - all divisors of the number. (prime and non prime)
     function Divisors( Number : Number_Type )
 		    return Vector_Pkg.Vector ;
-    
+
+    -- Decimal digits of the number
     function Digitize( Number : Number_Type )
 		   return Digits_Pkg.Vector ;
-    
+    -- Value of a decimal number
+    function Value( Digs : Digits_Pkg.Vector ) return Number_Type ;
+
+    ---------------------------------------------------------------------------
+    -- Special Numbers
     function IsPerfect( Number : Number_Type ) return Boolean ;
     function IsTrimorphic( Number : Number_Type ) return Boolean ;
     function IsKaprekar( Number : Number_Type ) return Boolean ;
-    
+
     function Value( Digs : Digits_Pkg.Vector ) return Number_Type ;
-    
+
 end numbers ;
