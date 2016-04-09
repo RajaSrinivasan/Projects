@@ -44,6 +44,4 @@ package numbers is
     function IsTrimorphic( Number : Number_Type ) return Boolean ;
     function IsKaprekar( Number : Number_Type ) return Boolean ;
 
-    function Value( Digs : Digits_Pkg.Vector ) return Number_Type ;
-
 end numbers ;

@@ -2,7 +2,7 @@ with ada.numerics.long_elementary_functions ; use Ada.Numerics.Long_Elementary_F
 with Ada.Text_Io; use Ada.Text_Io ;
 
 package body numbers is
-   
+
    package Sorting_Pkg is new Vector_Pkg.Generic_Sorting ;
    package Digits_Text_Io is new Ada.Text_Io.Integer_Io( Decimal_Digits_Type ) ;
    use Digits_Text_Io;
@@ -20,7 +20,7 @@ package body numbers is
        end loop ;
        New_Line ;
     end Show ;
-   
+
     procedure Show( Context : String ; Vec : Digits_Pkg.Vector ) is
        use type Ada.Containers.Count_Type ;
     begin
@@ -47,17 +47,17 @@ package body numbers is
        then
 	  return True ;
        end if ;
-	  
+
        for N in 2..Sqrt
        loop
 	  if Number rem N = 0
 	  then
 	     return False ;
 	  end if ;
-       end loop ;       
+       end loop ;
        return True ;
     end IsPrime ;
-           
+
     function Prime_Factors( number : number_type )
              return vector_pkg.Vector is
         vec : vector_pkg.Vector ;
@@ -88,7 +88,7 @@ package body numbers is
 	Sorting_Pkg.Sort( Vec ) ;
         return vec ;
     end Prime_Factors ;
-    
+
     function Factors( Number : Number_Type )
 		    return Vector_Pkg.Vector is
        vec : vector_pkg.Vector ;
@@ -107,7 +107,7 @@ package body numbers is
 	     Numbernow := Numbernow / Numfac ;
 	     if Numbernow = 1
 	     then
-		exit ;	     
+		exit ;
 	     end if ;
 	  else
 	     Numfac := Numfac + 1 ;
@@ -115,7 +115,7 @@ package body numbers is
        end loop ;
        return Vec ;
     end Factors ;
-    
+
     function Divisors( Number : Number_Type )
 		    return Vector_Pkg.Vector is
        vec : vector_pkg.Vector ;
@@ -124,7 +124,7 @@ package body numbers is
        Sqrt : Number_Type := Number_Type(Sqrt_Float) ;
     begin
        Vec.Append( 1 ) ;
-       for Numfac in 2 .. Sqrt 
+       for Numfac in 2 .. Sqrt
        loop
 	  if Number rem Numfac = 0
 	  then
@@ -136,7 +136,7 @@ package body numbers is
        Sorting_Pkg.Sort( Vec ) ;
        return Vec ;
     end Divisors ;
-    
+
     function digitize( number : number_type ) return digits_pkg.vector is
        vec : digits_pkg.vector ;
        Digitmax : Number_Type := Number_Type( Decimal_Digits_Type'Last + 1 );
@@ -151,7 +151,7 @@ package body numbers is
        end loop ;
        return vec ;
     end digitize ;
-    
+
     function IsPerfect( Number : Number_Type ) return Boolean is
        Vec : Vector_Pkg.Vector ;
        Facsum : Number_Type := 0 ;
@@ -161,7 +161,7 @@ package body numbers is
        loop
 	  Facsum := Facsum + Vector_Pkg.Element( Vec, Integer(Fac)-1 );
        end loop ;
-       
+
        if Facsum = 2 * Number
        then
 	  return True ;
@@ -169,7 +169,7 @@ package body numbers is
 	  return False ;
        end if ;
     end IsPerfect ;
-    
+
     function IsTrimorphic( Number : Number_Type ) return Boolean is
        Numdigits : Digits_Pkg.Vector ;
        Numcubedigits : Digits_Pkg.Vector ;
@@ -192,10 +192,10 @@ package body numbers is
        end loop ;
        return True ;
     end IsTrimorphic ;
-    
+
     function IsKaprekar( Number : Number_Type ) return Boolean is
        use Ada.Containers ;
-       Numsq : Number_Type := Number ** 2 ;       
+       Numsq : Number_Type := Number ** 2 ;
        Numsqdigits : Digits_Pkg.Vector ;
        Numleft, Numright : Number_Type ;
        Tempdig : Number_Type ;
@@ -219,10 +219,10 @@ package body numbers is
 		return True ;
 	     end if ;
 	  end loop;
-       end loop ;       
+       end loop ;
        return False ;
     end IsKaprekar ;
-    
+
     function Value( Digs : Digits_Pkg.Vector ) return Number_Type is
        Val : Number_Type := 0 ;
     begin
@@ -232,6 +232,6 @@ package body numbers is
        end loop ;
        return Val ;
     end Value ;
-    
+
 
 end numbers ;
