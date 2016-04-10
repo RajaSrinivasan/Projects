@@ -1,8 +1,10 @@
 with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with GNAT.os_lib ;
 with GNAT.Strings;
 with newutil_cli;
 with newutil_pkg;
+
 procedure newutil is
    use type GNAT.Strings.String_Access;
    utilname : Unbounded_String := Null_Unbounded_String;
@@ -37,9 +39,11 @@ begin
                New_Line;
             end if;
             newutil_pkg.process_file
-              (To_String (newutil_pkg.templatedir) &
+              (To_String (newutil_pkg.templatedir) & GNAT.os_lib.directory_separator &
                To_String (newutil_pkg.templates (t)),
-               newutil_cli.outputname.all & To_String (utilname) & finalname (11 .. finalname'Last),
+               newutil_cli.outputname.all &
+               GNAT.os_lib.directory_separator &
+               To_String (utilname) & finalname (11 .. finalname'Last),
                To_String (utilname));
          end;
       else

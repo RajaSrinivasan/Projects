@@ -10,7 +10,7 @@ package body template_tests is  -- [template/$]
     procedure Register_Tests( T : in out template_Test ) is   -- [template/$]
        use AUnit.Test_Cases.Registration ;
     begin
-        Register_Routine( T , Test_numbers'access , "template Test") ; -- [template/$]
+        Register_Routine( T , Test_template'access , "template Test") ; -- [template/$]
     end Register_Tests ;
 
     function Name( T : template_Test ) return Message_String is   -- [template/$]
