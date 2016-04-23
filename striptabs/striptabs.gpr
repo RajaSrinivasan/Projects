@@ -1,0 +1,19 @@
+project Striptabs is
+
+   for Object_Dir use "../build";
+   for Main use ("striptabs.adb");
+
+   package Ide is
+      for Vcs_Kind use "Git";
+   end Ide;
+
+   package Pretty_Printer is
+      for Default_Switches ("ada") use ("-M100", "-i4", "-aU");
+   end Pretty_Printer;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-O3", "-gnatf");
+   end Compiler;
+
+end Striptabs;
+

@@ -1,0 +1,11 @@
+ahex2bin
+
+     -h         - help
+     -v         - Verbose
+     -ob [file] - output binary file
+     -oh [file] - output hex file. (use with -c16 to create new hexfile)
+     -s [n]     - prom size. nK bytes
+     -e [hex]   - page erase value. hex=16#ff#
+     -b [hex]   - base address. default=16#0000#
+     -c16 [hex] - store 16 bit crc at address specified
+     -c32 [hex] - store 32 bit crc at address specified

@@ -1,0 +1,17 @@
+project Asyslog is
+
+   for Source_Dirs use (".", "../lib", "../bindings");
+   for Object_Dir use "../build";
+   for Main use ("asyslog.adb", "asyslogs.adb");
+   for Languages use ("Ada");
+
+   package Compiler is
+   end Compiler;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-L", "../../../Imports/zlib-1.2.8");
+   end Linker;
+
+
+end Asyslog;
+

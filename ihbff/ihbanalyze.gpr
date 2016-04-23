@@ -1,0 +1,17 @@
+project Ihbanalyze is
+
+   for Object_Dir use "../build";
+   for Main use ("abin2hex.adb", "ahex2bin.adb", "ihbranalyze.adb");
+   for Source_Dirs use (".", "../lib");
+
+   package Builder is
+   end Builder;
+
+   package Compiler is
+   end Compiler;
+
+   package Linker is
+   end Linker;
+
+end Ihbanalyze;
+

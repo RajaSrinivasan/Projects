@@ -1,0 +1,15 @@
+with "../adalib/adalib" ;
+project factors_test is
+
+   for Object_Dir use "../build";
+   for Main use ("factors_test.adb" , "numbers_test.adb");
+
+   package Pretty_Printer is
+      for Default_Switches ("ada") use ("-M100", "-i4", "-aU");
+   end Pretty_Printer;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-O3", "-gnatf");
+   end Compiler;
+
+end factors_test ;

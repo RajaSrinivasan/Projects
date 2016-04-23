@@ -1,0 +1,14 @@
+project bindings is
+
+   for Source_Dirs use (".");
+   for Object_Dir use "../obj";
+   for Library_Dir use "../lib";
+   for Library_Name use "bindings";
+
+   for Languages use ("Ada");
+   package Compiler is
+      for Switches ("Ada")
+          use ("-O2","-gnat05");
+   end Compiler;
+   
+end bindings ;
