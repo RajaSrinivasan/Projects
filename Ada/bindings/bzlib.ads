@@ -110,12 +110,12 @@ package bzlib is
    procedure ReadClose (arg1 : access int; arg2 : System.Address);  -- /usr/local/include/bzlib.h:148
    pragma Import (C, ReadClose, "BZ2_bzReadClose");
 
-   procedure BZ2_bzReadGetUnused
-     (arg1 : access int;
-      arg2 : System.Address;
-      arg3 : System.Address;
-      arg4 : access int);  -- /usr/local/include/bzlib.h:153
-   pragma Import (C, BZ2_bzReadGetUnused, "BZ2_bzReadGetUnused");
+   procedure ReadGetUnused
+     (bzerror  : access int;
+      BZFILE : System.Address;
+      unused_1 : System.Address;
+      unused_2 : access int);  -- /usr/local/include/bzlib.h:153
+   pragma Import (C, ReadGetUnused, "BZ2_bzReadGetUnused");
 
    function Read
      (bzerror : access int;
@@ -132,50 +132,50 @@ package bzlib is
       Unused_2 : Int := 0 ) return System.Address;  -- /usr/local/include/bzlib.h:167
    pragma Import (C, WriteOpen, "BZ2_bzWriteOpen");
 
-   procedure BZ2_bzWrite
-     (arg1 : access int;
-      arg2 : System.Address;
-      arg3 : System.Address;
-      arg4 : int);  -- /usr/local/include/bzlib.h:175
-   pragma Import (C, BZ2_bzWrite, "BZ2_bzWrite");
+   procedure Write
+     (bzerror  : access int;
+      BZFILE : System.Address;
+      buf : System.Address;
+      len : int);  -- /usr/local/include/bzlib.h:175
+   pragma Import (C, Write, "BZ2_bzWrite");
 
-   procedure BZ2_bzWriteClose
-     (arg1 : access int;
-      arg2 : System.Address;
-      arg3 : int;
-      arg4 : access unsigned;
-      arg5 : access unsigned);  -- /usr/local/include/bzlib.h:182
-   pragma Import (C, BZ2_bzWriteClose, "BZ2_bzWriteClose");
+   procedure WriteClose
+     (bzerror : access int;
+      BZFILE : System.Address;
+      abandon : int;
+      nbytes_in : access unsigned;
+      nbytes_out : access unsigned);  -- /usr/local/include/bzlib.h:182
+   pragma Import (C, WriteClose, "BZ2_bzWriteClose");
 
-   procedure BZ2_bzWriteClose64
-     (arg1 : access int;
-      arg2 : System.Address;
-      arg3 : int;
-      arg4 : access unsigned;
-      arg5 : access unsigned;
-      arg6 : access unsigned;
-      arg7 : access unsigned);  -- /usr/local/include/bzlib.h:190
-   pragma Import (C, BZ2_bzWriteClose64, "BZ2_bzWriteClose64");
+   procedure WriteClose64
+     (bzerror : access int;
+      BZFILE : System.Address;
+      abandon : int;
+      nbytes_in_lo32 : access unsigned;
+      nbytes_in_hi32 : access unsigned;
+      nbytes_out_lo32 : access unsigned;
+      nbytes_out_hi32 : access unsigned);  -- /usr/local/include/bzlib.h:190
+   pragma Import (C, WriteClose64, "BZ2_bzWriteClose64");
 
   ---- Utility functions --
-   function BZ2_bzBuffToBuffCompress
-     (arg1 : Interfaces.C.Strings.chars_ptr;
-      arg2 : access unsigned;
-      arg3 : Interfaces.C.Strings.chars_ptr;
-      arg4 : unsigned;
-      arg5 : int;
-      arg6 : int;
-      arg7 : int) return int;  -- /usr/local/include/bzlib.h:204
-   pragma Import (C, BZ2_bzBuffToBuffCompress, "BZ2_bzBuffToBuffCompress");
+   function BuffToBuffCompress
+     (dest : Interfaces.C.Strings.chars_ptr;
+      destLen : access unsigned;
+      source : Interfaces.C.Strings.chars_ptr;
+      sourceLen : unsigned;
+      blockSize100K : int;
+      verbosity : int;
+      workFactor : int) return int;  -- /usr/local/include/bzlib.h:204
+   pragma Import (C, BuffToBuffCompress, "BZ2_bzBuffToBuffCompress");
 
-   function BZ2_bzBuffToBuffDecompress
-     (arg1 : Interfaces.C.Strings.chars_ptr;
-      arg2 : access unsigned;
-      arg3 : Interfaces.C.Strings.chars_ptr;
-      arg4 : unsigned;
-      arg5 : int;
-      arg6 : int) return int;  -- /usr/local/include/bzlib.h:214
-   pragma Import (C, BZ2_bzBuffToBuffDecompress, "BZ2_bzBuffToBuffDecompress");
+   function BuffToBuffDecompress
+     (dest : Interfaces.C.Strings.chars_ptr;
+      destLen : access unsigned;
+      source : Interfaces.C.Strings.chars_ptr;
+      sourceLen : unsigned;
+      small : int;
+      verbosity : int) return int;  -- /usr/local/include/bzlib.h:214
+   pragma Import (C, BuffToBuffDecompress, "BZ2_bzBuffToBuffDecompress");
 
   ----
   --   Code contributed by Yoshioka Tsuneo (tsuneo@rr.iij4u.or.jp)
