@@ -8,6 +8,6 @@ project adalib is
    for Languages use ("Ada");
    package Compiler is
       for Switches ("Ada")
-          use ("-O2","-gnat05");
+          use ("-O2","-gnat05","-gnat12");
    end Compiler;
 end adalib ;
