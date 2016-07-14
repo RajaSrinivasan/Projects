@@ -55,10 +55,9 @@ package body digest_cli is                          -- [cli/$_cli]
                                       Long_Switch => "--md5",
                                       Help => "Use md5 algorithm");
         GNAT.Command_Line.Define_Switch (Config,
-                                         output => sha_level'access,
                                          Switch => "-s:",
                                          Long_Switch => "--sha:",
-                                         Help => "Use sha algorithm; level argument can be 1 | 224 | 256 | 384 | 512" );
+                                         Help => "Use sha algorithm; levels 1 224 256 384 512" );
          GNAT.Command_Line.Define_Switch (Config,
                                           output => adler_alg'access,
                                           Switch => "-a",
