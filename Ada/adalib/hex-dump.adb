@@ -44,8 +44,6 @@ package body Hex.dump is
          Blockstart := (B - 1) * Blocklen + 1;
          if show_offset then
             Put (Outfile, Blockstart, Base => 16);
-         else
-            Put (Outfile, GNAT.Debug_Utilities.Image (blockadr));
          end if;
 
          if Lengthleft >= Blocklen then

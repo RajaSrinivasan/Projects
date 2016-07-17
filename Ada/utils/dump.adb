@@ -13,10 +13,14 @@ begin
             exit;
          end if;
          if dump_cli.verbose then
-            Text_IO.Put ("* Dumping ***************************************");
+            Text_IO.Put_Line ("****************************************");
+            Text_Io.Put("File name : ");
             Text_IO.Put_Line (arg);
+            Text_Io.Put("Block len : ");
+            Text_Io.Put_Line( Integer'Image( dump_cli.blocklength ));
+            Text_IO.Put_Line ("****************************************");
          end if;
-         Hex.dump.file.Dump (arg);
+         Hex.dump.file.Dump (arg , blocklen => dump_cli.blocklength );
       end;
    end loop;
 end dump;

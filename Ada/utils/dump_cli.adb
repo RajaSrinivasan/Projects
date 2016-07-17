@@ -24,16 +24,22 @@ package body dump_cli is
          Switch      => "-v?",
          Long_Switch => "--verbose?",
          Help        => "Output extra verbose information");
+     GNAT.Command_Line.Define_Switch
+       (Config,
+        Output      => blocklength'Access,
+        Switch      => "-b:",
+        Long_Switch => "--blocklength:",
+        Initial => 16 ,
+        Default => 16 ,
+        Help        => "Block length");
       GNAT.Command_Line.Define_Switch
         (Config,
          Output      => outputname'Access,
          Switch      => "-o:",
          Long_Switch => "--output:",
          Help        => "Output Name");
-      GNAT.Command_Line.Getopt (Config, SwitchHandler'Access);
 
-      Put_Line ("Output Name " & outputname.all);
-      Put_Line ("Verbosity " & Boolean'Image (verbose));
+      GNAT.Command_Line.Getopt (Config, SwitchHandler'Access);
    end ProcessCommandLine;
 
    function GetNextArgument return String is
