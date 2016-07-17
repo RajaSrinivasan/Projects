@@ -27,6 +27,12 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                         Switch => "-s",
                         Long_Switch => "--show",
                         Help => "Show the contents of the hex file");
+        GNAT.Command_Line.Define_Switch (Config,
+                         dumpdataoption'access ,
+                         Switch => "-d",
+                         Long_Switch => "--dump-data",
+                         Help => "Show the contents of the hex file");
+
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
     end ProcessCommandLine;

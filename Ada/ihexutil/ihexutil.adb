@@ -1,6 +1,7 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io;
 
+with hex ; use hex ;
 with ihbr ; use ihbr ;
 
 with ihexutil_cli ;                            -- [cli/$_cli]
@@ -35,31 +36,33 @@ begin
                 case hexrec.Rectype is
                    when Extended_Lin_Adr_Rec =>
                       Put("ExtLinA ");
-                      Set_Col(12) ;
+                      Set_Col(10) ;
                       Put(long_integer'image(long_integer(hexrec.Linear_Base_Address))) ;
                       New_Line ;
                    when Extended_Seg_Adr_Rec =>
                       Put("ExtSegA ");
-                      Set_Col(12) ;
+                      Set_Col(10) ;
                       Put(long_integer'image(long_integer(hexrec.Segment_Base_Address))) ;
                       New_Line ;
                    when Data_Rec =>
                       Put("DataRec");
-                      Set_Col(12) ;
-                      Put("Load Offset ") ;
-                      Put( Integer(hexrec.LoadOffset) );
-                      put(" length ") ;
-                      Put( Integer(hexrec.DataRecLen) );
+                      Set_Col(10) ;
+                      Put("Offset ") ;
+                      Put( Integer(hexrec.LoadOffset) , Width => 6);
+                      Put( Integer(hexrec.LoadOffset) , base => 16 , width => 10 );
+                      put(" length") ;
+                      Put( Integer(hexrec.DataRecLen) , Width => 4);
+                      Put( " * ");
+                      Put( hex.Image( hexrec.Data'address , Integer(hexrec.DataRecLen) ) ) ;
                       New_Line ;
                    when Start_Lin_Adr_Rec =>
                       Put("LinStA ");
-                      Set_Col(12) ;
+                      Set_Col(10) ;
                       Put(long_integer'image(long_integer(hexrec.Exec_LinStart_Adr))) ;
                       New_Line ;
                    when Start_Seg_Adr_Rec =>
-
                       Put("SegStA ");
-                      Set_Col(12) ;
+                      Set_Col(10) ;
                       Put(long_integer'image(long_integer(hexrec.Exec_SegStart_Adr))) ;
                       New_Line ;
                    when End_Of_File_Rec =>

@@ -57,6 +57,7 @@ package Ihbr is
    procedure GetNext
      (File : in out File_Type;
       Rec  :    out Ihbr_Binary_Record_Type);
+            
    procedure PutNext (File : in out File_Type; Rec : Ihbr_Binary_Record_Type);
    function End_Of_File (file : Ihbr.File_Type) return Boolean;
 
