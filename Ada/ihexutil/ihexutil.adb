@@ -1,6 +1,6 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io;
-
+with Ada.Long_Integer_Text_Io; use Ada.Long_Integer_Text_Io;
 with hex ; use hex ;
 with ihbr ; use ihbr ;
 
@@ -37,7 +37,7 @@ begin
                    when Extended_Lin_Adr_Rec =>
                       Put("ExtLinA ");
                       Set_Col(10) ;
-                      Put(long_integer'image(long_integer(hexrec.Linear_Base_Address))) ;
+                      Put(long_integer(hexrec.Linear_Base_Address) , base => 16 , width => 10) ;
                       New_Line ;
                    when Extended_Seg_Adr_Rec =>
                       Put("ExtSegA ");
