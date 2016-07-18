@@ -78,9 +78,13 @@ package body Ihbr is
             raise format_error with "StartChar";
          end if;
 
-         Cs        := newline (line_length - 1 .. line_length);
+         Bcval  := Hex.Value (Bc);
+
+         --Cs        := newline (line_length - 1 .. line_length);
+         cs := newline( databegin + Integer(BCVAL) * 2 .. databegin + Integer(BCVAL) * 2 + 1) ;
          Csval     := Hex.Value (Cs);
-         calccsval := ComputeChecksum (newline (2 .. newline'Length - 2));
+         --calccsval := ComputeChecksum (newline (2 .. newline'Length - 2));
+         calccsval := ComputeChecksum( newline( 2 .. databegin + Integer(BCVAL)*2 -1 )) ;
          if Csval /= calccsval then
             raise format_error with "Checksum";
          else
@@ -92,6 +96,7 @@ package body Ihbr is
          end if;
 
          Bcval  := Hex.Value (Bc);
+
          Hxaval := Hex.Value (Hxa);
 
          Rtval := Hex.Value (Rt);
@@ -111,7 +116,20 @@ package body Ihbr is
                   end loop;
                   Rec := drdata;
                end;
-
+            when Extended_Lin_Adr_Rec =>
+                 declare
+                    xlinadr : ihbr_Binary_Record_Type(Extended_Lin_Adr_Rec) ;
+                    hibyte, lobyte : Interfaces.Unsigned_8 ;
+                begin
+                    if bcval /= 2
+                    then
+                        raise format_error with "xlinadrlen " & integer'image(integer(bcval)) ;
+                    end if ;
+                    hibyte := Hex.Value( newline(databegin..databegin+1) ) ;
+                    lobyte := Hex.Value( newline(databegin+2..databegin+3)) ;
+                    xlinadr.Linear_Base_Address := Unsigned_32(Shift_Left(hibyte,8) + lobyte) ;
+                    rec := xlinadr ;
+                end ;
             when End_Of_File_Rec =>
                if Bcval /= 0 then
                   Put_Line ("Non zero byte count for End_Of_File record");
@@ -201,6 +219,7 @@ package body Ihbr is
       if Str'Length mod 2 /= 0 then
          raise Program_Error with "OddLengthStr";
       end if;
+
       Numbytes := Str'Length / 2;
       for byte in 1 .. Numbytes loop
          Nextbyte := Hex.Value (Mystr ((byte - 1) * 2 + 1 .. byte * 2));

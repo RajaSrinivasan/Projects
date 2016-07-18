@@ -18,7 +18,7 @@ package body Hex is
          return Interfaces.Unsigned_8
              (10 + Character'Pos (Hex) - Character'Pos ('A'));
       end if;
-      raise format_error with "InvalidHex";
+      raise format_error with "InvalidHex " & Hex ;
    end Value;
 
    function Value (Hex : Hexstring) return Interfaces.Unsigned_8 is

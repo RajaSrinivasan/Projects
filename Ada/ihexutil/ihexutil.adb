@@ -1,7 +1,8 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io;
-
 with Ada.Strings.Unbounded ; use Ada.Strings.Unbounded ;
+with Ada.Long_Integer_Text_Io; use Ada.Long_Integer_Text_Io;
+
 with hex ; use hex ;
 with ihbr ; use ihbr ;
 
