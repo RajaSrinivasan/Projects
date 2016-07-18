@@ -57,10 +57,12 @@ package Ihbr is
    procedure GetNext
      (File : in out File_Type;
       Rec  :    out Ihbr_Binary_Record_Type);
-            
+
    procedure PutNext (File : in out File_Type; Rec : Ihbr_Binary_Record_Type);
    function End_Of_File (file : Ihbr.File_Type) return Boolean;
-
+   
+   function ComputeChecksum (Str : String) return Interfaces.Unsigned_8;
+   function ComputeChecksum (Bin : system.storage_elements.Storage_Array) return Interfaces.Unsigned_8 ;
 private
    type file_rec_type is record
       File         : Ada.Text_IO.File_Type;
@@ -68,7 +70,5 @@ private
    end record;
    type File_Type is access all file_rec_type;
 
-   function ComputeChecksum (Str : String) return Interfaces.Unsigned_8;
-   function ComputeChecksum (Bin : system.storage_elements.Storage_Array) return Interfaces.Unsigned_8 ;
 
 end Ihbr;
