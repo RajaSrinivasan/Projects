@@ -5,6 +5,8 @@ package ihexutil_cli is                                       -- [cli/$_cli]
    verbose : aliased boolean := false ;              -- Option:     -v or --verbose
    showoption : aliased boolean := false ;
    dumpdataoption : aliased boolean := false ;
+   hexline : unbounded_string := null_unbounded_string ;
+
    version : string := "IHEXUTIL_V01" ;
    outputname : aliased gnat.strings.string_access ;
 
