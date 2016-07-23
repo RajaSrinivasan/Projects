@@ -1,11 +1,14 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io ;
-with Interfaces ;
+with System.Storage_Elements ;
+with Interfaces ; use Interfaces ;
 
 with hex ;
+with hex.dump ;
 with ihbr ; use ihbr ;
 package body ihexutil_pkg is
     procedure Show( filename : string ) is
+       use System.Storage_Elements ;
        hexfile : ihbr.File_Type ;
        hexrec : ihbr.Ihbr_Binary_Record_Type ;
        linecount : Integer := 0 ;
@@ -18,8 +21,9 @@ package body ihexutil_pkg is
            case hexrec.Rectype is
               when Extended_Lin_Adr_Rec =>
                  Put("ExtLinA ");
-                 Set_Col(10) ;
-                 Put(long_integer'image(long_integer(hexrec.Linear_Base_Address))) ;
+                 Set_Col(17) ;
+                 Put(integer(hexrec.Linear_Base_Address) , width => 6 ) ;
+                 Put(integer(hexrec.Linear_Base_Address) , base => 16 , width => 10 ) ;
                  New_Line ;
               when Extended_Seg_Adr_Rec =>
                  Put("ExtSegA ");
@@ -34,6 +38,16 @@ package body ihexutil_pkg is
                  Put( Integer(hexrec.LoadOffset) , base => 16 , width => 10 );
                  put(" length") ;
                  Put( Integer(hexrec.DataRecLen) , Width => 4);
+                 Put( " * ");
+                 for c in 1..32
+                 loop
+                     if c <= Integer(hexrec.DataRecLen)
+                     then
+                        Put( hex.dump.CharImage( Unsigned_8(hexrec.Data(Storage_Offset(c)))) );
+                     else
+                        Put(' ') ;
+                     end if ;
+                 end loop;
                  Put( " * ");
                  Put( hex.Image( hexrec.Data'address , Integer(hexrec.DataRecLen) ) ) ;
                  New_Line ;

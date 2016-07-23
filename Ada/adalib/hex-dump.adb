@@ -5,6 +5,20 @@ with Ada.Integer_Text_IO;     use Ada.Integer_Text_IO;
 with GNAT.Debug_Utilities;
 
 package body Hex.dump is
+
+    function CharImage (ci : Interfaces.Unsigned_8) return Character is
+       c : Character := Character'Val (Integer (ci));
+    begin
+       if not Ada.Characters.Handling.Is_ISO_646 (c) then
+          return '.';
+       end if;
+       if Ada.Characters.Handling.Is_Alphanumeric (c) then
+          return c;
+       end if;
+
+       return '.';
+    end CharImage;
+
    procedure Dump
      (Adr         : System.Address;
       Length      : Integer;
@@ -24,19 +38,6 @@ package body Hex.dump is
       adrcol : Integer := 1;
       piccol : Integer := GNAT.Debug_Utilities.Address_Image_Length + adrcol;
       hexcol : Integer := piccol + Blocklen + 4;
-
-      function CharImage (ci : Interfaces.Unsigned_8) return Character is
-         c : Character := Character'Val (Integer (ci));
-      begin
-         if not Ada.Characters.Handling.Is_ISO_646 (c) then
-            return '.';
-         end if;
-         if Ada.Characters.Handling.Is_Alphanumeric (c) then
-            return c;
-         end if;
-
-         return '.';
-      end CharImage;
 
    begin
 
