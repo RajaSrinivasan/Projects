@@ -6,6 +6,9 @@ with Interfaces ; use Interfaces ;
 with hex ;
 with hex.dump ;
 with ihbr ; use ihbr ;
+with crc16 ; use crc16 ;
+
+with ihexutil_cli ;
 package body ihexutil_pkg is
     procedure Show( filename : string ) is
        use System.Storage_Elements ;
@@ -79,6 +82,7 @@ package body ihexutil_pkg is
       hexfilein, hexfileout : ihbr.File_Type ;
       hexrec : ihbr.Ihbr_Binary_Record_Type ;
       linecount : Integer := 0 ;
+      checksum : Interfaces.Unsigned_16 := 0 ;
     begin
         ihbr.Open( infilename , hexfilein );
         hexfileout := ihbr.Create( outfilename );
@@ -86,10 +90,36 @@ package body ihexutil_pkg is
         loop
           ihbr.GetNext( hexfilein , hexrec ) ;
           linecount := linecount + 1 ;
+          if hexrec.RecType = ihbr.Data_Rec
+          then
+              crc16.Update( checksum , hexrec.Data(1)'Address , Integer(hexrec.DataRecLen) , checksum ) ;
+          elsif hexrec.RecType = ihbr.End_Of_File_Rec
+          then
+            if crcaddress > 0
+            then
+                declare
+                   csrec : ihbr.Ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
+                begin
+                   csrec.DataRecLen := 2 ;
+                   csrec.Data(1) := System.Storage_Elements.Storage_Element(checksum and 16#00ff#) ;
+                   csrec.Data(2) := System.Storage_Elements.Storage_Element(Shift_Right(checksum,8)) ;
+                   csrec.LoadOffset := Unsigned_16(crcaddress) ;
+                   ihbr.PutNext( hexfileout , csrec ) ;
+                end ;
+            end if ;
+          end if ;
           ihbr.PutNext( hexfileout , hexrec ) ;
         end loop ;
-        ihbr.Close( hexfileout ) ;
         ihbr.Close( hexfilein ) ;
+        ihbr.Close( hexfileout ) ;
+        if ihexutil_cli.Verbose
+        then
+            Put( linecount ) ; Put( " records copied from ") ;
+            Put(infilename) ; Put(" to ") ; Put( outfilename ) ;
+            New_Line ;
+            Put("Checksum Calculated ") ; Put( Integer(checksum) ) ;
+            New_Line ;
+        end if ;
     end CopyWithCRC ;
     procedure Checksum( line : string ) is
        cs : Interfaces.Unsigned_8 ;
