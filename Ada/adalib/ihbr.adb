@@ -19,7 +19,6 @@ package body Ihbr is
 
    procedure free is new Unchecked_Deallocation (file_rec_type, File_Type);
 
-
    procedure Open (Name : String; File : out File_Type) is
       temp : File_Type := new file_rec_type;
    begin
@@ -187,6 +186,12 @@ package body Ihbr is
             loop
                store (Hex.Image (Rec.Data (dptr))) ;
             end loop;
+         when Extended_Lin_Adr_Rec =>
+              store( Hex.Image(Interfaces.Unsigned_8(2)) ) ;      -- 2 bytes of data
+              store( "0000" ) ;            -- Offset is 0
+              store( Hex.Image( Interfaces.Unsigned_8(RecType_Type'pos( rec.RecType )) )) ;
+              store( Hex.Image( Interfaces.Unsigned_16(rec.Linear_Base_Address))) ;
+            null ;
          when End_Of_File_Rec =>
             store (Hex.Image (bc));
             store (Hex.Image (loadadr));
@@ -200,7 +205,7 @@ package body Ihbr is
       Ada.Text_IO.Put (File.File, output_line (1 .. outptr - 1));
       Ada.Text_IO.Put_Line
         (File.File,
-         Hex.Image(ComputeChecksum(Rec.Data(1..System.Storage_Elements.Storage_Offset (Rec.DataRecLen)))));
+         Hex.Image(ComputeChecksum(output_line(1 .. outptr - 1))));
    end PutNext;
 
    function End_Of_File (file : Ihbr.File_Type) return Boolean is
@@ -243,5 +248,4 @@ package body Ihbr is
       Result := not Result;
       return Result + 1;
    end ComputeChecksum ;
-
 end Ihbr;

@@ -73,6 +73,24 @@ package body ihexutil_pkg is
        Put(" lines read from ");
        Put_Line(filename);
     end Show ;
+    procedure CopyWithCRC( infilename : string ;
+                           outfilename : string ;
+                           crcaddress : integer ) is
+      hexfilein, hexfileout : ihbr.File_Type ;
+      hexrec : ihbr.Ihbr_Binary_Record_Type ;
+      linecount : Integer := 0 ;
+    begin
+        ihbr.Open( infilename , hexfilein );
+        hexfileout := ihbr.Create( outfilename );
+        while not ihbr.End_Of_File( hexfilein )
+        loop
+          ihbr.GetNext( hexfilein , hexrec ) ;
+          linecount := linecount + 1 ;
+          ihbr.PutNext( hexfileout , hexrec ) ;
+        end loop ;
+        ihbr.Close( hexfileout ) ;
+        ihbr.Close( hexfilein ) ;
+    end CopyWithCRC ;
     procedure Checksum( line : string ) is
        cs : Interfaces.Unsigned_8 ;
     begin
