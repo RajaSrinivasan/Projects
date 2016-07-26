@@ -31,6 +31,13 @@ begin
          new_line ;
          Put("Output File : ");
          Put_Line(ihexutil_cli.outputname.all);
+         Put("RAM section name : ") ;
+         if ihexutil_cli.ramsecname = null
+         then
+            Put_Line("Not specified");
+         else
+            Put_Line( ihexutil_cli.ramsecname.all ) ;
+         end if ;
          Put_Line("-----------------------------------------------------------") ;
       end if ;
 

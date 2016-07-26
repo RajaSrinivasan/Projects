@@ -10,6 +10,7 @@ package ihexutil_cli is                                       -- [cli/$_cli]
 
    hexline : unbounded_string := null_unbounded_string ;
    outputname : aliased gnat.strings.string_access ;
+   ramsecname : aliased gnat.strings.string_access ;
 
    version : string := "IHEXUTIL_V02" ;
    procedure ProcessCommandLine ;

@@ -51,6 +51,12 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                           Switch => "-x:",
                           Long_Switch => "--hexline:",
                           Help => "Compute checksum for the hexline");
+        GNAT.Command_Line.Define_Switch( Config,
+                          ramsecname'access ,
+                          Switch => "-r?" ,
+                          Long_Switch => "--ram-sec?" ,
+                          Help => "RAM section name") ;
+
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
     end ProcessCommandLine;
