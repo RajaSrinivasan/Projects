@@ -8,11 +8,13 @@ package body ihexutil_cli is                          -- [cli/$_cli]
        Parameter : String;
        Section   : String) is
     begin
-       put ("SwitchHandler " & Switch ) ;
-       put (" Parameter " & Parameter) ;
-       put (" Section " & Section);
-       new_line ;
-
+       if Verbose
+       then
+          put ("SwitchHandler " & Switch ) ;
+          put (" Parameter " & Parameter) ;
+          put (" Section " & Section);
+          new_line ;
+       end if ;
        if Switch = "-x"
        then
           hexline := to_unbounded_string( Parameter ) ;
@@ -28,20 +30,27 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                        Switch => "-v?",
                        Long_Switch => "--verbose?",
                        Help => "Output extra verbose information");
+
        GNAT.Command_Line.Define_Switch (Config,
                         showoption'access ,
                         Switch => "-s",
                         Long_Switch => "--show",
                         Help => "Show the contents of the hex file");
-        GNAT.Command_Line.Define_Switch (Config,
-                         dumpdataoption'access ,
-                         Switch => "-d",
-                         Long_Switch => "--dump-data",
-                         Help => "Show the contents of the hex file");
+      GNAT.Command_Line.Define_Switch (Config,
+                       addcrcaddress'access ,
+                       Switch => "-a:",
+                       Long_Switch => "--add-crc:",
+                       Help => "Add computed CRC at address specified");
+
+       GNAT.Command_Line.Define_Switch (Config,
+                        Outputname'access ,
+                        Switch => "-o:",
+                        Long_Switch => "--output:",
+                        Help => "Output file name");
         GNAT.Command_Line.Define_Switch (Config,
                           Switch => "-x:",
                           Long_Switch => "--hexline:",
-                          Help => "Show the contents of the hex file");
+                          Help => "Compute checksum for the hexline");
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
     end ProcessCommandLine;
