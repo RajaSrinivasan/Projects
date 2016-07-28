@@ -1,3 +1,4 @@
+SUBS=adalib bindings gplimports tests utils ihexutil queue/client queue/manager
 all:
 	$(MAKE) -C adalib all
 	$(MAKE) -C bindings all
