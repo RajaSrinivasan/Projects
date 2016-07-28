@@ -4,6 +4,7 @@ with Ada.Integer_Text_Io; use Ada.Integer_Text_Io ;
 with gnat.command_line ;
 with GNAT.Source_Info ; use GNAT.Source_Info ;
 
+with Queue ;
 package body qclient_cli is                          -- [cli/$_cli]
 
     procedure SwitchHandler
@@ -43,8 +44,10 @@ package body qclient_cli is                          -- [cli/$_cli]
                        Help => "Server Node Name");
         GNAT.Command_Line.Define_Switch (Config,
                        ServerPortNumber'access ,
-                       Switch => "-p:",
-                       Long_Switch => "--port:",
+                       Switch => "-p?",
+                       Long_Switch => "--port?",
+                       Initial => Queue.DefaultPort ,
+                       Default => Queue.DefaultPort ,
                        Help => "Port Number") ;
         GNAT.Command_Line.Define_Switch (Config,
                        LogDestination'access ,
