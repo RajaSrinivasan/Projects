@@ -8,7 +8,7 @@ package qclient_cli is                                       -- [cli/$_cli]
    
    ListOption : aliased Boolean := False ;
    
-   Servernodename : aliased Gnat.Strings.String_Access ;
+   Servernodename : aliased Gnat.Strings.String_Access := new String'("localhost") ;
    ServerPortNumber : aliased Integer ;
    LogDestination : aliased Gnat.Strings.String_Access ;
    EnvironmentFile : aliased Gnat.Strings.String_Access ;
