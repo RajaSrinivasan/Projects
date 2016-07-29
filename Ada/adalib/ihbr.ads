@@ -4,7 +4,7 @@
 -- Reference: http://en.wikipedia.org/wiki/Intel_HEX
 -------------------------------------------------------------------------
 with System.Storage_Elements ;
-with Interfaces;
+with Interfaces; use Interfaces ;
 with Ada.Streams;
 with Ada.Text_IO;
 
@@ -24,6 +24,11 @@ package Ihbr is
 
    MAX_DATAREC_SIZE : constant := 256 ;
 
+   type block_desc_type is
+   record
+       low, high : Unsigned_32 := 0 ;
+   end record ;
+
    type Ihbr_Binary_Record_Type
      (Rectype : Rectype_Type := Unknown_Rec) is record
       case Rectype is
@@ -32,6 +37,7 @@ package Ihbr is
          when Extended_Seg_Adr_Rec =>
             Segment_Base_Address : Interfaces.Unsigned_16;
          when Data_Rec =>
+            description : block_desc_type ;
             DataRecLen : Interfaces.Unsigned_8;
             LoadOffset : Interfaces.Unsigned_16;
             Data       : system.storage_elements.Storage_Array(1..MAX_DATAREC_SIZE) ;
@@ -47,27 +53,28 @@ package Ihbr is
    end record;
    type ihbr_Record_Type is access all Ihbr_Binary_Record_Type;
 
+
    type File_Type is private;
    MAX_LINE_LENGTH : constant := 300;
 
    procedure Open (Name : String; File : out File_Type);
    function Create (name : String) return File_Type;
    procedure Close (File : in out File_Type);
-
    procedure GetNext
      (File : in out File_Type;
       Rec  :    out Ihbr_Binary_Record_Type);
-
+   procedure Show( hexrec : ihbr_Binary_Record_Type) ;
    procedure PutNext (File : in out File_Type; Rec : Ihbr_Binary_Record_Type);
    function End_Of_File (file : Ihbr.File_Type) return Boolean;
 
    function ComputeChecksum (Str : String) return Interfaces.Unsigned_8;
    function ComputeChecksum (Bin : system.storage_elements.Storage_Array) return Interfaces.Unsigned_8 ;
-   
+
 private
    type file_rec_type is record
       File         : Ada.Text_IO.File_Type;
-      Current_Line : Integer;
+      Current_Line : Integer := 0 ;
+      BaseAddress : Interfaces.Unsigned_32 := 0 ;
    end record;
    type File_Type is access all file_rec_type;
 

@@ -1,8 +1,10 @@
 with Unchecked_Deallocation;
 with Ada.Exceptions;
 with Ada.Integer_Text_IO;
+with System.Storage_Elements ; use System.Storage_Elements ;
 
 with Hex;
+with Hex.Dump ;
 
 package body Ihbr is
 
@@ -49,6 +51,14 @@ package body Ihbr is
       use Interfaces;
       input_line  : String (1 .. MAX_LINE_LENGTH);
       line_length : Natural;
+
+      procedure Show_Line is
+      begin
+         Put("Line : ");
+         Put( File.Current_Line , width => 4 ) ;
+         New_Line ;
+      end Show_Line ;
+
    begin
       Ada.Text_IO.Get_Line (File.File, input_line, line_length);
       declare
@@ -113,6 +123,8 @@ package body Ihbr is
                             (databegin + 2 * (byte - 1) ..
                                  databegin + 2 * (byte - 1) + 1));
                   end loop;
+                  drdata.description.low := File.BaseAddress + Unsigned_32(drdata.LoadOffset) ;
+                  drdata.description.high := drdata.description.low + Unsigned_32(drdata.DataRecLen) - 1 ;
                   Rec := drdata;
                end;
             when Extended_Lin_Adr_Rec =>
@@ -127,6 +139,14 @@ package body Ihbr is
                     hibyte := Hex.Value( newline(databegin..databegin+1) ) ;
                     lobyte := Hex.Value( newline(databegin+2..databegin+3)) ;
                     xlinadr.Linear_Base_Address := Unsigned_32(Shift_Left(hibyte,8) + lobyte) ;
+                    file.BaseAddress := Shift_Left(xlinadr.Linear_Base_Address,16) ;
+                    if verbose
+                    then
+                        Show_Line ;
+                        Put("Setting Base address ");
+                        Put( Integer(file.BaseAddress) , base => 16 );
+                        New_Line ;
+                    end if ;
                     rec := xlinadr ;
                 end ;
             when End_Of_File_Rec =>
@@ -158,6 +178,58 @@ package body Ihbr is
          Put_Line (Ada.Exceptions.Exception_Message (e));
          raise;
    end GetNext;
+   procedure Show( hexrec : ihbr_Binary_Record_Type) is
+   begin
+       case hexrec.Rectype is
+          when Extended_Lin_Adr_Rec =>
+             Put("ExtLinA ");
+             Set_Col(17) ;
+             Put(integer(hexrec.Linear_Base_Address) , width => 6 ) ;
+             Put(integer(hexrec.Linear_Base_Address) , base => 16 , width => 10 ) ;
+             New_Line ;
+          when Extended_Seg_Adr_Rec =>
+             Put("ExtSegA ");
+             Set_Col(10) ;
+             Put(long_integer'image(long_integer(hexrec.Segment_Base_Address))) ;
+             New_Line ;
+          when Data_Rec =>
+             Put("DataRec");
+             Set_Col(10) ;
+             Put("Offset ") ;
+             Put( Integer(hexrec.LoadOffset) , Width => 6);
+             Put( Integer(hexrec.LoadOffset) , base => 16 , width => 10 );
+             put(" length") ;
+             Put( Integer(hexrec.DataRecLen) , Width => 4);
+             Put( " * ");
+             for c in 1..32
+             loop
+                 if c <= Integer(hexrec.DataRecLen)
+                 then
+                    Put( hex.dump.CharImage( Unsigned_8(hexrec.Data(Storage_Offset(c)))) );
+                 else
+                    Put(' ') ;
+                 end if ;
+             end loop;
+             Put( " * ");
+             Put( hex.Image( hexrec.Data'address , Integer(hexrec.DataRecLen) ) ) ;
+             New_Line ;
+          when Start_Lin_Adr_Rec =>
+             Put("LinStA ");
+             Set_Col(10) ;
+             Put(long_integer'image(long_integer(hexrec.Exec_LinStart_Adr))) ;
+             New_Line ;
+          when Start_Seg_Adr_Rec =>
+             Put("SegStA ");
+             Set_Col(10) ;
+             Put(long_integer'image(long_integer(hexrec.Exec_SegStart_Adr))) ;
+             New_Line ;
+          when End_Of_File_Rec =>
+               Put_Line("End_Of_File_Rec") ;
+               New_Line ;
+          when Unknown_Rec =>
+             null ;
+       end case;
+   end Show ;
 
    procedure PutNext
      (File : in out File_Type;
