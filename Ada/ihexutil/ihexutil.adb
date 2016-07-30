@@ -22,6 +22,8 @@ begin
          Put_Line("-----------------------------------------------------------") ;
          Put("Show Option : ") ;
          Put_Line(boolean'image(ihexutil_cli.showoption)) ;
+         Put("Memory Option : ");
+	 Put_Line(boolean'image(ihexutil_cli.memoryoption)) ;
          Put("Hex File    : ") ;
          Put_Line(arg) ;
          Put("Hex Line    : ") ;
@@ -38,12 +40,15 @@ begin
          else
             Put_Line( ihexutil_cli.ramsecname.all ) ;
          end if ;
+         Put("Word Length : ") ;
+         Put( ihexutil_cli.wordlength ) ;
+         New_Line ;
          Put_Line("-----------------------------------------------------------") ;
       end if ;
 
       if ihexutil_cli.showoption
       then
-         ihexutil_Pkg.Show( arg ) ;
+         ihexutil_Pkg.Show( arg , ihexutil_cli.memoryoption ) ;
       elsif ihexutil_cli.hexline /= null_unbounded_string
       then
          ihexutil_Pkg.Checksum( to_string( ihexutil_cli.hexline ) ) ;

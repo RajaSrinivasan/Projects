@@ -41,7 +41,11 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                        Switch => "-a:",
                        Long_Switch => "--add-crc:",
                        Help => "Add computed CRC at address specified");
-
+      GNAT.Command_Line.Define_Switch( Config ,
+                       memoryoption'access ,
+                       Switch => "-m" ,
+                       Long_Switch => "--memory" ,
+                       Help => "show memory addresses" ) ;
        GNAT.Command_Line.Define_Switch (Config,
                         Outputname'access ,
                         Switch => "-o:",
@@ -56,7 +60,11 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                           Switch => "-r?" ,
                           Long_Switch => "--ram-sec?" ,
                           Help => "RAM section name") ;
-
+        GNAT.Command_Line.Define_Switch( Config ,
+                          wordlength'access ,
+                          Switch => "-w:" ,
+                          Long_Switch => "--word-length:" ,
+                          Help => "Word length" ) ;
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
     end ProcessCommandLine;

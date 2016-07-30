@@ -21,11 +21,12 @@ package body Ihbr is
 
    procedure free is new Unchecked_Deallocation (file_rec_type, File_Type);
 
-   procedure Open (Name : String; File : out File_Type) is
+   procedure Open (Name : String; File : out File_Type ; wordlength : integer := 1 ) is
       temp : File_Type := new file_rec_type;
    begin
       Ada.Text_IO.Open (temp.File, Ada.Text_IO.In_File, Name);
-      temp.Current_Line := 0;
+      temp.Current_Line := 0 ;
+      temp.wordlength := wordlength ;
       File              := temp;
    end Open;
    function Create (name : String) return File_Type is
@@ -89,10 +90,8 @@ package body Ihbr is
 
          Bcval  := Hex.Value (Bc);
 
-         --Cs        := newline (line_length - 1 .. line_length);
          cs := newline( databegin + Integer(BCVAL) * 2 .. databegin + Integer(BCVAL) * 2 + 1) ;
          Csval     := Hex.Value (Cs);
-         --calccsval := ComputeChecksum (newline (2 .. newline'Length - 2));
          calccsval := ComputeChecksum( newline( 2 .. databegin + Integer(BCVAL)*2 -1 )) ;
          if Csval /= calccsval then
             raise format_error with "Checksum";
@@ -124,7 +123,7 @@ package body Ihbr is
                                  databegin + 2 * (byte - 1) + 1));
                   end loop;
                   drdata.description.low := File.BaseAddress + Unsigned_32(drdata.LoadOffset) ;
-                  drdata.description.high := drdata.description.low + Unsigned_32(drdata.DataRecLen) - 1 ;
+                  drdata.description.high := drdata.description.low + Unsigned_32(Integer(drdata.DataRecLen)/File.wordlength) - 1 ;
                   Rec := drdata;
                end;
             when Extended_Lin_Adr_Rec =>
@@ -178,7 +177,7 @@ package body Ihbr is
          Put_Line (Ada.Exceptions.Exception_Message (e));
          raise;
    end GetNext;
-   procedure Show( hexrec : ihbr_Binary_Record_Type) is
+   procedure Show( hexrec : ihbr_Binary_Record_Type ; memory : boolean := false ) is
    begin
        case hexrec.Rectype is
           when Extended_Lin_Adr_Rec =>
@@ -200,6 +199,11 @@ package body Ihbr is
              Put( Integer(hexrec.LoadOffset) , base => 16 , width => 10 );
              put(" length") ;
              Put( Integer(hexrec.DataRecLen) , Width => 4);
+             if memory
+             then
+                Put( Integer(hexrec.description.low) , base => 16 , width => 12 ) ;
+                Put( Integer(hexrec.description.high)  , base => 16 , width => 12 ) ;
+             end if ;
              Put( " * ");
              for c in 1..32
              loop

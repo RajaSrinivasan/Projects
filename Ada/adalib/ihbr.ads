@@ -53,17 +53,16 @@ package Ihbr is
    end record;
    type ihbr_Record_Type is access all Ihbr_Binary_Record_Type;
 
-
    type File_Type is private;
    MAX_LINE_LENGTH : constant := 300;
 
-   procedure Open (Name : String; File : out File_Type);
+   procedure Open (Name : String; File : out File_Type; wordlength : integer := 1 );
    function Create (name : String) return File_Type;
    procedure Close (File : in out File_Type);
    procedure GetNext
      (File : in out File_Type;
       Rec  :    out Ihbr_Binary_Record_Type);
-   procedure Show( hexrec : ihbr_Binary_Record_Type) ;
+   procedure Show( hexrec : ihbr_Binary_Record_Type ; memory : boolean := false ) ;
    procedure PutNext (File : in out File_Type; Rec : Ihbr_Binary_Record_Type);
    function End_Of_File (file : Ihbr.File_Type) return Boolean;
 
@@ -75,6 +74,7 @@ private
       File         : Ada.Text_IO.File_Type;
       Current_Line : Integer := 0 ;
       BaseAddress : Interfaces.Unsigned_32 := 0 ;
+      wordlength : integer := 1 ;
    end record;
    type File_Type is access all file_rec_type;
 
