@@ -26,7 +26,7 @@ package body ihexutil_pkg is
 	  then
 	     if Desc.High >= Sector.Start + Unsigned_32(Sector.Length)
 	     then
-		Put(Integer(Desc.High) , Base => 16 ) ; Put(" > "); Put( Integer(Sector.Start) + Integer(Sector.Length) , Base => 16 ) ; New_Line ;
+		Put(Integer(Desc.High) , Base => 16 ) ; Put(" >= "); Put( Integer(Sector.Start) + Integer(Sector.Length) , Base => 16 ) ; New_Line ;
 		return False ;
 	     end if ;
 	  end if ;
