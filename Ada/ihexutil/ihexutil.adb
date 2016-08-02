@@ -10,8 +10,10 @@ with ihbr ; use ihbr ;
 
 with ihexutil_cli ;                            -- [cli/$_cli]
 with ihexutil_pkg ;
+with Ramdesc ;
 
 procedure ihexutil is                  -- [clitest/$]
+   Controller : access Ramdesc.Controller_Type ;
 begin
    ihexutil_cli.ProcessCommandLine ;           -- [cli/$_cli]
    declare
@@ -34,21 +36,30 @@ begin
          Put("Output File : ");
          Put_Line(ihexutil_cli.outputname.all);
          Put("RAM section name : ") ;
-         if ihexutil_cli.ramsecname = null
+         if ihexutil_cli.ramname = null
          then
             Put_Line("Not specified");
          else
-            Put_Line( ihexutil_cli.ramsecname.all ) ;
+            Put_Line( ihexutil_cli.ramname.all ) ;
          end if ;
          Put("Word Length : ") ;
          Put( ihexutil_cli.wordlength ) ;
          New_Line ;
          Put_Line("-----------------------------------------------------------") ;
       end if ;
-
+      if Ihexutil_Cli.Ramname /= null
+      then
+	 if Ihexutil_Cli.Ramname.all = "PMD"
+	 then
+	    Controller := Ramdesc.DSPPMD'Access ;
+	 else
+	    Controller := Ramdesc.MCUAHPEPMPBM'Access ; 
+	 end if ;
+      end if ;
+      
       if ihexutil_cli.showoption
       then
-         ihexutil_Pkg.Show( arg , ihexutil_cli.memoryoption ) ;
+         ihexutil_Pkg.Show( arg , ihexutil_cli.memoryoption , Controller ) ;
       elsif ihexutil_cli.hexline /= null_unbounded_string
       then
          ihexutil_Pkg.Checksum( to_string( ihexutil_cli.hexline ) ) ;

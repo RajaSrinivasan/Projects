@@ -25,12 +25,12 @@ package ramdesc is
                             ( to_unbounded_string("SECTORC") , 16#003f_0000# , 16#4000# ) ,
                             ( to_unbounded_string("SECTORD") , 16#003e_c000# , 16#4000# ) ,
                             ( to_unbounded_string("SECTORE") , 16#003e_8000# , 16#4000# ) ) ;
-  DSPPMD : Controller_Type := ( To_Unbounded_String("PMD") , null ) ;
+  DSPPMD : aliased Controller_Type := ( To_Unbounded_String("PMD") , null ) ;
   
   AHPEPMPBM : Flashram_type(1..2) := (
                             ( to_unbounded_string("DATA")    , 16#0400# , 16#0400# ) ,
 				 ( to_unbounded_string("PROGRAM") , 16#0000# , 16#73fd# ) ) ; 
-  MCUAHPEPMPBM : Controller_Type := ( To_Unbounded_String("AHPEPMPBM") , null ) ;
+  MCUAHPEPMPBM : aliased Controller_Type := ( To_Unbounded_String("AHPEPMPBM") , null ) ;
   
   procedure Show( ram : ram_type ) ;
   procedure Show( Flashram : Flashram_Ptr_Type ) ;

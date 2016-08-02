@@ -3,6 +3,7 @@ with Interfaces ;
 with gnat.strings ;
 
 package ihexutil_cli is                                       -- [cli/$_cli]
+   
    verbose : aliased boolean := false ;              -- Option:     -v or --verbose
    showoption : aliased boolean := false ;
    memoryoption : aliased boolean := false ;
@@ -11,9 +12,9 @@ package ihexutil_cli is                                       -- [cli/$_cli]
 
    hexline : unbounded_string := null_unbounded_string ;
    outputname : aliased gnat.strings.string_access ;
-   ramsecname : aliased gnat.strings.string_access ;
+   ramname : aliased gnat.strings.string_access ;
 
-   version : string := "IHEXUTIL_V02" ;
+   version : string := "IHEXUTIL_V03" ;
    procedure ProcessCommandLine ;
    function GetNextArgument return String ;
 

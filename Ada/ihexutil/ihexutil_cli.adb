@@ -23,6 +23,8 @@ package body ihexutil_cli is                          -- [cli/$_cli]
        then
 	  Put("Ram section name ");
 	  Put_Line( Parameter ) ;
+	  Ramname := new String( Parameter'Range ) ;
+	  Ramname.all := Parameter ;
        end if ;
     end SwitchHandler ;
 
