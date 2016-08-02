@@ -3,8 +3,6 @@ with Ramdesc ;
 
 procedure Ramdesctest is
 begin
-   Put_Line("PMD");
-   Ramdesc.Show( Ramdesc.PMD ) ;
-   Put_Line("AHPEPMPBM");
-   Ramdesc.Show( Ramdesc.AHPEPMPBM ) ;
+   Ramdesc.Show( Ramdesc.DSPPMD ) ;
+   Ramdesc.Show( Ramdesc.MCUAHPEPMPBM ) ;
 end Ramdesctest ;

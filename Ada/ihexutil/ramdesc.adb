@@ -19,4 +19,25 @@ package body ramdesc is
           show( ram(sector) ) ;
        end loop ;
     end show ;
+    
+    procedure Show( Flashram : Flashram_Ptr_Type ) is
+    begin
+       for S in Flashram.all'Range
+       loop
+	  Show( Flashram(S) ) ;
+       end loop ;
+    end Show ;
+    
+    procedure Show( Controller : Controller_Type ) is
+    begin
+       Put("Controller : ") ;
+       Put( To_String( Controller.Name ) ) ;
+       New_Line ;
+       Show( Controller.Flash ) ;
+    end Show ;
+begin
+   DSPPMD.Flash := new Flashram_Type( PMD'Range ) ;
+   DSPPMD.Flash.all := PMD ;
+   MCUAHPEPMPBM.Flash := new Flashram_Type( AHPEPMPBM'Range ) ;
+   MCUAHPEPMPBM.Flash.all := AHPEPMPBM ;
 end ramdesc ;

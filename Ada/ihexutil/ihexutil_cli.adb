@@ -19,7 +19,11 @@ package body ihexutil_cli is                          -- [cli/$_cli]
        then
           hexline := to_unbounded_string( Parameter ) ;
        end if;
-
+       if Switch = "-r"
+       then
+	  Put("Ram section name ");
+	  Put_Line( Parameter ) ;
+       end if ;
     end SwitchHandler ;
 
     procedure ProcessCommandLine is
@@ -56,7 +60,6 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                           Long_Switch => "--hexline:",
                           Help => "Compute checksum for the hexline");
         GNAT.Command_Line.Define_Switch( Config,
-                          ramsecname'access ,
                           Switch => "-r?" ,
                           Long_Switch => "--ram-sec?" ,
                           Help => "RAM section name") ;
