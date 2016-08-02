@@ -11,5 +11,6 @@ project ihexutil is                           -- [template/$]
           use ("-O2","-gnat05");
    end Compiler;
 
-   for Main use ("ihexutil.adb") ;              -- [clitest/$]
+   for Main use ("ihexutil.adb" , "ramdesctest.adb" ) ;              -- [clitest/$]
+
 end ihexutil ;                                 -- [template/$]
