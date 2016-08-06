@@ -4,7 +4,7 @@ with Ada.Directories;
 
 package body linecount_pkg is
    summary         : summary_pkg.Map;
-   filetypesummary : summary_pkg.Map;
+   filetypesummary : Stats_pkg.Map;
    procedure Count (filename : String) is
       line       : String (1 .. 1024);
       linelength : Natural;
@@ -25,21 +25,30 @@ package body linecount_pkg is
       declare
          fileext : String :=
            Ada.Directories.Extension (Ada.Text_IO.Name (file));
-         cursor : summary_pkg.Cursor;
-         use summary_pkg;
+         cursor : Stats_pkg.Cursor;
+         use Stats_pkg;
+	 Filetypestats : Stats_Type ;
       begin
+	 
          cursor :=
-           summary_pkg.Find (filetypesummary, To_Unbounded_String (fileext));
-         if cursor = summary_pkg.No_Element then
-            summary_pkg.Insert
+           Stats_pkg.Find (filetypesummary, To_Unbounded_String (fileext));
+         if cursor = Stats_pkg.No_Element then
+	    Put("Creating file type ");
+	    Put_Line(Fileext) ;
+	    Filetypestats.Filecount := 1 ;
+	    Filetypestats.Linecount := Numlines ;
+            Stats_Pkg.Insert
               (filetypesummary,
                To_Unbounded_String (fileext),
-               1);
+               Filetypestats );
          else
-            summary_pkg.Replace_Element
+	    Filetypestats := Stats_Pkg.Element(Cursor) ;
+	    Filetypestats.Filecount := Filetypestats.Filecount + 1 ;
+	    filetypestats.Linecount := Filetypestats.Linecount + Numlines ;
+            Stats_pkg.Replace_Element
               (filetypesummary,
                cursor,
-               1 + summary_pkg.Element (cursor));
+               Filetypestats );
          end if;
       end;
 
@@ -89,11 +98,29 @@ package body linecount_pkg is
       Put (summary_pkg.Element (cursor));
       New_Line;
    end Print;
+   
+   procedure Print (cursor : Stats_pkg.Cursor) is
+      Filetypestats : Stats_Type ;
+   begin
+      Filetypestats := Stats_Pkg.Element(Cursor) ;
+      Put (To_String (Stats_pkg.Key (cursor)));
+      Set_Col(8);
+      Put (Filetypestats.Filecount);
+      Set_Col(20);
+      Put (Filetypestats.LineCount) ;
+      New_Line;
+   end Print;
 
    procedure ShowSummary is
    begin
       summary_pkg.Iterate (summary, Print'Access);
       Put_Line ("File Type Summary");
-      summary_pkg.Iterate (filetypesummary, Print'Access);
+      Put("Type") ;
+      Set_Col(10) ;
+      Put("FileCount") ;
+      Set_Col(22) ;
+      Put("LineCount");
+      New_Line ;
+      Stats_pkg.Iterate (filetypesummary, Print'Access);
    end ShowSummary;
 end linecount_pkg;
