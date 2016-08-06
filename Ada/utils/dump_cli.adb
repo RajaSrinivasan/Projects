@@ -21,8 +21,14 @@ package body dump_cli is
       GNAT.Command_Line.Define_Switch
         (Config,
          verbose'Access,
-         Switch      => "-v?",
-         Long_Switch => "--verbose?",
+         Switch      => "-h",
+         Long_Switch => "--help" ,
+         Help        => VERSION );
+      GNAT.Command_Line.Define_Switch
+        (Config,
+         verbose'Access,
+         Switch      => "-v",
+         Long_Switch => "--verbose",
          Help        => "Output extra verbose information");
      GNAT.Command_Line.Define_Switch
        (Config,
@@ -32,13 +38,6 @@ package body dump_cli is
         Initial => 16 ,
         Default => 16 ,
         Help        => "Block length");
-      GNAT.Command_Line.Define_Switch
-        (Config,
-         Output      => outputname'Access,
-         Switch      => "-o:",
-         Long_Switch => "--output:",
-         Help        => "Output Name");
-
       GNAT.Command_Line.Getopt (Config, SwitchHandler'Access);
    end ProcessCommandLine;
 

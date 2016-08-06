@@ -2,6 +2,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.Strings;
 
 package dump_cli is
+   VERSION : constant String := "V01.00" ;
    verbose : aliased Boolean :=
      False;              -- Option:     -v or --verbose
    Arg        : Unbounded_String := Null_Unbounded_String;
