@@ -2,7 +2,7 @@ with Ada.Text_Io; use Ada.Text_Io;
 with gnat.command_line ;
 with GNAT.Source_Info ; use GNAT.Source_Info ;
 
-package body cli is                          -- [cli/$_cli]
+package body qclient_cli is                          -- [cli/$_cli]
 
     procedure SwitchHandler
       (Switch    : String;
@@ -47,4 +47,4 @@ package body cli is                          -- [cli/$_cli]
         return GNAT.Command_Line.Get_Argument(Do_Expansion => True) ;
     end GetNextArgument ;
 
-end cli ;                                   -- [cli/$_cli]
+end qclient_cli ;                                   -- [cli/$_cli]
