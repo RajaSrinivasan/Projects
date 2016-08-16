@@ -1,3 +1,5 @@
+with Ada.Text_Io; use Ada.Text_Io ;
+
 with qclient_cli ;                            -- [cli/$_cli]
 with Qclient_Pkg ;
 
@@ -15,5 +17,5 @@ begin
    then
       Qclient_Pkg.ShowJobs ;
    end if ;
-   
+   Put_Line("Bye");
 end qclient ;                         -- [clitest/$]
