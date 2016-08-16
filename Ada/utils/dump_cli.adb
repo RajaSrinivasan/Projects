@@ -27,7 +27,6 @@ package body dump_cli is
 				   Usage => "generate a hex dump of a file");
       GNAT.Command_Line.Define_Switch
         (Config,
-         verbose'Access,
          Switch      => "-h",
          Long_Switch => "--help" ,
          Help        => "generate this help message" );

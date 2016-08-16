@@ -1,5 +1,6 @@
 with Ada.Text_Io; use Ada.Text_Io;
 with gnat.command_line ;
+with GNAT.Source_Info ; use GNAT.Source_Info ;
 
 package body cli is                          -- [cli/$_cli]
 
@@ -17,6 +18,12 @@ package body cli is                          -- [cli/$_cli]
     procedure ProcessCommandLine is
         Config : GNAT.Command_Line.Command_Line_Configuration;
     begin
+       GNAT.Command_Line.Set_Usage( Config ,
+				   Help => NAME & " " & 
+				      VERSION & " " & 
+				      Compilation_ISO_Date & " " &
+				      Compilation_Time ,
+				    Usage => "Command Line utility");
         GNAT.Command_Line.Define_Switch (Config,
                        verbose'access ,
                        Switch => "-v?",
