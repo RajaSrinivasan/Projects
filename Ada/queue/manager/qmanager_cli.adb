@@ -1,8 +1,10 @@
 with Ada.Text_Io; use Ada.Text_Io;
+with Ada.Integer_Text_Io; use Ada.Integer_Text_Io;
+
 with gnat.command_line ;
 with GNAT.Source_Info ; use GNAT.Source_Info ;
 
-package body cli is                          -- [cli/$_cli]
+package body qmanager_cli is                          -- [cli/$_cli]
 
     procedure SwitchHandler
       (Switch    : String;
@@ -19,27 +21,25 @@ package body cli is                          -- [cli/$_cli]
         Config : GNAT.Command_Line.Command_Line_Configuration;
     begin
        GNAT.Command_Line.Set_Usage( Config ,
-				   Help => NAME & " " & 
-				      VERSION & " " & 
-				      Compilation_ISO_Date & " " &
-				      Compilation_Time ,
-				    Usage => "Command Line utility");
+                                   Help => NAME & " " &
+                                      VERSION & " " &
+                                      Compilation_ISO_Date & " " &
+                                      Compilation_Time ,
+                                    Usage => "que manager");
         GNAT.Command_Line.Define_Switch (Config,
                        verbose'access ,
-                       Switch => "-v?",
-                       Long_Switch => "--verbose?",
+                       Switch => "-v",
+                       Long_Switch => "--verbose",
                        Help => "Output extra verbose information");
+
         GNAT.Command_Line.Define_Switch (Config,
-                                      output => outputname'access,
-                                      Switch => "-o:",
-                                      Long_Switch => "--output:",
-                                      Help => "Output Name");
+                       verbose'access ,
+                       Switch => "-p:",
+                       Long_Switch => "--port:",
+                       Help => "Output extra verbose information");
 
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
-       put_line("Output Name " & outputname.all ) ;
-       put_line("Verbosity " & boolean'Image(Verbose)) ;
-       put_line("Argument " & GetNextArgument ) ;
     end ProcessCommandLine;
 
     function GetNextArgument return String is
@@ -52,6 +52,9 @@ package body cli is                          -- [cli/$_cli]
        Put("Verbose ") ;
        Put(Boolean'Image( Verbose ) );
        New_Line ;
+       Put("Port No ");
+       Put(ServerPortNo);
+       New_Line ;
     end ShowCommandLineArguments ;
-    
-end cli ;                                   -- [cli/$_cli]
+
+end qmanager_cli ;                                   -- [cli/$_cli]

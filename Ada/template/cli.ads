@@ -10,5 +10,5 @@ package cli is                                       -- [cli/$_cli]
 
    procedure ProcessCommandLine ;
    function GetNextArgument return String ;
-
+    procedure ShowCommandLineArguments ;
 end cli ;                                            -- [cli/$_cli]
