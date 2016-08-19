@@ -1,6 +1,7 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 
-with qclient_cli ;                            -- [cli/$_cli]
+with Queue ;
+with Qclient_cli ;                            -- [cli/$_cli]
 with Qclient_Pkg ;
 
 procedure qclient is                  -- [clitest/$]
@@ -10,9 +11,9 @@ begin
    then
       Qclient_Cli.ShowCommandLineArguments ;
    end if ;
-   
+
    Qclient_Pkg.SetServer( Qclient_Cli.ServerNodeName.all ,
-			  Qclient_Cli.ServerPortNumber ) ;
+                          Qclient_Cli.ServerPortNumber ) ;
    if Qclient_Cli.ListOption
    then
       Qclient_Pkg.ShowJobs ;
