@@ -1,3 +1,5 @@
+with Queue ;
+
 with Qmanager_cli ;                            -- [cli/$_cli]
 with Qmanager_Pkg ;
 

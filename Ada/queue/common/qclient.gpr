@@ -2,7 +2,6 @@ with "../../gplimports/gplimports" ;
 
 project qclient is                           -- [template/$]
 
-   for Source_Dirs use (".","../common");
    for Object_Dir use "../../build";
 
    for Languages use ("Ada");
@@ -11,5 +10,5 @@ project qclient is                           -- [template/$]
           use ("-O2","-gnat05");
    end Compiler;
 
-   for Main use ("qclient.adb") ;              -- [clitest/$]
+   for Main use ("queue-client.adb") ;              -- [clitest/$]
 end qclient ;                                 -- [template/$]

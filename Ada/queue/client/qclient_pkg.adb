@@ -2,6 +2,7 @@ with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io ;
 with GNAT.Sockets ;
 
+with Queue ;
 with Qclient_Cli ;
 package body Qclient_Pkg is
    Mysocket : GNAT.Sockets.Socket_Type ;
@@ -43,8 +44,10 @@ package body Qclient_Pkg is
    end SetServer ;
    
    procedure ShowJobs is
+      Msg : Queue.Message_Type ;
    begin
-      null ;
+      Msg := Queue.Create("show") ;
+      Queue.Show( Msg ) ;
    end ShowJobs ;
    
    procedure Submit( Script : String ;
