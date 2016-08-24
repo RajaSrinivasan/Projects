@@ -26,6 +26,12 @@ package body dump_cli is
          Help        => "Output extra verbose information");
       GNAT.Command_Line.Define_Switch
         (Config,
+         Output => Blocklen'Access ,
+         Switch => "-b:" ,
+         Long_Switch => "--blocklen:" ,
+         Help => "Block length");
+      GNAT.Command_Line.Define_Switch
+        (Config,
          Output      => outputname'Access,
          Switch      => "-o:",
          Long_Switch => "--output:",

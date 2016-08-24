@@ -15,6 +15,9 @@ begin
          if dump_cli.verbose then
             Text_IO.Put ("* Dumping ***************************************");
             Text_IO.Put_Line (arg);
+            Text_Io.Put("Blocklength : ");
+            Text_Io.Put(Integer'Image( dump_cli.Blocklen ) );
+	    Text_Io.New_Line ;
          end if;
          Hex.dump.file.Dump (arg);
       end;
