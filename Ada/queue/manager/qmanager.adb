@@ -10,6 +10,8 @@ begin
    then
       Qmanager_Cli.ShowCommandLineArguments ;
    end if ;
+   Queue.Verbose := Qmanager_Cli.Verbose ;
+
    if Qmanager_Cli.ServerPortNo /= 0
    then
       Qmanager_Pkg.SetPort( Qmanager_Cli.ServerPortNo ) ;

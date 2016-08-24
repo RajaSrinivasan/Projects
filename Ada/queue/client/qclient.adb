@@ -11,7 +11,7 @@ begin
    then
       Qclient_Cli.ShowCommandLineArguments ;
    end if ;
-
+   Queue.Verbose := Qclient_Cli.Verbose ;
    Qclient_Pkg.SetServer( Qclient_Cli.ServerNodeName.all ,
                           Qclient_Cli.ServerPortNumber ) ;
    if Qclient_Cli.ListOption
@@ -19,5 +19,5 @@ begin
       Qclient_Pkg.ShowJobs ;
    end if ;
    Put_Line("Bye");
-   
+
 end qclient ;                         -- [clitest/$]

@@ -6,6 +6,7 @@ procedure Jsontest is
    Args : JSON_VALUE ;
 begin
    Cmd := GNATCOLL.JSON.Create_Object ;
+   Set_Field(Cmd , "protocol" , Create("0.1"));
    Set_Field(Cmd , "command" , Create("list"));
    Args := Create_Object ;
    Set_Field( Args , "depth" , Create(Integer(5)) ) ;
@@ -13,6 +14,7 @@ begin
    Set_Field( Cmd , "arguments" , Args ) ;
    Put_Line( Write( Cmd ) ) ;
    
-   Cmd := Read( "{""command"" : ""list"" }" , "command.txt" ) ;
+   Cmd := Read( "{""command"" : ""list"" }" ) ;
    Put_Line( Write(Cmd) ) ;
+   
 end Jsontest ;
