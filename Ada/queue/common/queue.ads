@@ -4,7 +4,7 @@ with Gnatcoll.Json ;
 package Queue is
    Verbose : Boolean := True ;   
    Version : constant String := "V01.00.00" ;
-   DefaultPort : Integer := 100756 ;
+   DefaultPort : Integer := 10756 ;
    
    type Packet_Type is
      (

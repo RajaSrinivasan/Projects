@@ -60,7 +60,6 @@ package body Qmanager_Pkg is
    end StartService ;
 
 begin
-
    Put( "Server Host: ");
    Put( GNAT.Sockets.Host_Name ) ;
    New_Line;

@@ -4,6 +4,7 @@ with Ada.Integer_Text_Io; use Ada.Integer_Text_Io;
 with gnat.command_line ;
 with GNAT.Source_Info ; use GNAT.Source_Info ;
 
+with Queue ;
 package body qmanager_cli is                          -- [cli/$_cli]
 
     procedure SwitchHandler
@@ -31,12 +32,13 @@ package body qmanager_cli is                          -- [cli/$_cli]
                        Switch => "-v",
                        Long_Switch => "--verbose",
                        Help => "Output extra verbose information");
-
         GNAT.Command_Line.Define_Switch (Config,
-                       verbose'access ,
-                       Switch => "-p:",
-                       Long_Switch => "--port:",
-                       Help => "Output extra verbose information");
+                       ServerPortNo'access ,
+                       Switch => "-p?",
+                       Long_Switch => "--port?",
+                       Initial => Queue.DefaultPort,
+                       Default => Queue.DefaultPort,
+                       Help => "Port Number");
 
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
