@@ -32,18 +32,6 @@ package body dump_cli is
          Help        => "generate this help message" );
       GNAT.Command_Line.Define_Switch
         (Config,
-<<<<<<< HEAD
-         Output => Blocklen'Access ,
-         Switch => "-b:" ,
-         Long_Switch => "--blocklen:" ,
-         Help => "Block length");
-      GNAT.Command_Line.Define_Switch
-        (Config,
-         Output      => outputname'Access,
-         Switch      => "-o:",
-         Long_Switch => "--output:",
-         Help        => "Output Name");
-=======
          verbose'Access,
          Switch      => "-v",
          Long_Switch => "--verbose",
@@ -56,7 +44,6 @@ package body dump_cli is
         Initial => 16 ,
         Default => 16 ,
         Help        => "Block length");
->>>>>>> 49fb81f896bb8ef7f3d580645c76026742c883b1
       GNAT.Command_Line.Getopt (Config, SwitchHandler'Access);
    end ProcessCommandLine;
 
