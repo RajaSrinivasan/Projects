@@ -5,6 +5,8 @@ all:
 	$(MAKE) -C tests all
 	$(MAKE) -C utils all
 	$(MAKE) -C ihexutil all
+	$(MAKE) -C queue/client all
+	$(MAKE) -C queue/manager all
 
 clean:
 	$(MAKE) -C adalib clean
@@ -13,4 +15,6 @@ clean:
 	$(MAKE) -C tests clean
 	$(MAKE) -C utils clean
 	$(MAKE) -C ihexutil clean
+	$(MAKE) -C queue/client clean
+	$(MAKE) -C queue/manager clean
 
