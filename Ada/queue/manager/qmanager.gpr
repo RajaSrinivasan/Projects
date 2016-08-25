@@ -1,5 +1,4 @@
-with "../../gplimports/gplimports" ;
-
+with "gnatcoll" ;
 project qmanager is                           -- [template/$]
 
    for Source_Dirs use (".","../common");

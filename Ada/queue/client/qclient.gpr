@@ -1,4 +1,4 @@
-with "../../gplimports/gplimports" ;
+with "gnatcoll" ;
 
 project qclient is                           -- [template/$]
 
