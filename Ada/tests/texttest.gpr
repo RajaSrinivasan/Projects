@@ -9,7 +9,7 @@ project texttest is
    end Pretty_Printer;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-O3", "-gnatf" , "-gnata" );
+      for Default_Switches ("ada") use ("-O3", "-gnatf" );
    end Compiler;
 
 end texttest ;

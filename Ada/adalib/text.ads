@@ -8,7 +8,7 @@ package Text is
 
    type Base64_Char is range 0..63 ;
    type Base64_String is array (Positive range <>) of Base64_Char ;
-
+   pragma Pack( Base64_String ) ;
    function Encode( Input : Base64_Char ) return Character ;
    function Decode( Input : Character ) return Base64_Char ;
 
