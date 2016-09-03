@@ -6,14 +6,30 @@ with Hex.Dump ; use Hex.Dump ;
 
 package body Text.SelfTest is
 
+
    procedure EncodeTest( Input : Storage_Array ) is
    begin
       Put_Line("-------EncodeTest---------");
       Dump( Input'Address , Input'Length ) ;
-      Put_Line( Base64_Encode( Input ) ) ;
+      declare
+         Encodedstr : String := Base64_Encode( Input ) ;
+      begin
+         Put_Line( EncodedStr ) ;
+         Put_Line( "Decode back" ) ;
+         declare
+            Decodedback : Storage_Array := Base64_Decode(EncodedStr) ;
+         begin
+            Dump( Decodedback'Address , Decodedback'Length ) ;
+         end ;
+      end ;
       Put_Line("-------EncodeTest---------");
    end EncodeTest ;
-
+   procedure EncodeTest( Input : String ) is
+      InputBytes : Storage_Array( 1..Input'Length ) ;
+      for InputBytes'Address use Input'Address ;
+   begin
+      EncodeTest( InputBytes ) ;
+   end EncodeTest ;
    procedure DecodeTest( Input : String ) is
       Decoded : Storage_Array := Base64_Decode( Input ) ;
    begin
@@ -26,30 +42,14 @@ package body Text.SelfTest is
    procedure Test is
    begin
       Put_Line("Text.SelfTest") ;
-      declare
-         Testdata : Storage_Array( 1..32 ) ;
-      begin
-         for Td in Testdata'Range
-         loop
-            Testdata( Td ) := Storage_Element(Integer(Td) * 3) ;
-         end loop ;
-         for Td in Testdata'Range
-         loop
-            EncodeTest( Testdata( 1..Td ) ) ;
-         end loop ;
-      end ;
       pragma Assert( Encode( 10 ) = 'K' ) ;
       Put_Line( Integer'Image( Integer( Decode('K'))));
-
       declare
          Man : String := "Man" ;
          ManBytes : Storage_Array( 1 .. Storage_Offset(Man'Last) ) ;
          for ManBytes'Address use Man'Address ;
          ManEncoded : String := Base64_Encode( ManBytes ) ;
---         ManDecoded : Storage_Array := Base64_Decode( ManEncoded ) ;
       begin
---         pragma Assert( ManEncoded = "TWFu" );
---         pragma Assert( ManDecoded = ManBytes ) ;
          Put(Man) ;
          Put( " encoded " ) ;
          Put_Line( ManEncoded ) ;
@@ -58,5 +58,10 @@ package body Text.SelfTest is
          Put(Man) ;
          New_Line ;
       end ;
+      EncodeTest("any carnal pleasure.");
+      EncodeTest("any carnal pleasure");
+      EncodeTest("any carnal pleasur");
+      EncodeTest("any carnal pleasu");
+      EncodeTest("any carnal pleas");
    end Test ;
 end Text.SelfTest ;
