@@ -57,8 +57,15 @@ package body Qclient_Pkg is
 
    procedure Submit( Script : String ;
                      EnvironmentFile : String ) is
+      Msg : Queue.Message_Type ;
+      Reply : Queue.Message_Type ;
    begin
-      null ;
+      Msg := Queue.Create( Queue.Query ,
+                           Queue.SUBMIT_JOB ) ;
+      Queue.Add_File( Msg , "commandfile"  , Script ) ;
+      Queue.Send( MySocket , Msg ) ;
+      delay 0.2 ;
+      Queue.Receive( MySocket , Reply ) ;
    end Submit ;
 begin
    GNAT.Sockets.Create_Socket( Mysocket ) ;

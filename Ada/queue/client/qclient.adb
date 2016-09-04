@@ -14,10 +14,15 @@ begin
    Queue.Verbose := Qclient_Cli.Verbose ;
    Qclient_Pkg.SetServer( Qclient_Cli.ServerNodeName.all ,
                           Qclient_Cli.ServerPortNumber ) ;
+
+
    if Qclient_Cli.ListOption
    then
       Qclient_Pkg.ShowJobs ;
+   else
+      Qclient_Pkg.Submit( Qclient_Cli.GetNextArgument , "" ) ;
    end if ;
+
    Put_Line("Bye");
 
 end qclient ;                         -- [clitest/$]
