@@ -1,5 +1,5 @@
---with "../gplimports/gplimports" ;
-with "gnatcoll" ;
+with "../gplimports/gplimports" ;
+
 project newutil is                     -- [newutil]
 
    for Source_Dirs use (".");

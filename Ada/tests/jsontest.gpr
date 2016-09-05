@@ -1,5 +1,5 @@
---with "../gplimports/gplimports" ;
-with "gnatcoll" ;
+with "../gplimports/gplimports" ;
+
 project jsontest is
 
    for Object_Dir use "../build";
