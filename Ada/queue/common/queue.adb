@@ -108,9 +108,71 @@ package body Queue is
       return Msg ;
    end Create ;
 
+   function Get( Msg : Message_Type ) return Packet_Type is
+      Pkttypeint : Integer := Gnatcoll.Json.Get(Msg.Contents,"packettype") ;
+      Pkttype : Packet_Type := Packet_Type'Val(Pkttypeint) ;
+   begin
+      return Pkttype ;
+   end Get ;
+
+   function Get( Msg : Message_Type ) return Services_Type is
+      Svctypeint : Integer := Gnatcoll.Json.Get(Msg.Contents,"service") ;
+      Svc : Services_Type := Services_Type'Val(Svctypeint) ;
+   begin
+      return Svc ;
+   end Get ;
+
+   function GetFile( Msg : Message_Type ; Name : String ) return String is
+      use System.Storage_Elements ;
+      use Ada.Streams;
+      packedfile : Json_Value := Gnatcoll.Json.Get(Msg.Contents, Name ) ;
+      Basename : String := Gnatcoll.Json.Get(Packedfile , "basename" ) ;
+      Filecontents : String := Gnatcoll.Json.Get(Packedfile , "contents" ) ;
+   begin
+      if Verbose
+      then
+         Put("File basename "); Put_Line(Basename) ;
+         Put_Line("File Contents: ") ;
+         Put_Line( Filecontents ) ;
+      end if ;
+
+      declare
+         Filedata : Storage_Array := Text.Base64_Decode( Filecontents ) ;
+         Filebindata : Ada.Streams.Stream_Element_Array( 1..Stream_Element_Offset(Filedata'Length) ) ;
+         for Filebindata'Address use Filedata'Address ;
+         Filestr : String (1..Filedata'Length) ;
+         for Filestr'Address use Filedata'Address ;
+         Outfile : Ada.Streams.Stream_Io.File_Type ;
+      begin
+         if Verbose
+         then
+            Put(Filestr) ;
+         end if ;
+         Ada.Streams.Stream_Io.Create( Outfile , Ada.Streams.Stream_Io.Out_File , Basename ) ;
+         Ada.Streams.Stream_Io.Write( Outfile , Filebindata ) ;
+         Ada.Streams.Stream_Io.Close(Outfile) ;
+         return Basename ;
+      end ;
+   end GetFile ;
+
    procedure Show( Message : Message_TYpe ) is
+      Fieldvalue : Gnatcoll.Json.Json_Value ;
    begin
       Put_Line( GNATCOLL.JSON.Write( Message.Contents ) ) ;
+      Fieldvalue := Gnatcoll.Json.Get( Message.Contents , "version" ) ;
+      Put("Version : ");
+      declare
+         Vstring : String := Gnatcoll.Json.Get(Fieldvalue) ;
+      begin
+         Put_Line( Vstring ) ;
+      end ;
+      Put_Line( Packet_Type'Image(Get(Message)) );
+
+      Put("Service : ");
+      Put_Line( Services_Type'Image(Get(Message)) ) ;
+
+      Fieldvalue := Gnatcoll.Json.Get( Message.Contents , "command" ) ;
+      Put("Command : "); Put_Line( Gnatcoll.Json.Get(Fieldvalue) ) ;
    end Show ;
 
 end Queue ;

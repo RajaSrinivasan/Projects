@@ -1,4 +1,6 @@
 with "gnatcoll" ;
+with "../../adalib/adalib" ;
+
 project qmanager is                           -- [template/$]
 
    for Source_Dirs use (".","../common");

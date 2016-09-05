@@ -9,7 +9,8 @@ package Queue is
    type Packet_Type is
      (
       QUERY ,
-      RESPONSE
+      RESPONSE ,
+      DONT_UNDERSTAND
      ) ;
    type Services_Type is
      (
@@ -35,6 +36,10 @@ package Queue is
                    Msg : Message_Type ) ;
    procedure Receive( Source : GNAT.Sockets.Socket_Type ;
                       Msg : out Message_Type ) ;
+
+   function Get( Msg : Message_Type ) return Packet_Type ;
+   function Get( Msg : Message_Type ) return Services_Type ;
+   function GetFile( Msg : Message_Type ; Name : String ) return String ;
 
    procedure Show( Message : Message_Type ) ;
 
