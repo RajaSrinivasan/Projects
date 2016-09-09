@@ -38,7 +38,8 @@ package body Queue is
 
    procedure Add_File( Msg : in out Message_Type ;
                        Name : String ;
-                       Path : String ) is
+                       Path : String ;
+                       Base64 : Boolean := False ) is
       use Ada.Streams ;
       file   : Ada.Streams.Stream_IO.File_Type;
       stream : Ada.Streams.Stream_IO.Stream_Access;
@@ -51,6 +52,8 @@ package body Queue is
          Filedatabuffer : Ada.Streams.Stream_Element_Array( 1..Stream_Element_Offset(FileSize) ) ;
          Filedatabytes : System.Storage_Elements.Storage_Array( 1..Storage_Offset(FileSize) ) ;
          for Filedatabytes'Address use Filedatabuffer'Address ;
+         Filedatastring : String( 1..FileSize ) ;
+         for Filedatastring'Address use Filedatabuffer'Address ;
       begin
          Ada.Streams.Stream_IO.Open
            (file,
@@ -58,16 +61,30 @@ package body Queue is
             Path );
          stream := Ada.Streams.Stream_IO.Stream (file);
          Stream.Read( Stream_Element_Array(Filedatabuffer) , Stream_Element_Offset(FileSize) ) ;
+         Ada.Streams.Stream_IO.Close(File) ;
+         if Base64
+         then
          declare
             Filedatabase64 : String := Text.Base64_Encode( Filedatabytes ) ;
             Packeddata : Gnatcoll.Json.JSON_VALUE ;
          begin
             Packeddata := Gnatcoll.Json.Create_Object ;
             Set_Field( Packeddata , "basename" , Basename ) ;
+            Set_Field( Packeddata , "base64" , "true" ) ;
             Set_Field( Packeddata , "contents" , Filedatabase64 ) ;
             Set_Field( Msg.Contents , Name , Packeddata ) ;
          end ;
-         Ada.Streams.Stream_IO.Close(File) ;
+         else
+         declare
+            Packeddata : Gnatcoll.JSON.JSON_VALUE ;
+         begin
+            Packeddata := Gnatcoll.Json.Create_Object ;
+            Set_Field( Packeddata , "basename" , Basename ) ;
+            Set_Field( Packeddata , "base64" , "false" ) ;
+            Set_Field( Packeddata , "contents" , Filedatastring ) ;
+            Set_Field( Msg.Contents , Name , Packeddata ) ;
+         end ;
+         end if ;
       end ;
    end Add_File ;
 
@@ -128,14 +145,16 @@ package body Queue is
       packedfile : Json_Value := Gnatcoll.Json.Get(Msg.Contents, Name ) ;
       Basename : String := Gnatcoll.Json.Get(Packedfile , "basename" ) ;
       Filecontents : String := Gnatcoll.Json.Get(Packedfile , "contents" ) ;
+      Base64 : String := Gnatcoll.JSON.Get(Packedfile , "base64") ;
    begin
       if Verbose
       then
-         Put("File basename "); Put_Line(Basename) ;
+         Put("File basename "); Put(Basename) ; Put( " ; Base64 = " ) ;Put_Line(Base64) ;
          Put_Line("File Contents: ") ;
          Put_Line( Filecontents ) ;
       end if ;
-
+      if Base64 = "true"
+      then
       declare
          Filedata : Storage_Array := Text.Base64_Decode( Filecontents ) ;
          Filebindata : Ada.Streams.Stream_Element_Array( 1..Stream_Element_Offset(Filedata'Length) ) ;
@@ -151,8 +170,19 @@ package body Queue is
          Ada.Streams.Stream_Io.Create( Outfile , Ada.Streams.Stream_Io.Out_File , Basename ) ;
          Ada.Streams.Stream_Io.Write( Outfile , Filebindata ) ;
          Ada.Streams.Stream_Io.Close(Outfile) ;
-         return Basename ;
       end ;
+      else
+      declare
+         Filebindata : Ada.Streams.Stream_Element_Array( 1..Stream_Element_Offset(Filecontents'Length) ) ;
+         for Filebindata'Address use Filecontents'Address ;
+         Outfile : Ada.Streams.Stream_Io.File_Type ;
+      begin
+         Ada.Streams.Stream_Io.Create( Outfile , Ada.Streams.Stream_Io.Out_File , Basename ) ;
+         Ada.Streams.Stream_Io.Write( Outfile , Filebindata ) ;
+         Ada.Streams.Stream_Io.Close(Outfile) ;
+      end ;
+      end if ;
+      return Basename ;
    end GetFile ;
 
    procedure Show( Message : Message_TYpe ) is

@@ -31,7 +31,8 @@ package Queue is
                            Value : String ) ;
    procedure Add_File( Msg : in out Message_Type ;
                        Name : String ;
-                       Path : String ) ;
+                       Path : String ;
+                       Base64 : Boolean := False ) ;
    procedure Send( Destination : GNAT.Sockets.Socket_Type ;
                    Msg : Message_Type ) ;
    procedure Receive( Source : GNAT.Sockets.Socket_Type ;
