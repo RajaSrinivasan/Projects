@@ -1,5 +1,6 @@
 with "../../gplimports/gplimports" ;
 with "../../adalib/adalib" ;
+with "../../components/components-sqlite" ;
 
 project qmanager is                           -- [template/$]
 

@@ -1,19 +1,46 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io ;
+with Interfaces.C;          use Interfaces.C;
+
 with GNAT.Sockets ;
+with GNAT.Time_Stamp ;
+
+with SQLite ;
 
 with Queue ;
-
 with Qmanager_Cli ;
 
 package body Qmanager_Pkg is
+
    Mysocket : GNAT.Sockets.Socket_Type ;
    ServerPort : Integer := 10756 ;
+
+   Databaseconnected : Boolean := False ;
+   Mydb : SQLite.Data_Base ;
+   Databasename : String := "qmanager.db" ;
 
    procedure SetPort( PortNo : Integer ) is
    begin
       ServerPort := PortNo ;
    end SetPort ;
+
+   procedure ConnectToDatabase is
+      Stmt : String :=
+        "CREATE TABLE jobs " &
+        "(" &
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, " &
+        "client TEXT, " &
+        "added DATE, " &
+        "cmdfile TEXT" &
+        ") ;" ;
+   begin
+      MyDb := SQLite.Open( Databasename ) ;
+      if not SQLite.Table_Exists( MyDb , "jobs" )
+      then
+         SQLite.Exec( MyDb , Stmt ) ;
+      end if ;
+      Databaseconnected := True ;
+   end ConnectToDatabase ;
 
    procedure List_All_Jobs_Service( Client : GNAT.Sockets.Socket_Type;
                                     Msg : Queue.Message_Type ) is
@@ -27,12 +54,45 @@ package body Qmanager_Pkg is
                                  Msg : Queue.Message_Type ) is
       Reply : Queue.Message_Type ;
       Filepath : String := Queue.GetFile( Msg , "commandfile" ) ;
+      procedure SaveJob is
+         Insertstmt : SQLite.Statement := SQLite.Prepare(MyDb, "INSERT INTO jobs (cmdfile,added) VALUES (?,?) ;" ) ;
+         Datetime : aliased String := GNAT.Time_Stamp.Current_Time  ;
+         FindStmt : SQLite.Statement :=  SQLite.Prepare(MyDb, "SELECT id FROM jobs WHERE added='" & Datetime & "';" ) ;
+         NewId : Int ;
+      begin
+         SQLite.Bind( InsertStmt , 1 , Filepath ) ;
+         SQLite.Bind( InsertStmt , 2 , Datetime ) ;
+         SQLite.Step( InsertStmt ) ;
+         Put_Line("Data Inserted at" & Datetime );
+         SQLite.Step( FindStmt ) ;
+         NewId := SQLite.Column( FindStmt , 1 ) ;
+         Put_Line("New Id " & Integer'Image(Integer(NewId)));
+      exception
+         when others =>
+            Put_Line("Exception in SaveJob");
+      end SaveJob ;
    begin
       if Qmanager_Cli.Verbose
       then
          Put("Command file :");
          Put_Line( Filepath ) ;
       end if ;
+
+      if not DatabaseConnected
+      then
+         if Qmanager_Cli.Verbose
+         then
+            Put_Line("Connecting to Database");
+         end if ;
+         ConnectToDatabase ;
+      end if ;
+      if Qmanager_Cli.Verbose
+      then
+         Put(Filepath) ;
+         Put(" Queued from ");
+         Put_Line( GNAT.Sockets.Image( GNAT.Sockets.Get_Peer_Name( Client ) ) );
+      end if ;
+      SaveJob ;
       Reply := Queue.Create( Queue.RESPONSE , Queue.SUBMIT_JOB ) ;
       Queue.Send( client , Reply ) ;
    end Submit_Job_Service ;
