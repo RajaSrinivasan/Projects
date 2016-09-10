@@ -7,6 +7,7 @@ with System.Storage_Elements ;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON ;
 with GNAT.Directory_Operations ; use GNAT.Directory_Operations ;
+with GNAT.Sockets ;
 
 with Text ;
 
@@ -18,6 +19,7 @@ package body Queue is
    begin
       Msg.Contents := GNATCOLL.JSON.Create_Object ;
       Set_Field( Msg.Contents , "version" , Create(Version) ) ;
+      Set_Field( Msg.Contents , "hostname" , GNAT.Sockets.Host_Name ) ;
       Set_Field( Msg.Contents , "packettype" , Create( Integer(Packet_Type'Pos(Packet)))) ;
       Set_Field( Msg.Contents , "service" , Create( Integer(Services_Type'Pos(Service)))) ;
       Set_Field( Msg.Contents , "command" , Create( Services_Type'Image( Service ) ) ) ;
@@ -34,6 +36,13 @@ package body Queue is
                            Value : String ) is
    begin
       Set_Field( Msg.Contents , name , Create( Value )) ;
+   end Set_Argument ;
+
+   procedure Set_Argument( Msg : in out Message_Type ;
+                           Name : String ;
+                           Value : Integer ) is
+   begin
+      Set_Field( Msg.Contents , Name , Create(Value) ) ;
    end Set_Argument ;
 
    procedure Add_File( Msg : in out Message_Type ;
@@ -137,6 +146,11 @@ package body Queue is
       Svc : Services_Type := Services_Type'Val(Svctypeint) ;
    begin
       return Svc ;
+   end Get ;
+
+   function Get( Msg : Message_Type ; Name : String ) return String is
+   begin
+      return Gnatcoll.Json.Get(Msg.Contents,Name) ;
    end Get ;
 
    function GetFile( Msg : Message_Type ; Name : String ) return String is

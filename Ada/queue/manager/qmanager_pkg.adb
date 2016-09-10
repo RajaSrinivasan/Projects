@@ -54,26 +54,36 @@ package body Qmanager_Pkg is
                                  Msg : Queue.Message_Type ) is
       Reply : Queue.Message_Type ;
       Filepath : String := Queue.GetFile( Msg , "commandfile" ) ;
-      procedure SaveJob is
-         Insertstmt : SQLite.Statement := SQLite.Prepare(MyDb, "INSERT INTO jobs (cmdfile,added) VALUES (?,?) ;" ) ;
+      hostname : String := Queue.Get( Msg , "hostname" ) ;
+      Savedjobid : Integer ;
+
+      function SaveJob return Integer is
+         Insertstmt : SQLite.Statement := SQLite.Prepare(MyDb, "INSERT INTO jobs (cmdfile,added,client) VALUES (?,?,?) ;" ) ;
          Datetime : aliased String := GNAT.Time_Stamp.Current_Time  ;
          FindStmt : SQLite.Statement :=  SQLite.Prepare(MyDb, "SELECT id FROM jobs WHERE added='" & Datetime & "';" ) ;
-         NewId : Int ;
+         NewJobId : Int ;
       begin
          SQLite.Bind( InsertStmt , 1 , Filepath ) ;
          SQLite.Bind( InsertStmt , 2 , Datetime ) ;
+         SQLite.Bind( InsertStmt , 3 , Hostname )  ;
          SQLite.Step( InsertStmt ) ;
          Put_Line("Data Inserted at" & Datetime );
          SQLite.Step( FindStmt ) ;
-         NewId := SQLite.Column( FindStmt , 1 ) ;
-         Put_Line("New Id " & Integer'Image(Integer(NewId)));
+         NewJobId := SQLite.Column( FindStmt , 1 ) ;
+         if Qmanager_Cli.Verbose
+         then
+            Put_Line("New Id " & Integer'Image(Integer(NewJobId)));
+         end if ;
+         return Integer(NewJobId) ;
       exception
          when others =>
             Put_Line("Exception in SaveJob");
+            return 0 ;
       end SaveJob ;
    begin
       if Qmanager_Cli.Verbose
       then
+         Put("Host "); Put(Hostname) ; Put(": submit ");
          Put("Command file :");
          Put_Line( Filepath ) ;
       end if ;
@@ -92,8 +102,9 @@ package body Qmanager_Pkg is
          Put(" Queued from ");
          Put_Line( GNAT.Sockets.Image( GNAT.Sockets.Get_Peer_Name( Client ) ) );
       end if ;
-      SaveJob ;
+      SavedJobId := SaveJob ;
       Reply := Queue.Create( Queue.RESPONSE , Queue.SUBMIT_JOB ) ;
+      Queue.Set_Argument( Reply , "jobid" , SavedJobId ) ;
       Queue.Send( client , Reply ) ;
    end Submit_Job_Service ;
 

@@ -10,7 +10,7 @@ begin
    then
       Qmanager_Cli.ShowCommandLineArguments ;
    end if ;
-   Queue.Verbose := Qmanager_Cli.Verbose ;
+--   Queue.Verbose := Qmanager_Cli.Verbose ;
    Qmanager_Pkg.SetPort( Qmanager_Cli.ServerPortNo ) ;
 
    Qmanager_Pkg.StartService ;

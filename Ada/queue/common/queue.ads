@@ -29,6 +29,9 @@ package Queue is
    procedure Set_Argument( Msg : in out Message_Type ;
                            Name : String ;
                            Value : String ) ;
+   procedure Set_Argument( Msg : in out Message_Type ;
+                           Name : String ;
+                           Value : Integer ) ;
    procedure Add_File( Msg : in out Message_Type ;
                        Name : String ;
                        Path : String ;
@@ -40,6 +43,7 @@ package Queue is
 
    function Get( Msg : Message_Type ) return Packet_Type ;
    function Get( Msg : Message_Type ) return Services_Type ;
+   function Get( Msg : Message_Type ; Name : String ) return String ;
    function GetFile( Msg : Message_Type ; Name : String ) return String ;
 
    procedure Show( Message : Message_Type ) ;

@@ -11,7 +11,7 @@ begin
    then
       Qclient_Cli.ShowCommandLineArguments ;
    end if ;
-   Queue.Verbose := Qclient_Cli.Verbose ;
+   -- Queue.Verbose := Qclient_Cli.Verbose ;
    Qclient_Pkg.SetServer( Qclient_Cli.ServerNodeName.all ,
                           Qclient_Cli.ServerPortNumber ) ;
 
