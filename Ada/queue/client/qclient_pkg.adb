@@ -66,6 +66,18 @@ package body Qclient_Pkg is
       Queue.Send( MySocket , Msg ) ;
       delay 0.2 ;
       Queue.Receive( MySocket , Reply ) ;
+      declare
+         newjobid : integer := Queue.Get( Reply , "newjob" ) ;
+      begin
+         if newjobid > 0
+         then
+            Put("Submitted job #") ;
+            Put(newjobid) ;
+         else
+            put("Failed to submit the job") ;
+         end if ;
+         new_line ;
+      end ;
    end Submit ;
 begin
    GNAT.Sockets.Create_Socket( Mysocket ) ;

@@ -54,14 +54,17 @@ package body Qmanager_Pkg is
                                  Msg : Queue.Message_Type ) is
       Reply : Queue.Message_Type ;
       Filepath : String := Queue.GetFile( Msg , "commandfile" ) ;
+      NewId : Int := -1 ;
       procedure SaveJob is
-         Insertstmt : SQLite.Statement := SQLite.Prepare(MyDb, "INSERT INTO jobs (cmdfile,added) VALUES (?,?) ;" ) ;
+         Insertstmt : SQLite.Statement := SQLite.Prepare(MyDb, "INSERT INTO jobs (cmdfile,added,client) VALUES (?,?,?) ;" ) ;
          Datetime : aliased String := GNAT.Time_Stamp.Current_Time  ;
          FindStmt : SQLite.Statement :=  SQLite.Prepare(MyDb, "SELECT id FROM jobs WHERE added='" & Datetime & "';" ) ;
-         NewId : Int ;
+         client : aliased String := Queue.Get( Msg , "hostname" ) ;
+
       begin
          SQLite.Bind( InsertStmt , 1 , Filepath ) ;
          SQLite.Bind( InsertStmt , 2 , Datetime ) ;
+         SQLite.Bind( InsertStmt , 3 , client ) ;
          SQLite.Step( InsertStmt ) ;
          Put_Line("Data Inserted at" & Datetime );
          SQLite.Step( FindStmt ) ;
@@ -90,10 +93,11 @@ package body Qmanager_Pkg is
       then
          Put(Filepath) ;
          Put(" Queued from ");
-         Put_Line( GNAT.Sockets.Image( GNAT.Sockets.Get_Peer_Name( Client ) ) );
+         Put_Line( Queue.Get( Msg , "hostname") );
       end if ;
       SaveJob ;
       Reply := Queue.Create( Queue.RESPONSE , Queue.SUBMIT_JOB ) ;
+      Queue.Set_Argument( Reply , "newjob" , Integer( NewId ) ) ;
       Queue.Send( client , Reply ) ;
    end Submit_Job_Service ;
 
