@@ -480,7 +480,21 @@ package body SQLite is
          end;
       end if;
    end Column;
-
+   function Column_Name
+            (  Command  : Statement;
+               Position : Positive
+            )  return String is
+      function Name
+               (  Statement : SQLite_Handle;
+                  Index     : int
+               )  return chars_ptr;
+      pragma Import (C, Name, "sqlite3_column_name");
+      Handle : constant SQLite_Handle := Ptr (Command.Handle).Handle;
+      Index  : constant int       := int (Position) - 1;
+      Result : constant chars_ptr := Name (Handle, Index);
+   begin
+      return Value(Result) ;
+   end Column_Name;
    function Column_Count (Command : Statement) return Natural is
       function Internal (Statement : SQLite_Handle) return int;
       pragma Import (C, Internal, "sqlite3_column_count");

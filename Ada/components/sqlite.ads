@@ -229,7 +229,11 @@ package SQLite is
    function Column_Type
             (  Command  : Statement;
                Position : Positive
-            )  return Datatype;
+              )  return Datatype;
+   function Column_Name
+     (  Command  : Statement;
+        Position : Positive
+       )  return String ;
 --
 -- Exec -- Execute a SQL command
 --
