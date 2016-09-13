@@ -3,7 +3,7 @@ with Gnatcoll.Json ;
 
 package Queue is
    Verbose : Boolean := True ;
-   Version : constant String := "V01.00.01" ;
+   Version : constant String := "V01.00.02" ;
    DefaultPort : Integer := 10756 ;
 
    type Packet_Type is
@@ -17,7 +17,7 @@ package Queue is
        LIST_ALL_JOBS ,
        SUBMIT_JOB ,
        QUERY_JOB ,
-       ABORT_JOB ,
+       DELETE_JOB ,
        RESTART_MANAGER
      ) ;
 
