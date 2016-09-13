@@ -7,9 +7,11 @@ package qclient_cli is                                       -- [cli/$_cli]
    verbose : aliased boolean := false ;              -- Option:     -v or --verbose
    
    ListOption : aliased Boolean := False ;
+   DeleteOption : aliased Boolean := false ;
    
    Servernodename : aliased Gnat.Strings.String_Access := new String'("localhost") ;
    ServerPortNumber : aliased Integer ;
+  
    LogDestination : aliased Gnat.Strings.String_Access ;
    EnvironmentFile : aliased Gnat.Strings.String_Access ;
 

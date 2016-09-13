@@ -48,7 +48,8 @@ package body qclient_cli is                          -- [cli/$_cli]
                        Long_Switch => "--port?",
                        Initial => Queue.DefaultPort ,
                        Default => Queue.DefaultPort ,
-                       Help => "Port Number") ;
+                                         Help => "Port Number") ;
+      
         GNAT.Command_Line.Define_Switch (Config,
                        LogDestination'access ,
                        Switch => "-L:",
@@ -59,7 +60,12 @@ package body qclient_cli is                          -- [cli/$_cli]
 					 Switch => "-env:",
 					 Long_Switch => "--environment-file:",
 					 Help => "Port Number") ;
-	
+        GNAT.Command_Line.Define_Switch (Config,
+					 DeleteOption'access ,
+                                         Switch => "-d",
+                                         Long_Switch => "--delete-job",
+                                         Help => "Delete a job") ;
+      
         GNAT.Command_Line.Define_Switch (Config,
 					 ListOption'access ,
 					 Switch => "-list",

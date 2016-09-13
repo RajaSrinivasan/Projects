@@ -19,6 +19,9 @@ begin
    if Qclient_Cli.ListOption
    then
       Qclient_Pkg.ShowJobs ;
+   elsif Qclient_Cli.DeleteOption
+   then
+      QClient_Pkg.Delete_Job( Integer'Value(QClient_Cli.GetNextArgument) ) ;
    else
       Qclient_Pkg.Submit( Qclient_Cli.GetNextArgument , "" ) ;
    end if ;
