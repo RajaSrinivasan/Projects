@@ -45,8 +45,20 @@ package body Qmanager_Pkg is
    procedure List_All_Jobs_Service( Client : GNAT.Sockets.Socket_Type;
                                     Msg : Queue.Message_Type ) is
       Reply : Queue.Message_Type ;
+      listjobsstmt : SQLite.Statement := SQLite.Prepare( MyDb ,
+                                                         "SELECT * FROM jobs ; " ) ;
    begin
       Reply := Queue.Create( Queue.RESPONSE , Queue.LIST_ALL_JOBS ) ;
+      while SQLite.Step( listjobsstmt )
+      loop
+         for col in 1..SQLite.Column_Count( listjobsstmt )
+         loop
+            Put( SQLite.Column_Name( listjobsstmt , col ) );
+            Put( " => " ) ;
+            Put( SQLite.Column( listjobsstmt , col ) ) ;
+         end loop ;
+         New_Line ;
+      end loop ;
       Queue.Send( client , Reply ) ;
    end List_All_Jobs_Service ;
 
@@ -81,14 +93,6 @@ package body Qmanager_Pkg is
          Put_Line( Filepath ) ;
       end if ;
 
-      if not DatabaseConnected
-      then
-         if Qmanager_Cli.Verbose
-         then
-            Put_Line("Connecting to Database");
-         end if ;
-         ConnectToDatabase ;
-      end if ;
       if Qmanager_Cli.Verbose
       then
          Put(Filepath) ;
@@ -100,6 +104,26 @@ package body Qmanager_Pkg is
       Queue.Set_Argument( Reply , "newjob" , Integer( NewId ) ) ;
       Queue.Send( client , Reply ) ;
    end Submit_Job_Service ;
+   procedure Delete_Job_Service( Client : GNAT.Sockets.Socket_Type;
+                                 Msg : Queue.Message_Type ) is
+      Reply : Queue.Message_Type ;
+      jobid : Integer := Queue.Get( Msg , "jobid" ) ;
+      DelStmt : SQLite.Statement := SQLite.Prepare(MyDb,"DELETE FROM jobs WHERE id = " & Integer'Image(jobid) & " ;") ;
+   begin
+      Put_Line("Delete Job Service");
+      Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;
+      if QManager_Cli.Verbose
+      then
+         Put("Delete Job ");
+         Put( jobid ) ;
+         New_line ;
+      end if ;
+      SQLite.Step( DelStmt ) ;
+      Queue.Send( client , Reply ) ;
+   exception
+      when others =>
+         raise ;
+   end Delete_Job_Service ;
 
    procedure ProvideService (Client : GNAT.Sockets.Socket_Type) Is
       Msg : Queue.Message_Type ;
@@ -115,7 +139,10 @@ package body Qmanager_Pkg is
               return ;
             when Queue.SUBMIT_JOB =>
               Submit_Job_Service( Client, Msg ) ;
-              return ;
+               return ;
+            when Queue.DELETE_JOB =>
+               Delete_Job_Service( Client , Msg ) ;
+               return ;
             when others =>
                null ;
          end case ;
@@ -162,4 +189,5 @@ begin
    Put( "Server Host: ");
    Put( GNAT.Sockets.Host_Name ) ;
    New_Line;
+   ConnectToDatabase ;
 end Qmanager_Pkg ;
