@@ -4,11 +4,10 @@ with Ada.Streams.Stream_IO;
 with Ada.Text_Io; use Ada.Text_Io ;
 
 with System.Storage_Elements ;
-
-with GNATCOLL.JSON; use GNATCOLL.JSON ;
-with GNAT.Directory_Operations ; use GNAT.Directory_Operations ;
 with GNAT.Sockets ;
 
+with GNAT.Directory_Operations ; use GNAT.Directory_Operations ;
+with GNATCOLL.JSON; use GNATCOLL.JSON ;
 with Text ;
 
 package body Queue is
@@ -19,10 +18,10 @@ package body Queue is
    begin
       Msg.Contents := GNATCOLL.JSON.Create_Object ;
       Set_Field( Msg.Contents , "version" , Create(Version) ) ;
-      Set_Field( Msg.Contents , "hostname" , GNAT.Sockets.Host_Name ) ;
       Set_Field( Msg.Contents , "packettype" , Create( Integer(Packet_Type'Pos(Packet)))) ;
       Set_Field( Msg.Contents , "service" , Create( Integer(Services_Type'Pos(Service)))) ;
       Set_Field( Msg.Contents , "command" , Create( Services_Type'Image( Service ) ) ) ;
+      Set_Field( Msg.Contents , "hostname" , Create( GNAT.Sockets.Host_Name ) ) ;
       if Verbose
       then
          Put("Create: ") ;
@@ -37,14 +36,12 @@ package body Queue is
    begin
       Set_Field( Msg.Contents , name , Create( Value )) ;
    end Set_Argument ;
-
    procedure Set_Argument( Msg : in out Message_Type ;
                            Name : String ;
                            Value : Integer ) is
    begin
-      Set_Field( Msg.Contents , Name , Create(Value) ) ;
+      Set_Field( Msg.Contents , Name , Create( Value ) ) ;
    end Set_Argument ;
-
    procedure Add_File( Msg : in out Message_Type ;
                        Name : String ;
                        Path : String ;
@@ -147,10 +144,14 @@ package body Queue is
    begin
       return Svc ;
    end Get ;
-
    function Get( Msg : Message_Type ; Name : String ) return String is
    begin
-      return Gnatcoll.Json.Get(Msg.Contents,Name) ;
+      return GnatColl.JSON.Get(Msg.Contents,Name) ;
+   end Get ;
+   function Get( Msg : Message_Type ; Name : String ) return Integer is
+      val : Integer := GNATCOLL.JSON.Get( Msg.Contents , Name ) ;
+   begin
+      return val ;
    end Get ;
 
    function GetFile( Msg : Message_Type ; Name : String ) return String is
@@ -218,5 +219,92 @@ package body Queue is
       Fieldvalue := Gnatcoll.Json.Get( Message.Contents , "command" ) ;
       Put("Command : "); Put_Line( Gnatcoll.Json.Get(Fieldvalue) ) ;
    end Show ;
+   procedure Set_Argument( Msg : in out Message_Type ;
+                           Value : Recurrence_Type ) is
+      recurrencepck : Gnatcoll.JSON.JSON_VALUE := GNATCOLL.JSON.Create_Object ;
+   begin
+      GNATCOLL.JSON.Set_Field( recurrencepck , "pattern" , Integer(RecurrencePattern_Type'pos(Value.pattern)) ) ;
+      GNATCOLL.JSON.Set_Field( recurrencepck , "hour" , Integer( Value.hour ) ) ;
+      GNATCOLL.JSON.Set_Field( recurrencepck , "minute" , Integer(Value.minute));
+      GNATCOLL.JSON.Set_Field( recurrencepck , "second" , Integer(value.second)) ;
+      case Value.pattern is
+         when EXEC_ONCE =>
+            GNATCOLL.JSON.Set_Field( recurrencepck , "execute_asap" , Value.execute_asap ) ;
+         when WEEKLY =>
+            for d in GNAT.Calendar.Day_name'range
+            loop
+               if Value.days(d)
+               then
+                  GNATCOLL.JSON.Set_Field( recurrencepck , GNAT.Calendar.Day_Name'Image(d) , "true" ) ;
+               end if ;
+            end loop ;
+         when MONTHLY =>
+            GNATCOLL.JSON.Set_Field( recurrencepck , "day" , Value.day ) ;
+         when others =>
+            null ;
+      end case ;
+      GNATCOLL.JSON.Set_Field( Msg.Contents , "recurrence" , recurrencepck );
+   end Set_Argument ;
+
+   function Get( Msg : Message_Type ) return Recurrence_Type is
+      recurrencepck : GNATCOLL.JSON.JSON_Value := GNATCOLL.JSON.Get( Msg.Contents , "recurrence" ) ;
+      recurrenceptn : Integer := GNATCOLL.JSON.Get( recurrencepck , "pattern" ) ;
+      pattern : RecurrencePattern_Type := RecurrencePattern_Type'Val(recurrenceptn) ;
+      hour : integer := GNATCOLL.JSON.Get( recurrencepck , "hour" ) ;
+      minute : integer := GNATCOLL.JSON.Get( recurrencepck , "minute" ) ;
+      second : integer := GNATCOLL.JSON.Get( recurrencepck , "second" )  ;
+      procedure Set_Common_Fields ( rec : in out Recurrence_Type ) is
+      begin
+         rec.hour := hour ;
+         rec.minute := minute ;
+         rec.second := second ;
+      end Set_Common_Fields ;
+   begin
+      case pattern is
+         when EXEC_ONCE =>
+            declare
+               execute_asap : boolean := GNATCOLL.JSON.Get( recurrencepck , "execute_asap" ) ;
+               recurrence : Recurrence_Type(EXEC_ONCE) ;
+            begin
+               Set_Common_Fields(recurrence) ;
+               recurrence.execute_asap := execute_asap ;
+               return Recurrence ;
+            end ;
+         when WEEKLY =>
+            declare
+               recurrence : Recurrence_Type(WEEKLY) ;
+               dayval : boolean ;
+            begin
+               Set_Common_Fields(recurrence) ;
+               recurrence.days := ( others => false ) ;
+               for d in GNAT.Calendar.Day_Name'range
+               loop
+                  begin
+                     dayval := GNATCOLL.JSON.Get( recurrencepck , GNAT.Calendar.Day_Name'Image(d) ) ;
+                     recurrence.days(d) := true ;
+                  exception
+                     when others => null ;
+                  end ;
+               end loop ;
+               return recurrence ;
+            end ;
+         when MONTHLY =>
+            declare
+               day : Integer := GNATCOLL.JSON.Get( recurrencepck , "day" ) ;
+               recurrence : Recurrence_Type( MONTHLY ) ;
+            begin
+               Set_Common_Fields (recurrence) ;
+               recurrence.day := Ada.Calendar.Day_Number( day ) ;
+               return recurrence ;
+            end ;
+         when others =>
+            declare
+               recurrence : Recurrence_TYpe( pattern ) ;
+            begin
+               Set_Common_Fields (recurrence) ;
+               return recurrence ;
+            end ;
+      end case ;
+   end Get ;
 
 end Queue ;

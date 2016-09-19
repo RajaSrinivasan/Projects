@@ -3,5 +3,6 @@ package Qclient_Pkg is
 			ServerPort : Integer ) ;
    procedure ShowJobs ;   
    procedure Submit( Script : String ;
-		     EnvironmentFile : String ) ;
+                     EnvironmentFile : String ) ;
+   procedure Delete_Job( JobNo : Integer ) ;
 end Qclient_Pkg ;

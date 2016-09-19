@@ -66,7 +66,29 @@ package body Qclient_Pkg is
       Queue.Send( MySocket , Msg ) ;
       delay 0.2 ;
       Queue.Receive( MySocket , Reply ) ;
+      declare
+         newjobid : integer := Queue.Get( Reply , "newjob" ) ;
+      begin
+         if newjobid > 0
+         then
+            Put("Submitted job #") ;
+            Put(newjobid) ;
+         else
+            put("Failed to submit the job") ;
+         end if ;
+         new_line ;
+      end ;
    end Submit ;
+   procedure Delete_Job( JobNo : Integer ) is
+      Msg : Queue.Message_Type ;
+      Reply : Queue.Message_Type ;
+   begin
+      Msg := Queue.Create( Queue.Query ,
+                           Queue.DELETE_JOB ) ;
+      Queue.Set_Argument( Msg , "jobid" , JobNo ) ;
+      Queue.Send( MySocket , Msg ) ;
+      Queue.Receive( MySocket, Reply ) ;
+   end Delete_Job ;
 begin
    GNAT.Sockets.Create_Socket( Mysocket ) ;
    Put( "Client Host: ");
