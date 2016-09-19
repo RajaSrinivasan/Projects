@@ -69,10 +69,31 @@ package body qclient_cli is                          -- [cli/$_cli]
         GNAT.Command_Line.Define_Switch (Config,
 					 ListOption'access ,
 					 Switch => "-list",
-					 Help => "List known jobs") ;
-					 
+                                         Help => "List known jobs") ;
+      
+        GNAT.Command_Line.Define_Switch (Config,
+					 AtOption'access ,
+                                         Switch => "-T:",
+                                         Long_Switch => "--At-time:" ,
+                                         Help => "Execute at the specified time: (next hour[:minute[:second]])") ;
+        GNAT.Command_Line.Define_Switch (Config,
+					 HourlyOption'access ,
+                                         Switch => "-H:",
+                                         Long_Switch => "--Hourly:" ,
+                                         Help => "Execute hourly at the specified time: (:minute[:second])") ;      
+        GNAT.Command_Line.Define_Switch (Config,
+					 WeeklyOption'access ,
+                                         Switch => "-W:",
+                                         Long_Switch => "--Weekly:" ,
+                                         Help => "Execute at the specified time (with -T) on specified days: (Sunday,Monday..Saturday)") ; 
+        GNAT.Command_Line.Define_Switch (Config,
+					 MonthlyOption'access ,
+                                         Switch => "-M:",
+                                         Long_Switch => "--Monthly:" ,
+                                         Help => "Execute at the specified time (with -T) on specified day of the month") ; 
+         
         GNAT.Command_Line.Getopt(config,SwitchHandler'access);
-
+ 
     end ProcessCommandLine;
 
     function GetNextArgument return String is
@@ -80,7 +101,8 @@ package body qclient_cli is                          -- [cli/$_cli]
         return GNAT.Command_Line.Get_Argument(Do_Expansion => True) ;
     end GetNextArgument ;
     
-    procedure ShowCommandLineArguments is
+   procedure ShowCommandLineArguments is
+      use GNAT.Strings ;
     begin
        Put("Verbose ") ;
        Put(Boolean'Image( Verbose ) );
@@ -100,6 +122,11 @@ package body qclient_cli is                          -- [cli/$_cli]
        Put("List Option ");
        Put(Boolean'Image( ListOption ) );
        New_Line ;
+      if AtOption /= null
+      then
+         put("At time option ");
+         put(AtOption.all) ;
+      end if ;
     end ShowCommandLineArguments ;
     
 end qclient_cli ;                                   -- [cli/$_cli]

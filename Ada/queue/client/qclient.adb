@@ -1,17 +1,18 @@
 with Ada.Text_Io; use Ada.Text_Io ;
-
+with GNAT.Command_Line ;
 with Queue ;
 with Qclient_cli ;                            -- [cli/$_cli]
 with Qclient_Pkg ;
 
 procedure qclient is                  -- [clitest/$]
 begin
+
    qclient_cli.ProcessCommandLine ;           -- [cli/$_cli]
    if Qclient_Cli.Verbose
    then
       Qclient_Cli.ShowCommandLineArguments ;
    end if ;
-   Queue.Verbose := Qclient_Cli.Verbose ;
+
    Qclient_Pkg.SetServer( Qclient_Cli.ServerNodeName.all ,
                           Qclient_Cli.ServerPortNumber ) ;
 
@@ -27,5 +28,7 @@ begin
    end if ;
 
    Put_Line("Bye");
-
+exception
+   when GNAT.Command_Line.Exit_From_Command_Line =>
+      return ;
 end qclient ;                         -- [clitest/$]

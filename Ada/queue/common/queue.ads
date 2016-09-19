@@ -1,4 +1,7 @@
+with Ada.Calendar ;
+
 with GNAT.Sockets ;
+with GNAT.Calendar ;
 with Gnatcoll.Json ;
 
 package Queue is
@@ -45,14 +48,42 @@ package Queue is
    function Get( Msg : Message_Type ) return Services_Type ;
    function Get( Msg : Message_Type ; Name : String ) return String ;
    function Get( Msg : Message_Type ; Name : String ) return Integer ;
-
    function GetFile( Msg : Message_Type ; Name : String ) return String ;
-
    procedure Show( Message : Message_Type ) ;
+
+   type RecurrencePattern_Type is
+     (
+      EXEC_ONCE ,
+      HOURLY ,
+      DAILY ,
+      WEEKLY ,
+      MONTHLY) ;
+   type Weekly_Schedule_Type is array (GNAT.Calendar.Day_Name range <> ) of boolean ;
+   pragma pack( Weekly_Schedule_Type ) ;
+   type Recurrence_Type ( pattern : RecurrencePattern_Type := EXEC_ONCE ) is
+      record
+         hour : GNAT.Calendar.Hour_Number := 0 ;
+         minute : GNAT.Calendar.Minute_Number := 0 ;
+         second : GNAT.Calendar.Second_Number := 0 ;
+         case pattern is
+            when EXEC_ONCE =>
+               execute_asap : boolean := false ;
+            when WEEKLY =>
+               days : Weekly_Schedule_Type(GNAT.Calendar.Day_Name'First .. GNAT.Calendar.Day_Name'Last) := (others => false) ;
+            when MONTHLY =>
+               day : Ada.Calendar.Day_Number ;
+            when others => null ;
+         end case ;
+      end record ;
+
+   procedure Set_Argument( Msg : in out Message_Type ;
+                           Value : Recurrence_Type ) ;
+   function Get( Msg : Message_Type ) return Recurrence_Type ;
 
 private
    type Message_Type is
       record
          Contents : GNATCOLL.JSON.JSON_Value ;
       end record ;
+   ExecuteOnce : Recurrence_Type ;
 end Queue ;
