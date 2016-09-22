@@ -5,9 +5,12 @@ with GNAT.Calendar ;
 with Gnatcoll.Json ;
 
 package Queue is
+
    Verbose : Boolean := True ;
-   Version : constant String := "V01.00.02" ;
+   Version : constant String := "V01.00.03" ;
    DefaultPort : Integer := 10756 ;
+
+   nameseparator : constant string := "/" ;
 
    type Packet_Type is
      (
@@ -86,4 +89,5 @@ private
          Contents : GNATCOLL.JSON.JSON_Value ;
       end record ;
    ExecuteOnce : Recurrence_Type ;
+   function Get( Msg : Message_Type ; Name : String ) return GNATCOLL.JSON.JSON_Value ;
 end Queue ;
