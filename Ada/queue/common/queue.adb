@@ -2,6 +2,7 @@ with Ada.Directories ;
 with Ada.Streams ;
 with Ada.Streams.Stream_IO;
 with Ada.Text_Io; use Ada.Text_Io ;
+with Ada.Strings.Fixed ;
 
 with System.Storage_Elements ;
 with GNAT.Sockets ;
@@ -157,7 +158,8 @@ package body Queue is
    function GetFile( Msg : Message_Type ; Name : String ) return String is
       use System.Storage_Elements ;
       use Ada.Streams;
-      packedfile : Json_Value := Gnatcoll.Json.Get(Msg.Contents, Name ) ;
+      --packedfile : Json_Value := Gnatcoll.Json.Get(Msg.Contents, Name ) ;
+      packedfile : Json_Value := Get( Msg.Contents , Name ) ;
       Basename : String := Gnatcoll.Json.Get(Packedfile , "basename" ) ;
       Filecontents : String := Gnatcoll.Json.Get(Packedfile , "contents" ) ;
       Base64 : String := Gnatcoll.JSON.Get(Packedfile , "base64") ;
@@ -305,6 +307,26 @@ package body Queue is
                return recurrence ;
             end ;
       end case ;
+   end Get ;
+   function Get( MsgContents : GNATCOLL.JSON.Json_Value ; Name : String ) return GNATCOLL.JSON.JSON_Value is
+      curtop : GNATCOLL.JSON.Json_Value := MsgContents ;
+   begin
+      if Ada.Strings.Fixed.Index( Name , nameseparator ) > 0
+      then
+         declare
+            parent : GNATCOLL.JSON.JSON_Value :=
+              GNATCOLL.JSON.Get( curtop , Name( Name'first .. ada.strings.fixed.index(Name,nameseparator)-1)) ;
+         begin
+            return Get( parent , Name( Ada.strings.fixed.index(Name,nameseparator) + 1 .. Name'Last) );
+         end ;
+      else
+         return GNATCOLL.JSON.Get( MsgContents , Name ) ;
+      end if ;
+   end Get ;
+
+   function Get( Msg : Message_Type ; Name : String ) return GNATCOLL.JSON.JSON_Value is
+   begin
+      return Get(Msg.Contents , Name ) ;
    end Get ;
 
 end Queue ;
