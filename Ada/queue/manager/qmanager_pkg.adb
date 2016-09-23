@@ -119,6 +119,7 @@ package body Qmanager_Pkg is
          New_line ;
       end if ;
       SQLite.Step( DelStmt ) ;
+      Queue.Set_Argument( Reply , "R1/R2/R3" , "Region 1 , Region 2 , Region 3") ;
       Queue.Send( client , Reply ) ;
    exception
       when others =>

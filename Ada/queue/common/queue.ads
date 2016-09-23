@@ -90,4 +90,5 @@ private
       end record ;
    ExecuteOnce : Recurrence_Type ;
    function Get( Msg : Message_Type ; Name : String ) return GNATCOLL.JSON.JSON_Value ;
+   procedure Set( Msg : in out Message_Type ; Name : String ; Value : GNATCOLL.JSON.JSON_Value ) ;
 end Queue ;

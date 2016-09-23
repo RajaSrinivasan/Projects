@@ -35,13 +35,13 @@ package body Queue is
                            Name : String ;
                            Value : String ) is
    begin
-      Set_Field( Msg.Contents , name , Create( Value )) ;
+      Set( Msg , name , Create( Value )) ;
    end Set_Argument ;
    procedure Set_Argument( Msg : in out Message_Type ;
                            Name : String ;
                            Value : Integer ) is
    begin
-      Set_Field( Msg.Contents , Name , Create( Value ) ) ;
+      Set( Msg , Name , Create( Value ) ) ;
    end Set_Argument ;
    procedure Add_File( Msg : in out Message_Type ;
                        Name : String ;
@@ -89,7 +89,7 @@ package body Queue is
             Set_Field( Packeddata , "basename" , Basename ) ;
             Set_Field( Packeddata , "base64" , "false" ) ;
             Set_Field( Packeddata , "contents" , Filedatastring ) ;
-            Set_Field( Msg.Contents , Name , Packeddata ) ;
+            Set( Msg , Name , Packeddata ) ;
          end ;
          end if ;
       end ;
@@ -147,12 +147,13 @@ package body Queue is
    end Get ;
    function Get( Msg : Message_Type ; Name : String ) return String is
    begin
-      return GnatColl.JSON.Get(Msg.Contents,Name) ;
+      return Get(Msg.Contents,Name) ;
    end Get ;
    function Get( Msg : Message_Type ; Name : String ) return Integer is
-      val : Integer := GNATCOLL.JSON.Get( Msg.Contents , Name ) ;
+      val : GNATCOLL.JSON.Json_Value ;
    begin
-      return val ;
+      val := Get( Msg.Contents , Name ) ;
+      return GNATCOLL.JSON.Get(val) ;
    end Get ;
 
    function GetFile( Msg : Message_Type ; Name : String ) return String is
@@ -308,6 +309,7 @@ package body Queue is
             end ;
       end case ;
    end Get ;
+
    function Get( MsgContents : GNATCOLL.JSON.Json_Value ; Name : String ) return GNATCOLL.JSON.JSON_Value is
       curtop : GNATCOLL.JSON.Json_Value := MsgContents ;
    begin
@@ -328,5 +330,25 @@ package body Queue is
    begin
       return Get(Msg.Contents , Name ) ;
    end Get ;
+
+   procedure Set( MsgContents : in out GNATCOLL.JSON.JSON_Value ; Name : String ; Value : GNATCOLL.JSON.JSON_Value ) is
+   begin
+      if Ada.Strings.Fixed.Index( Name , nameseparator ) > 0
+      then
+         declare
+            setvalue : GNATCOLL.JSON.Json_Value := GNATCOLL.JSON.Create_Object ;
+         begin
+            Set( setvalue , Name( Ada.Strings.Fixed.Index(Name,Nameseparator) + 1 .. Name'last ) , Value ) ;
+            GNATCOLL.JSON.Set_Field( MsgContents , Name( Name'first .. Ada.Strings.Fixed.Index(Name,nameseparator) - 1 ) , setvalue ) ;
+         end ;
+      else
+         GNATCOLL.JSON.Set_Field( MsgContents , Name , Value ) ;
+      end if ;
+   end Set ;
+
+   procedure Set( Msg : in out Message_Type ; Name : String ; Value : GNATCOLL.JSON.JSON_Value ) is
+   begin
+      Set( Msg.Contents , Name , Value ) ;
+   end Set ;
 
 end Queue ;
