@@ -9,8 +9,10 @@ all :
 	gprbuild -p -P qmanager.gpr
 
 clean:
+	$(RM) \#*\#
+	$(RM) *~ 
 	gprclean -P qmanager.gpr
-	rm -f $(LISTINGS) $(LOGS)
+	$(RM) $(LISTINGS) $(LOGS)
 
 %.ads.lis : %.ads
 	lister $(<) > $(@)
