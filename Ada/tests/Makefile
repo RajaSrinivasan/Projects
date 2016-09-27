@@ -2,7 +2,7 @@
 SPECS := $(wildcard *.ads)
 BODIES := $(wildcard *.adb)
 LISTINGS := $(SPECS:%.ads=%.ads.lis) $(BODIES:%.adb=%.adb.lis)
-EXECS=crc16test factors_test numbers_test testlogging zlibtest jsontest texttest sqlitetest
+EXECS=crc16test factors_test numbers_test testlogging zlibtest jsontest texttest sqlitetest sieve
 LOGS= $(addsuffix .log,$(EXECS))
 EXECDIR=../build
 
@@ -14,6 +14,7 @@ all:
 	gprbuild -p -P jsontest
 	gprbuild -p -P texttest
 	gprbuild -p -P sqlitetest
+	gprbuild -p -P sieve
 
 clean:
 	gprclean -P crc16test
@@ -23,6 +24,7 @@ clean:
 	gprclean -P jsontest
 	gprclean -P texttest
 	gprclean -P sqlitetest
+	gprclean -P sieve
 	rm -f $(LISTINGS) $(LOGS)
 
 %.ads.lis : %.ads

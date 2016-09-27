@@ -1,0 +1,8 @@
+project Sieve is
+
+   for Source_Files use ("crc16test.adb", "factors_test.adb", "jsontest.adb", "numbers_test.adb", "sieve.adb", "sieve.adb", "sqlitetest.adb", "testlogging.adb", "texttest.adb", "zlibtest.adb");
+   for Main use ("sieve.adb");
+   for Exec_Dir use "../../build";
+
+end Sieve;
+
