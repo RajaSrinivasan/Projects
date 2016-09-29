@@ -1,4 +1,5 @@
 with Ada.Calendar ;
+with Ada.Strings.Unbounded ; use Ada.Strings.Unbounded ;
 
 with GNAT.Sockets ;
 with GNAT.Calendar ;
@@ -78,6 +79,13 @@ package Queue is
             when others => null ;
          end case ;
       end record ;
+
+   type Entry_Type is
+      record
+         CommandFile : Ada.Strings.Unbounded.Unbounded_String ;
+         Recurrence : Recurrence_Type ;
+      end record ;
+   type Entries_Type is array (Integer range <>) of Entry_Type ;
 
    procedure Set_Argument( Msg : in out Message_Type ;
                            Value : Recurrence_Type ) ;
