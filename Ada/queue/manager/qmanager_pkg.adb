@@ -1,9 +1,12 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io ;
+with Ada.Exceptions ;
+
 with Interfaces.C;          use Interfaces.C;
 
 with GNAT.Sockets ;
 with GNAT.Time_Stamp ;
+with GNAT.Source_Info ;
 
 with SQLite ;
 
@@ -72,7 +75,6 @@ package body Qmanager_Pkg is
          Datetime : aliased String := GNAT.Time_Stamp.Current_Time  ;
          FindStmt : SQLite.Statement :=  SQLite.Prepare(MyDb, "SELECT id FROM jobs WHERE added='" & Datetime & "';" ) ;
          client : aliased String := Queue.Get( Msg , "hostname" ) ;
-
       begin
          SQLite.Bind( InsertStmt , 1 , Filepath ) ;
          SQLite.Bind( InsertStmt , 2 , Datetime ) ;
@@ -82,6 +84,7 @@ package body Qmanager_Pkg is
          SQLite.Step( FindStmt ) ;
          NewId := SQLite.Column( FindStmt , 1 ) ;
          Put_Line("New Id " & Integer'Image(Integer(NewId)));
+
       exception
          when others =>
             Put_Line("Exception in SaveJob");
@@ -108,9 +111,13 @@ package body Qmanager_Pkg is
                                  Msg : Queue.Message_Type ) is
       Reply : Queue.Message_Type ;
       jobid : Integer := Queue.Get( Msg , "jobid" ) ;
-      DelStmt : SQLite.Statement := SQLite.Prepare(MyDb,"DELETE FROM jobs WHERE id = " & Integer'Image(jobid) & " ;") ;
+      --DelStmt : SQLite.Statement := SQLite.Prepare(MyDb,"DELETE FROM jobs WHERE id = " & Integer'Image(jobid) & " ;") ;
+      DelStmt : SQLite.Statement ;
+      --:= SQLite.Prepare(MyDb,"DELETE FROM badjobs WHERE id = " & Integer'Image(jobid) & " ;") ;
    begin
       Put_Line("Delete Job Service");
+      Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;      Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;
+      DelStmt := SQLite.Prepare(MyDb,"DELETE FROM badjobs WHERE id = " & Integer'Image(jobid) & " ;") ;
       Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;
       if QManager_Cli.Verbose
       then
@@ -120,10 +127,18 @@ package body Qmanager_Pkg is
       end if ;
       SQLite.Step( DelStmt ) ;
       Queue.Set_Argument( Reply , "R1/R2/R3" , "Region 1 , Region 2 , Region 3") ;
+      Queue.Set_Argument( Reply , "status" , "done" ) ;
       Queue.Send( client , Reply ) ;
    exception
-      when others =>
-         raise ;
+      when error : others =>
+         Put("Exception : "); Put( Ada.Exceptions.Exception_Name( error ) ) ;
+         New_Line ;
+         Put( GNAT.Source_Info.Enclosing_Entity ) ;
+         Put( " : " ) ;
+         Put( GNAT.Source_Info.Source_Location ) ;
+         New_Line ;
+         Queue.Set_Argument( Reply , "status" , "exception" ) ;
+         Queue.Send( client , Reply ) ;
    end Delete_Job_Service ;
 
    procedure ProvideService (Client : GNAT.Sockets.Socket_Type) Is
