@@ -113,11 +113,10 @@ package body Qmanager_Pkg is
       jobid : Integer := Queue.Get( Msg , "jobid" ) ;
       --DelStmt : SQLite.Statement := SQLite.Prepare(MyDb,"DELETE FROM jobs WHERE id = " & Integer'Image(jobid) & " ;") ;
       DelStmt : SQLite.Statement ;
-      --:= SQLite.Prepare(MyDb,"DELETE FROM badjobs WHERE id = " & Integer'Image(jobid) & " ;") ;
    begin
       Put_Line("Delete Job Service");
       Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;      Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;
-      DelStmt := SQLite.Prepare(MyDb,"DELETE FROM badjobs WHERE id = " & Integer'Image(jobid) & " ;") ;
+      DelStmt := SQLite.Prepare(MyDb,"DELETE FROM jobs WHERE id = " & Integer'Image(jobid) & " ;") ;
       Reply := Queue.Create( Queue.RESPONSE , Queue.DELETE_JOB ) ;
       if QManager_Cli.Verbose
       then
