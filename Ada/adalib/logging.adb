@@ -17,18 +17,79 @@ with Hex;
 
 package body logging is
 
-   procedure SetDestination (destination : Destination_Access_Type) is
-   begin
-      if Current_Destination /= null then
-         Close (Current_Destination.all);
-      end if;
-      Current_Destination := destination;
-   end SetDestination;
-
    package Sources_Pkg is new Ada.Containers.Vectors
      (Source_type,
       Unbounded_String);
+
    registered_sources : Sources_Pkg.Vector;
+
+   ----------------------------------- Sources ---------------------------------
+   procedure Register( source : String ;
+                       id : Source_Type := Source_Type'Last) is
+   begin
+      Sources_Pkg.Reserve_Capacity
+        (registered_sources,
+         Ada.Containers.Count_Type (Source_type'Last));
+      Sources_Pkg.Replace_Element( registered_sources ,
+                                   id ,
+                                   to_unbounded_string( source ) ) ;
+   end Register ;
+
+   -----------------
+   -- RegisterAll --
+   -----------------
+   procedure RegisterAll (filename : String) is
+      sourcesfile   : Ada.Text_IO.File_Type;
+      sourceline    : String (1 .. 32);
+      sourcelinelen : Natural ;
+      id : Source_Type := Source_Type'first ;
+   begin
+      Sources_Pkg.Reserve_Capacity
+        (registered_sources,
+         Ada.Containers.Count_Type (Source_type'Last));
+      Open (sourcesfile, In_File, filename);
+      while not End_Of_File (sourcesfile) loop
+         Get_Line (sourcesfile, sourceline, sourcelinelen);
+         pragma Debug
+           (Put_Line ("Registering " & sourceline (1 .. sourcelinelen)));
+         Register( id , sourceline(1..sourcelinelen) );
+         id := id + 1 ;
+      end loop;
+      Close (sourcesfile);
+   end RegisterAll;
+
+   function Get (source : Source_type) return String is
+      regsource : Unbounded_String;
+   begin
+      regsource := Sources_Pkg.Element (registered_sources, source);
+      return To_String (regsource);
+   exception
+      when others =>
+         return "Unknown";
+   end Get;
+
+   function Get (name : String) return Source_type is
+      use Sources_Pkg;
+      cursor : Sources_Pkg.Cursor;
+   begin
+      cursor :=
+        Sources_Pkg.Find (registered_sources, To_Unbounded_String (name));
+      if cursor = Sources_Pkg.No_Element then
+         Put_Line ("Did not find source " & name);
+         return Source_type'Last;
+      end if;
+      Put_Line ("Found the source " & name);
+      return Sources_Pkg.To_Index (cursor);
+   end Get;
+
+--     procedure SetDestination (destination : Destination_Access_Type) is
+--     begin
+--        if Current_Destination /= null then
+--           Close (Current_Destination.all);
+--        end if;
+--        Current_Destination := destination;
+--     end SetDestination;
+
 
    function Time_Stamp return String is
       ts : Unbounded_String :=
@@ -47,6 +108,7 @@ package body logging is
       return To_String (ts);
    end Time_Stamp;
 
+   ------------------------- Message Level ------------------------------------
    function Image (level : message_level_type) return String is
    begin
       case level is
@@ -60,78 +122,47 @@ package body logging is
             return "[I]";
          when others =>
             return "[" & message_level_type'Image (level) & "]";
-      end case;
-   end Image;
+                   end case;
+                   end Image;
 
-   -----------------
-   -- RegisterAll --
-   -----------------
-   procedure RegisterAll (filename : String) is
-      sourcesfile   : Ada.Text_IO.File_Type;
-      sourceline    : String (1 .. 32);
-      sourcelinelen : Natural;
+   current_message_level_Filter : message_level_type := Message_Level_Type'Last ;
+   procedure Filter( level : message_level_type := INFORMATIONAL ) is
    begin
-      Sources_Pkg.Reserve_Capacity
-        (registered_sources,
-         Ada.Containers.Count_Type (Source_type'Last));
-      Open (sourcesfile, In_File, filename);
-      while not End_Of_File (sourcesfile) loop
-         Get_Line (sourcesfile, sourceline, sourcelinelen);
-         pragma Debug
-           (Put_Line ("Registering " & sourceline (1 .. sourcelinelen)));
-         Sources_Pkg.Append
-           (registered_sources,
-            To_Unbounded_String (sourceline (1 .. sourcelinelen)));
-      end loop;
-      Close (sourcesfile);
-   end RegisterAll;
+      current_message_level_filter := level ;
+   end Filter ;
 
-   ---------
-   -- Get --
-   ---------
-
-   function Get (source : Source_type) return String is
-      regsource : Unbounded_String;
+   function Ignore( level : message_level_type ) return boolean is
    begin
-      regsource := Sources_Pkg.Element (registered_sources, source);
-      return To_String (regsource);
-   exception
-      when others =>
-         return "Unknown";
-   end Get;
+      if level < current_message_level_filter
+      then
+         return false ;
+      end if ;
+      return true ;
+   end Ignore ;
 
-   ---------
-   -- Get --
-   ---------
-
-   function Get (name : String) return Source_type is
-      use Sources_Pkg;
-      cursor : Sources_Pkg.Cursor;
+   -------------------------- Message Class -----------------------------------
+   package Message_Class_Pkg renames Sources_Pkg ;
+   filtered_classes : Message_Class_Pkg.Vector ;
+   procedure Filter( class : String ) is
+      msgclass : Message_Class_Type := Default_Message_Class ;
    begin
-      cursor :=
-        Sources_Pkg.Find (registered_sources, To_Unbounded_String (name));
-      if cursor = Sources_Pkg.No_Element then
-         Put_Line ("Did not find source " & name);
-         return Source_type'Last;
-      end if;
-      Put_Line ("Found the source " & name);
-      return Sources_Pkg.To_Index (cursor);
-   end Get;
+      Ada.Strings.Fixed.Move( class , msgclass , drop => Ada.Strings.Right ) ;
+   end Filter ;
 
-   function Image (packet : LogPacket_Type) return String is
-      destline : constant String :=
-        GNAT.Time_Stamp.Current_Time &
-        " " &
-        Get (packet.hdr.source) &
-        "> " &
-        packet.class &
-        "> " &
-        Image (packet.level) &
-        " " &
-        packet.message (1 .. packet.MessageLen);
-   begin
-      return destline;
-   end Image;
+--     function Image (packet : LogPacket_Type) return String is
+--        destline : constant String :=
+--          GNAT.Time_Stamp.Current_Time &
+--          " " &
+--          Get (packet.hdr.source) &
+--          "> " &
+--          packet.class &
+--          "> " &
+--          Image (packet.level) &
+--          " " &
+--          packet.message (1 .. packet.MessageLen);
+--     begin
+--        return destline;
+--     end Image;
 
    function Create (name : String) return TextFileDestinationAccess_Type is
       txtdest : TextFileDestinationAccess_Type := new TextFileDestination_Type;
