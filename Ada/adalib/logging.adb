@@ -52,7 +52,7 @@ package body logging is
          Get_Line (sourcesfile, sourceline, sourcelinelen);
          pragma Debug
            (Put_Line ("Registering " & sourceline (1 .. sourcelinelen)));
-         Register( id , sourceline(1..sourcelinelen) );
+         Register( sourceline(1..sourcelinelen) , id );
          id := id + 1 ;
       end loop;
       Close (sourcesfile);
@@ -149,6 +149,38 @@ package body logging is
       Ada.Strings.Fixed.Move( class , msgclass , drop => Ada.Strings.Right ) ;
    end Filter ;
 
+   current_destination : DestHandle_TYpe ;
+   procedure Set( dest : access destination_type ) is
+   begin
+      current_destination := dest ;
+   end Set ;
+
+      -- Simplest form of message
+   procedure Log( Message : String ;
+                  level : message_level_type := CRITICAL ;
+                  class : message_class_type := Default_Message_Class ) is
+   begin
+      Log( current_destination , message , level , class ) ;
+   end Log ;
+
+
+
+   procedure Log( dest : FileDestination_Type ;
+                  Message : String ;
+                  level : message_level_type := CRITICAL ;
+                  class : message_class_type := Default_Message_Class ) is
+   begin
+      Ada.Text_Io.Put( dest.file , GNAT.Time_Stamp.Current_Time ) ;
+      Ada.Text_Io.Put( dest.file , " " ) ;
+      Ada.Text_Io.Put( ) ;
+      Ada.Text_Io.Put( dest.file , " " ) ;
+      Ada.Text_Io.Put( dest.file , class ) ;
+      Ada.Text_Io.Put( dest.file , ">" ) ;
+      Ada.Text_Io.Put( dest.file , Image(level) ) ;
+      Ada.Text_Io.Put( dest.file , " " ) ;
+      Ada.Text_Io.Put_Line( dest.file , message ) ;
+   end Log ;
+
 --     function Image (packet : LogPacket_Type) return String is
 --        destline : constant String :=
 --          GNAT.Time_Stamp.Current_Time &
@@ -236,12 +268,5 @@ package body logging is
       ShowRecord (Destination.logfile.all, Packet);
    end SendRecord;
 
-   procedure SelfTest is
-   begin
-      for i in 1 .. 10 loop
-         Put_Line (Ada.Calendar.Formatting.Image (Ada.Calendar.Clock));
-         delay 0.5;
-      end loop;
-   end SelfTest;
 
 end logging;

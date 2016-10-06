@@ -47,13 +47,28 @@ package logging is
 
 
    type Destination_Type is abstract tagged null record ;
-   procedure Set( dest : in out destination_type ) ;
+   procedure Set( dest : access destination_type ) ;
 
-   -- Simplest form of message
+   -- Simplest form of message. Sent to the current destination
    procedure Log( Message : String ;
                   level : message_level_type := CRITICAL ;
                   class : message_class_type := Default_Message_Class ) ;
 
+   -- Simplest form of message. Sent to the current destination
+   procedure Log( dest : Destination_Type ;
+                  Message : String ;
+                  level : message_level_type := CRITICAL ;
+                  class : message_class_type := Default_Message_Class ) is abstract ;
+
+   type FileDestination_Type is new Destination_Type with
+      record
+         file : access ada.text_Io.File_Type ;
+      end record ;
+
+   procedure Log( dest : FileDestination_Type ;
+                  Message : String ;
+                  level : message_level_type := CRITICAL ;
+                  class : message_class_type := Default_Message_Class ) ;
 --     MAX_MESSAGE_LENGTH : constant := 132;
 --     type LogPacketHdr_Type is record
 --        source : Source_type;
