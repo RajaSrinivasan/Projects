@@ -5,5 +5,7 @@ package ramdesc.pmd is
                             ( to_unbounded_string("SECTORC") , 16#003f_0000# , 16#4000# ) ,
                             ( to_unbounded_string("SECTORD") , 16#003e_c000# , 16#4000# ) ,
                             ( to_unbounded_string("SECTORE") , 16#003e_8000# , 16#4000# ) ) ;
-  DSPPMD : aliased Controller_Type := ( To_Unbounded_String("PMD") , null ) ;
+   DSPPMD : aliased Controller_Type := ( To_Unbounded_String("PMD") , null ) ;
+private
+   procedure Initialize ;
 end ramdesc.pmd ;

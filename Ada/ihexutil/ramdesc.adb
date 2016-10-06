@@ -34,10 +34,6 @@ package body ramdesc is
        Put( To_String( Controller.Name ) ) ;
        New_Line ;
        Show( Controller.Flash ) ;
-    end Show ;
-begin
-   DSPPMD.Flash := new Flashram_Type( PMD'Range ) ;
-   DSPPMD.Flash.all := PMD ;
-   MCUAHPEPMPBM.Flash := new Flashram_Type( AHPEPMPBM'Range ) ;
-   MCUAHPEPMPBM.Flash.all := AHPEPMPBM ;
+   end Show ;
+   
 end ramdesc ;

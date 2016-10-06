@@ -11,6 +11,8 @@ with ihbr ; use ihbr ;
 with ihexutil_cli ;                            -- [cli/$_cli]
 with ihexutil_pkg ;
 with Ramdesc ;
+with ramdesc.pmd ;
+with ramdesc.ahpepmpbm ;
 
 procedure ihexutil is                  -- [clitest/$]
    Controller : access Ramdesc.Controller_Type ;
@@ -51,9 +53,9 @@ begin
       then
 	 if Ihexutil_Cli.Ramname.all = "PMD"
 	 then
-	    Controller := Ramdesc.DSPPMD'Access ;
+	    Controller := Ramdesc.pmd.DSPPMD'Access ;
 	 else
-	    Controller := Ramdesc.MCUAHPEPMPBM'Access ; 
+	    Controller := Ramdesc.ahpepmpbm.MCUAHPEPMPBM'Access ; 
 	 end if ;
       end if ;
       
