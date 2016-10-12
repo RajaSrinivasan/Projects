@@ -31,10 +31,12 @@ package mcu is
 
    type controller_type is abstract tagged
       record
+         typename : unbounded_string ;
          name : Unbounded_String ;
       end record ;
 
-   function Create( name : string ) return Controller_Type'Class ;
+   function Create( name : string ;
+                    mcutype : string ) return Controller_Type'Class ;
    procedure Initialize( controller : in out Controller_TYpe'Class ;
                          name : string ) ;
    procedure Set( controller : Controller_Type ;

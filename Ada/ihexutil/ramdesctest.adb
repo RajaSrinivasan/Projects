@@ -14,7 +14,7 @@ begin
    declare
       mcupmd : aliased mcu.tms320.f2810_Type ;
    begin
-      mcupmd := mcu.tms320.f2810_type(mcu.Create("PMD"));
+      mcupmd := mcu.tms320.f2810_type(mcu.Create( "PMD" , mcu.tms320.mcutype_f2810 ));
       mcu.Show(mcupmd'access) ;
    end ;
 

@@ -10,6 +10,8 @@ package mcu.tms320 is
       record
          flash : sectors_ptr_type(1..5) ;
       end record ;
+
+   mcutype_f2810 : string := "f2810" ;
    function Create( name : string ) return f2810_type ;
 
    procedure Set( controller : f2810_type ;

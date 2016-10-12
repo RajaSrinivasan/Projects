@@ -1,9 +1,10 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with mcu.tms320 ;
 package body mcu is
-   function Create( name : string ) return Controller_Type'Class is
+   function Create( name : string ;
+                    mcutype : string ) return Controller_Type'Class is
    begin
-      if name = "PMD"
+      if mcutype = "f2810"
       then
          return mcu.tms320.Create( name ) ;
       end if ;
