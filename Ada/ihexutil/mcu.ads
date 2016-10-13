@@ -14,18 +14,20 @@ package mcu is
    type bits16_memory_block_type is array (integer range <>) of unsigned_16 ;
    type bits16_memory_block_ptr_type is access all bits16_memory_block_type ;
 
-   type sector_type is tagged
+   type flash_type is tagged
       record
          name : unbounded_string ;
          start : Interfaces.Unsigned_32 ;
          length : Interfaces.Unsigned_16 ;
       end record ;
 
-   type sector_ptr_type is access all sector_type'class ;
-   type sectors_ptr_type is array (integer range <>) of sector_ptr_type ;
+   type flash_ptr_type is access all flash_type'class ;
 
-   function InSector( sector : sector_ptr_type ;
+   type sectors_ptr_type is array (integer range <>) of flash_ptr_type ;
+
+   function InSector( sector : flash_ptr_type ;
                       address : unsigned_32 ) return boolean ;
+
    function Insector( sectors : sectors_ptr_type ;
                       address : unsigned_32 ) return integer ;
 

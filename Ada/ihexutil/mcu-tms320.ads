@@ -1,14 +1,14 @@
 package mcu.tms320 is
 
-   type flash_type is new mcu.sector_Type with
+   type sector_type is new mcu.flash_Type with
       record
          ram : bits16_memory_block_ptr_type ;
       end record ;
-   type flash_ptr_type is access all flash_type ;
+   type sector_ptr_type is access all sector_type ;
 
    type f2810_Type is new mcu.Controller_Type with
       record
-         flash : sectors_ptr_type(1..5) ;
+         sectors : sectors_ptr_type(1..5) ;
       end record ;
 
    mcutype_f2810 : string := "f2810" ;

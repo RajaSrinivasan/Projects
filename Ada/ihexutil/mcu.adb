@@ -1,6 +1,7 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with mcu.tms320 ;
 package body mcu is
+
    function Create( name : string ;
                     mcutype : string ) return Controller_Type'Class is
    begin
@@ -17,7 +18,7 @@ package body mcu is
       controller.name := to_unbounded_string(name) ;
    end Initialize ;
 
-   function InSector( sector : sector_ptr_type ;
+   function InSector( sector : flash_ptr_type ;
                       address : unsigned_32 ) return boolean is
    begin
       if address >= sector.start and

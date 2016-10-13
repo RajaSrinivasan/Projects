@@ -6,14 +6,14 @@ package body mcu.tms320 is
    function Create( name : string ) return f2810_type is
       this : f2810_type ;
       procedure set_sector( num : integer ; name : string ; beginadr : Unsigned_32 ; length : Unsigned_16 ) is
-         thissector : flash_ptr_type := new flash_type ;
+         thissector : sector_ptr_type := new sector_type ;
       begin
          thissector.name := to_unbounded_string (name) ;
          thissector.start := beginadr ;
          thissector.length := length ;
-         flash_ptr_type(thissector).ram := new bits16_memory_block_type(1..integer(length)) ;
+         sector_ptr_type(thissector).ram := new bits16_memory_block_type(1..integer(length)) ;
          thissector.ram.all := (others => 16#ffff#) ;
-         this.flash(num) := sector_ptr_type(thissector) ;
+         this.sectors(num) := flash_ptr_type(thissector) ;
       end set_sector ;
 
    begin
@@ -32,13 +32,13 @@ package body mcu.tms320 is
                   value : Unsigned_32 ) is
       sector : integer ;
    begin
-      sector := InSector( controller.flash , ramaddress ) ;
-      if sector in controller.flash'range
+      sector := InSector( controller.sectors , ramaddress ) ;
+      if sector in controller.sectors'range
       then
          declare
-            flash : flash_ptr_type := flash_ptr_type( controller.flash(sector) ) ;
+            flash : sector_ptr_type := sector_ptr_type( controller.sectors(sector) ) ;
          begin
-            flash.ram.all( integer(ramaddress - controller.flash(sector).start) + 1) := unsigned_16(value) ;
+            flash.ram.all( integer(ramaddress - flash.start) + 1) := unsigned_16(value) ;
             return ;
          end ;
       end if ;
@@ -50,13 +50,13 @@ package body mcu.tms320 is
                 return Unsigned_32 is
       sector : integer ;
    begin
-      sector := InSector( controller.flash , ramaddress ) ;
-      if sector in controller.flash'range
+      sector := InSector( controller.sectors , ramaddress ) ;
+      if sector in controller.sectors'range
       then
          declare
-            flash : flash_ptr_type := flash_ptr_type( controller.flash(sector) ) ;
+            flash : sector_ptr_type := sector_ptr_type( controller.sectors(sector) ) ;
          begin
-            return unsigned_32( flash.ram.all( integer(ramaddress - controller.flash(sector).start) + 1)) ;
+            return unsigned_32( flash.ram.all( integer(ramaddress - flash.start) + 1)) ;
          end ;
       end if ;
       raise Program_error ;
@@ -65,17 +65,17 @@ package body mcu.tms320 is
 
    procedure Show( controller : f2810_type ) is
    begin
-      for sector in controller.flash'Range
+      for sector in controller.sectors'Range
       loop
          put("Sector ");
-         Put( to_string(controller.flash(sector).name)) ;
+         Put( to_string(controller.sectors(sector).name)) ;
          Put(" Start ");
-         Put( Integer( controller.flash(sector).start ) , base=>16 ) ;
+         Put( Integer( controller.sectors(sector).start ) , base=>16 ) ;
          Put( " Size " );
-         Put( Integer( Controller.flash(sector).length ) ) ;
+         Put( Integer( Controller.sectors(sector).length ) ) ;
          Put( " Last " ) ;
-         Put( Integer( Controller.flash(sector).start +
-                       Unsigned_32(Controller.flash(sector).length) - 1 ) , base=>16) ;
+         Put( Integer( Controller.sectors(sector).start +
+                       Unsigned_32(Controller.sectors(sector).length) - 1 ) , base=>16) ;
          New_Line;
       end loop ;
    end Show ;
