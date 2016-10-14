@@ -11,8 +11,8 @@ package body mcu.tms320 is
          thissector.name := to_unbounded_string (name) ;
          thissector.start := beginadr ;
          thissector.length := length ;
-         sector_ptr_type(thissector).ram := new bits16_memory_block_type(1..integer(length)) ;
-         thissector.ram.all := (others => 16#ffff#) ;
+         sector_ptr_type(thissector).flash := new bits16_memory_block_type(1..integer(length)) ;
+         thissector.flash.all := (others => 16#ffff#) ;
          this.sectors(num) := flash_ptr_type(thissector) ;
       end set_sector ;
 
@@ -38,7 +38,7 @@ package body mcu.tms320 is
          declare
             flash : sector_ptr_type := sector_ptr_type( controller.sectors(sector) ) ;
          begin
-            flash.ram.all( integer(ramaddress - flash.start) + 1) := unsigned_16(value) ;
+            flash.flash.all( integer(ramaddress - flash.start) + 1) := unsigned_16(value) ;
             return ;
          end ;
       end if ;
@@ -56,7 +56,7 @@ package body mcu.tms320 is
          declare
             flash : sector_ptr_type := sector_ptr_type( controller.sectors(sector) ) ;
          begin
-            return unsigned_32( flash.ram.all( integer(ramaddress - flash.start) + 1)) ;
+            return unsigned_32( flash.flash.all( integer(ramaddress - flash.start) + 1)) ;
          end ;
       end if ;
       raise Program_error ;

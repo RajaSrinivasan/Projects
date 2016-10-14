@@ -2,7 +2,7 @@ package mcu.tms320 is
 
    type sector_type is new mcu.flash_Type with
       record
-         ram : bits16_memory_block_ptr_type ;
+         flash : bits16_memory_block_ptr_type ;
       end record ;
    type sector_ptr_type is access all sector_type ;
 
