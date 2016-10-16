@@ -1,10 +1,15 @@
 with Ada.Text_Io; use Ada.Text_Io ;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_Io;
 with Ada.Strings.Unbounded ; use Ada.Strings.Unbounded ;
+with Ada.Strings.Fixed ; use Ada.Strings.Fixed ;
+
 with Ada.Long_Integer_Text_Io; use Ada.Long_Integer_Text_Io;
+
 with Interfaces ; use Interfaces ;
 
 with gnat.strings ; use gnat.strings ;
+
+
 with hex ; use hex ;
 with ihbr ; use ihbr ;
 
@@ -13,6 +18,10 @@ with ihexutil_pkg ;
 with Ramdesc ;
 with ramdesc.pmd ;
 with ramdesc.ahpepmpbm ;
+
+with mcu ;
+with mcu.tms320 ;
+with mcu.msc1210 ;
 
 procedure ihexutil is                  -- [clitest/$]
    Controller : access Ramdesc.Controller_Type ;
@@ -23,32 +32,28 @@ begin
    begin
       if ihexutil_cli.Verbose
       then
-         Put_Line("-----------------------------------------------------------") ;
-         Put("Show Option : ") ;
-         Put_Line(boolean'image(ihexutil_cli.showoption)) ;
-         Put("Memory Option : ");
-	 Put_Line(boolean'image(ihexutil_cli.memoryoption)) ;
-         Put("Hex File    : ") ;
-         Put_Line(arg) ;
-         Put("Hex Line    : ") ;
-         Put_Line(to_string( ihexutil_cli.hexline )) ;
-         Put("Add crc @   : ") ;
-         Put(ihexutil_cli.addcrcaddress) ;
-         new_line ;
-         Put("Output File : ");
-         Put_Line(ihexutil_cli.outputname.all);
-         Put("RAM section name : ") ;
-         if ihexutil_cli.ramname = null
-         then
-            Put_Line("Not specified");
-         else
-            Put_Line( ihexutil_cli.ramname.all ) ;
-         end if ;
-         Put("Word Length : ") ;
-         Put( ihexutil_cli.wordlength ) ;
-         New_Line ;
-         Put_Line("-----------------------------------------------------------") ;
+         ihexutil_cli.ShowArguments ;
       end if ;
+      if ihexutil_cli.mcuspec /= null
+      then
+         declare
+            mcuname, mcutype : unbounded_string ;
+            sep : integer; 
+         begin
+            sep := index( ihexutil_cli.mcuspec.all , ":" ) ;
+            if sep = 0
+            then
+               put_line("MCU spec should be name:type") ;
+               raise Program_Error ;
+            end if ;
+            mcuname := to_unbounded_string( head( ihexutil_cli.mcuspec.all , sep - 1 ) ) ;
+            mcutype := to_unbounded_string( tail( ihexutil_cli.mcuspec.all , sep + 1 ) ) ;
+            put("MCU Type : ") ; put_line( to_string(mcutype) ) ;
+            put("MCU Name : ") ; put_line( to_string(mcuname) ) ;
+         end ;
+         
+      end if ;
+      
       if Ihexutil_Cli.Ramname /= null
       then
 	 if Ihexutil_Cli.Ramname.all = "PMD"
@@ -75,4 +80,5 @@ begin
          ihexutil_pkg.CopyWithCRC( arg , ihexutil_cli.outputname.all , ihexutil_cli.addcrcaddress ) ;
       end if ;
    end ;
+   
 end ihexutil ;                         -- [clitest/$]

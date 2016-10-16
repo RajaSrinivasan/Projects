@@ -13,9 +13,14 @@ package ihexutil_cli is                                       -- [cli/$_cli]
    hexline : unbounded_string := null_unbounded_string ;
    outputname : aliased gnat.strings.string_access ;
    ramname : aliased gnat.strings.string_access ;
-
-   version : string := "IHEXUTIL_V03" ;
+   mcuspec : aliased gnat.strings.string_access ;
+   mcutype : unbounded_string := null_unbounded_string ;
+   mcuname : unbounded_string := null_unbounded_string ;
+   
+   version : string := "IHEXUTIL_V04" ;
    procedure ProcessCommandLine ;
    function GetNextArgument return String ;
 
+   procedure ShowArguments ;
+   
 end ihexutil_cli ;                                            -- [cli/$_cli]
