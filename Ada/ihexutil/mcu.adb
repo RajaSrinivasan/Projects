@@ -1,3 +1,4 @@
+with System.Storage_Elements ; use System.Storage_Elements ;
 with Ada.Text_Io; use Ada.Text_Io ;
 with mcu.tms320 ;
 with mcu.msc1210 ;
@@ -45,6 +46,8 @@ package body mcu is
       end loop ;
       return sectors'first-1 ;
    end InSector ;
+
+
 
    procedure Show( controller : access Controller_Type'Class ) is
    begin

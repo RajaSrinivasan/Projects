@@ -3,6 +3,7 @@ with Interfaces; use Interfaces ;
 with Ada.Containers.Vectors ;
 with Ada.Strings.Unbounded ; use Ada.Strings.Unbounded ;
 
+with ihbr ;
 
 package mcu is
 
@@ -41,12 +42,21 @@ package mcu is
                     mcutype : string ) return Controller_Type'Class ;
    procedure Initialize( controller : in out Controller_TYpe'Class ;
                          name : string ) ;
+
    procedure Set( controller : Controller_Type ;
-                 ramaddress : Unsigned_32 ;
+                 romaddress : Unsigned_32 ;
                  value : Unsigned_32 ) is abstract ;
    function Get( controller : Controller_Type ;
-                 ramaddress : Unsigned_32 )
+                 romaddress : Unsigned_32 )
                 return Unsigned_32 is abstract ;
+
+   procedure Set( controller : Controller_Type ;
+                  rom : ihbr.ihbr_Binary_Record_Type ) is abstract ;
+   function Get( controller : Controller_Type ;
+                 romaddress : Unsigned_32 ;
+                blocklen : integer )
+                return ihbr.ihbr_Binary_Record_Type is abstract ;
+
    procedure Show( controller : Controller_Type ) is abstract ;
    procedure Show( controller : access Controller_Type'Class ) ;
 

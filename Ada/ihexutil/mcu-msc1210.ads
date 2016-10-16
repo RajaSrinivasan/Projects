@@ -14,11 +14,17 @@ package mcu.msc1210 is
    function Create( name : string ) return msc1210_type ;
 
    procedure Set( controller : msc1210_type ;
-                 ramaddress : Unsigned_32 ;
+                 romaddress : Unsigned_32 ;
                  value : Unsigned_32 ) ;
    function Get( controller : msc1210_type ;
-                 ramaddress : Unsigned_32 )
+                 romaddress : Unsigned_32 )
                 return Unsigned_32 ;
+   procedure Set( controller : msc1210_type ;
+                  rom : ihbr.ihbr_Binary_Record_Type ) ;
+   function Get( controller : msc1210_type ;
+                 romaddress : Unsigned_32 ;
+                 blocklen : integer )
+                return ihbr.ihbr_Binary_Record_Type ;
    procedure Show( controller : msc1210_type ) ;
 
 end mcu.msc1210 ;

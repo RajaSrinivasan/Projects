@@ -1,3 +1,5 @@
+with System.Storage_Elements ; use System.Storage_Elements ;
+
 with Ada.Text_Io; use ADa.Text_Io ;
 with Ada.Integer_Text_IO ; use Ada.Integer_Text_IO ;
 
@@ -28,17 +30,17 @@ package body mcu.tms320 is
 
 
    procedure Set( controller : f2810_type ;
-                  ramaddress : Unsigned_32 ;
+                  romaddress : Unsigned_32 ;
                   value : Unsigned_32 ) is
       sector : integer ;
    begin
-      sector := InSector( controller.sectors , ramaddress ) ;
+      sector := InSector( controller.sectors , romaddress ) ;
       if sector in controller.sectors'range
       then
          declare
             flash : sector_ptr_type := sector_ptr_type( controller.sectors(sector) ) ;
          begin
-            flash.flash.all( integer(ramaddress - flash.start) + 1) := unsigned_16(value) ;
+            flash.flash.all( integer(romaddress - flash.start) + 1) := unsigned_16(value) ;
             return ;
          end ;
       end if ;
@@ -46,20 +48,68 @@ package body mcu.tms320 is
    end Set ;
 
    function Get( controller : f2810_Type ;
-                 ramaddress : Unsigned_32 )
+                 romaddress : Unsigned_32 )
                 return Unsigned_32 is
       sector : integer ;
    begin
-      sector := InSector( controller.sectors , ramaddress ) ;
+      sector := InSector( controller.sectors , romaddress ) ;
       if sector in controller.sectors'range
       then
          declare
             flash : sector_ptr_type := sector_ptr_type( controller.sectors(sector) ) ;
          begin
-            return unsigned_32( flash.flash.all( integer(ramaddress - flash.start) + 1)) ;
+            return unsigned_32( flash.flash.all( integer(romaddress - flash.start) + 1)) ;
          end ;
       end if ;
       raise Program_error ;
+   end Get ;
+
+  procedure Set( controller : f2810_type ;
+                 rom : ihbr.ihbr_Binary_Record_Type ) is
+      use ihbr ;
+      staddress : unsigned_32 := rom.description.low ;
+      numwords : integer := Integer(rom.DataRecLen) / 2 ;
+      nextword : unsigned_16 ;
+   begin
+      if rom.rectype /= ihbr.Data_Rec
+      then
+         raise Program_Error ;
+      end if ;
+      for w in 1..numwords
+      loop
+         nextword := Shift_Left(Unsigned_16(rom.Data( Storage_Offset(w*2 - 1 ))) , 8) +
+           Unsigned_16(rom.Data( Storage_Offset(w*2) )) ;
+         Set( controller , staddress , unsigned_32(nextword) ) ;
+         staddress := staddress + 1 ;
+      end loop ;
+   end Set ;
+
+   function Get( controller : f2810_type ;
+                 romaddress : Unsigned_32 ;
+                 blocklen : integer )
+                 return ihbr.ihbr_Binary_Record_Type is
+      rec : ihbr.Ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
+   begin
+      rec.description.low := romaddress ;
+      rec.description.high := Unsigned_32(Integer(romaddress)+blocklen-1) ;
+      rec.datareclen := Unsigned_8(blocklen) ;
+      rec.LoadOffset := Unsigned_16(romaddress) ;
+      rec.data := (others => 0) ;
+
+      for word in 1..blocklen/2
+      loop
+         declare
+            nextword : unsigned_16 := unsigned_16(Get(Controller,romaddress+Unsigned_32(word-1))) ;
+         begin
+            rec.data(Storage_Offset(word*2-1)) := Storage_Element(shift_right(nextword,8)) ;
+            rec.data(Storage_Offset(word*2)) := Storage_Element( nextword mod 256 ) ;
+         exception
+            when others =>
+               exit ;
+         end ;
+      end loop ;
+
+      return rec ;
    end Get ;
 
 
