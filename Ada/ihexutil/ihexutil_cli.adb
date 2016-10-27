@@ -45,7 +45,6 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                raise Program_Error ;
             end if ;
             mcuname := to_unbounded_string( head( Parameter , sep - 1 ) ) ;
-            -- mcutype := to_unbounded_string( tail( Parameter , sep + 1 ) ) ;
             mcutype := to_unbounded_string(Parameter(sep+1 .. Parameter'last)) ;
          end ;
       end if ;
@@ -65,17 +64,19 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                         showoption'access ,
                         Switch => "-s",
                         Long_Switch => "--show",
-                        Help => "Show the contents of the hex file");
+                                        Help => "Show the contents of the hex file");
+
       GNAT.Command_Line.Define_Switch (Config,
                        addcrcaddress'access ,
                        Switch => "-a:",
                        Long_Switch => "--add-crc:",
-                       Help => "Add computed CRC at address specified");
-      GNAT.Command_Line.Define_Switch( Config ,
-                       memoryoption'access ,
-                       Switch => "-m" ,
-                       Long_Switch => "--memory" ,
-                       Help => "show memory addresses" ) ;
+                                       Help => "Add computed CRC at address specified");
+
+--        GNAT.Command_Line.Define_Switch( Config ,
+--                         memoryoption'access ,
+--                         Switch => "-m" ,
+--                         Long_Switch => "--memory" ,
+--                         Help => "show memory addresses" ) ;
        GNAT.Command_Line.Define_Switch (Config,
                         Outputname'access ,
                         Switch => "-o:",
@@ -85,15 +86,16 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                           Switch => "-x:",
                           Long_Switch => "--hexline:",
                           Help => "Compute checksum for the hexline");
-        GNAT.Command_Line.Define_Switch( Config,
-                          Switch => "-r?" ,
-                          Long_Switch => "--ram-sec?" ,
-                          Help => "RAM section name") ;
-        GNAT.Command_Line.Define_Switch( Config ,
-                          wordlength'access ,
-                          Switch => "-w:" ,
-                          Long_Switch => "--word-length:" ,
-                                         Help => "Word length" ) ;
+--          GNAT.Command_Line.Define_Switch( Config,
+--                            Switch => "-r?" ,
+--                            Long_Switch => "--ram-sec?" ,
+--                                           Help => "RAM section name") ;
+--
+--          GNAT.Command_Line.Define_Switch( Config ,
+--                            wordlength'access ,
+--                            Switch => "-w:" ,
+--                            Long_Switch => "--word-length:" ,
+--                                           Help => "Word length" ) ;
 
          GNAT.Command_Line.Define_Switch( Config ,
                                           Switch => "-c:" ,
