@@ -77,15 +77,27 @@ package body mcu.tms320 is
       staddress : unsigned_32 := rom.description.low ;
       numwords : integer := Integer(rom.DataRecLen) / 2 ;
       nextword : unsigned_16 ;
+      sector : integer ;
+
    begin
       if rom.rectype /= ihbr.Data_Rec
       then
          raise Program_Error ;
       end if ;
+      sector := InSector( controller.sectors , staddress ) ;
       for w in 1..numwords
       loop
          nextword := Shift_Left(Unsigned_16(rom.Data( Storage_Offset(w*2 - 1 ))) , 8) +
            Unsigned_16(rom.Data( Storage_Offset(w*2) )) ;
+         if sector /= InSector(controller.sectors,staddress)
+         then
+            Put("Sector Violation at address ");
+            Put(integer(staddress)) ;
+            Put(integer(staddress) , base => 16) ;
+            Put(" discarding the rest of this ihbr") ;
+            New_Line ;
+            return ;
+         end if ;
          Set( controller , staddress , unsigned_32(nextword) ) ;
          staddress := staddress + 1 ;
       end loop ;
