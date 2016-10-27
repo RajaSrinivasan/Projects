@@ -10,66 +10,37 @@ with crc16 ; use crc16 ;
 
 with ihexutil_cli ;
 package body ihexutil_pkg is
+   
     procedure Show( filename : string ;
-                    memory : boolean := false ;
-		    Controller : access Ramdesc.Controller_Type := null ) is
+		    Controller : access mcu.Controller_Type'Class := null ) is
        use System.Storage_Elements ;
        hexfile : ihbr.File_Type ;
        hexrec : ihbr.Ihbr_Binary_Record_Type ;
        linecount : Integer := 0 ;
-       wordlength : integer := 1 ;
        
-       function VerifyRange( Sector : Ramdesc.Sector_Type ; Desc : Ihbr.Block_Desc_Type ) return Boolean is
-       begin
-	  if Desc.Low >= Sector.Start and
-	     Desc.Low < Sector.Start + Unsigned_32(Sector.Length) 
-	  then
-	     if Desc.High >= Sector.Start + Unsigned_32(Sector.Length)
-	     then
-		Put(Integer(Desc.High) , Base => 16 ) ; Put(" >= "); Put( Integer(Sector.Start) + Integer(Sector.Length) , Base => 16 ) ; New_Line ;
-		return False ;
-	     end if ;
-	  end if ;
-	  return True ;
-       end VerifyRange ;
-       procedure ReportRangeViolation( Sector : Ramdesc.Sector_Type ; Desc : Ihbr.Ihbr_Binary_Record_Type ) is
-       begin
-	  Put("Address violation : ") ;
-	  Put(To_String(Sector.Name)) ;
-	  New_Line ;
-       end ReportRangeViolation ;       
-       procedure VerifyRange is
-       begin
-	  for Sector in Controller.Flash'Range
-	  loop
-	     if not VerifyRange( Controller.Flash(Sector) , Hexrec.Description )
-	     then
-		ReportRangeViolation( Controller.Flash(Sector) , Hexrec ) ;
-	     end if ;
-	  end loop ;	  
-       end VerifyRange ;       
-
-    begin
-       if ihexutil_cli.wordlength > 0
-       then
-          wordlength := ihexutil_cli.wordlength ;
-       end if ;
-       ihbr.Open( filename , hexfile , wordlength );
+   begin
+      if Controller /= null
+      then
+         ihbr.Open( filename , hexfile , mcu.WordLength(Controller.all) );
+      else
+         ihbr.Open( filename , hexfile ) ;
+      end if ;
        while not ihbr.End_Of_File( hexfile )
        loop
            ihbr.GetNext( hexfile , hexrec ) ;
            linecount := linecount + 1 ;
-           ihbr.Show( hexrec , memory ) ;
+           ihbr.Show( hexrec , true ) ;
 	   if Controller /= null and then Hexrec.RecType = Ihbr.Data_Rec	     
-	   then
-	      VerifyRange ;
+         then
+              mcu.Set( Controller.all , hexrec ) ;
 	   end if ;
        end loop ;
        ihbr.Close( hexfile ) ;
        Put(Integer'Image(linecount));
        Put(" lines read from ");
        Put_Line(filename);
-    end Show ;
+   end Show ;
+   
     procedure CopyWithCRC( infilename : string ;
                            outfilename : string ;
                            crcaddress : integer ) is

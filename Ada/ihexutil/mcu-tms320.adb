@@ -64,6 +64,13 @@ package body mcu.tms320 is
       raise Program_error ;
    end Get ;
 
+   overriding
+   function WordLength( controller : f2810_Type )
+                       return Integer is
+   begin
+      return 2 ;
+   end WordLength ;
+
   procedure Set( controller : f2810_type ;
                  rom : ihbr.ihbr_Binary_Record_Type ) is
       use ihbr ;

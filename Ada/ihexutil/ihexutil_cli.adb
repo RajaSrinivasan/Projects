@@ -25,13 +25,7 @@ package body ihexutil_cli is                          -- [cli/$_cli]
        then
           hexline := to_unbounded_string( Parameter ) ;
        end if;
-       if Switch = "-r"
-       then
-	  Put("Ram section name ");
-	  Put_Line( Parameter ) ;
-	  Ramname := new String( Parameter'Range ) ;
-	  Ramname.all := Parameter ;
-      end if ;
+
 
       if Switch = "-c" or Switch = "--mcu-spec"
       then
@@ -72,11 +66,6 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                        Long_Switch => "--add-crc:",
                                        Help => "Add computed CRC at address specified");
 
---        GNAT.Command_Line.Define_Switch( Config ,
---                         memoryoption'access ,
---                         Switch => "-m" ,
---                         Long_Switch => "--memory" ,
---                         Help => "show memory addresses" ) ;
        GNAT.Command_Line.Define_Switch (Config,
                         Outputname'access ,
                         Switch => "-o:",
@@ -86,16 +75,6 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                           Switch => "-x:",
                           Long_Switch => "--hexline:",
                           Help => "Compute checksum for the hexline");
---          GNAT.Command_Line.Define_Switch( Config,
---                            Switch => "-r?" ,
---                            Long_Switch => "--ram-sec?" ,
---                                           Help => "RAM section name") ;
---
---          GNAT.Command_Line.Define_Switch( Config ,
---                            wordlength'access ,
---                            Switch => "-w:" ,
---                            Long_Switch => "--word-length:" ,
---                                           Help => "Word length" ) ;
 
          GNAT.Command_Line.Define_Switch( Config ,
                                           Switch => "-c:" ,
@@ -117,8 +96,6 @@ package body ihexutil_cli is                          -- [cli/$_cli]
       Put_Line("-----------------------------------------------------------") ;
       Put("Show Option : ") ;
       Put_Line(boolean'image(showoption)) ;
-      Put("Memory Option : ");
-      Put_Line(boolean'image(memoryoption)) ;
 
       Put("Hex Line    : ") ;
       Put_Line(to_string(hexline )) ;
@@ -127,16 +104,7 @@ package body ihexutil_cli is                          -- [cli/$_cli]
       new_line ;
       Put("Output File : ");
       Put_Line(outputname.all);
-      Put("RAM section name : ") ;
-      if ramname = null
-      then
-         Put_Line("Not specified");
-      else
-         Put_Line(ramname.all ) ;
-      end if ;
-      Put("Word Length : ") ;
-      Put( wordlength ) ;
-      New_Line ;
+
       Put("MCU Name ");
       put_line(to_string(mcuname));
       Put("MCU Type ");

@@ -40,8 +40,14 @@ package mcu is
 
    function Create( name : string ;
                     mcutype : string ) return Controller_Type'Class ;
+
+   function Create( name : unbounded_string ;
+                    mcutype : unbounded_string ) return Controller_Type'Class ;
+
    procedure Initialize( controller : in out Controller_TYpe'Class ;
                          name : string ) ;
+   function WordLength( controller : Controller_Type )
+              return Integer ;
 
    procedure Set( controller : Controller_Type ;
                  romaddress : Unsigned_32 ;

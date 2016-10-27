@@ -22,6 +22,10 @@ package mcu.tms320 is
    function Get( controller : f2810_Type ;
                  romaddress : Unsigned_32 )
                 return Unsigned_32 ;
+   overriding
+   function WordLength( controller : f2810_Type )
+                       return Integer ;
+
    procedure Set( controller : f2810_Type ;
                   rom : ihbr.ihbr_Binary_Record_Type ) ;
    function Get( controller : f2810_type ;
