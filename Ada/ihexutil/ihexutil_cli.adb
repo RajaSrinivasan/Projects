@@ -26,7 +26,6 @@ package body ihexutil_cli is                          -- [cli/$_cli]
           hexline := to_unbounded_string( Parameter ) ;
        end if;
 
-
       if Switch = "-c" or Switch = "--mcu-spec"
       then
          declare
@@ -42,46 +41,44 @@ package body ihexutil_cli is                          -- [cli/$_cli]
             mcutype := to_unbounded_string(Parameter(sep+1 .. Parameter'last)) ;
          end ;
       end if ;
-
     end SwitchHandler ;
 
     procedure ProcessCommandLine is
         Config : GNAT.Command_Line.Command_Line_Configuration;
     begin
-        GNAT.Command_Line.Define_Switch (Config,
-                       verbose'access ,
-                       Switch => "-v?",
-                       Long_Switch => "--verbose?",
-                       Help => "Output extra verbose information");
-
+      GNAT.Command_Line.Define_Switch (Config,
+                                       verbose'access ,
+                                       Switch => "-v?",
+                                       Long_Switch => "--verbose?",
+                                       Help => "Output extra verbose information");
        GNAT.Command_Line.Define_Switch (Config,
-                        showoption'access ,
-                        Switch => "-s",
-                        Long_Switch => "--show",
+                                        showoption'access ,
+                                        Switch => "-s",
+                                        Long_Switch => "--show",
                                         Help => "Show the contents of the hex file");
 
       GNAT.Command_Line.Define_Switch (Config,
-                       addcrcaddress'access ,
-                       Switch => "-a:",
-                       Long_Switch => "--add-crc:",
+                                       addcrcaddress'access ,
+                                       Switch => "-a:",
+                                       Long_Switch => "--add-crc:",
                                        Help => "Add computed CRC at address specified");
 
-       GNAT.Command_Line.Define_Switch (Config,
-                        Outputname'access ,
-                        Switch => "-o:",
-                        Long_Switch => "--output:",
-                        Help => "Output file name");
-        GNAT.Command_Line.Define_Switch (Config,
-                          Switch => "-x:",
-                          Long_Switch => "--hexline:",
-                          Help => "Compute checksum for the hexline");
+      GNAT.Command_Line.Define_Switch (Config,
+                                       Outputname'access ,
+                                       Switch => "-o:",
+                                       Long_Switch => "--output:",
+                                       Help => "Output file name");
+      GNAT.Command_Line.Define_Switch (Config,
+                                       Switch => "-x:",
+                                       Long_Switch => "--hexline:",
+                                       Help => "Compute checksum for the hexline");
 
-         GNAT.Command_Line.Define_Switch( Config ,
-                                          Switch => "-c:" ,
-                                          Long_Switch => "--mcu-spec:" ,
-                                          Help => "MCU name and type e.g. PMD:f2810 or AHP:msc1210" ) ;
+      GNAT.Command_Line.Define_Switch( Config ,
+                                       Switch => "-c:" ,
+                                       Long_Switch => "--mcu-spec:" ,
+                                       Help => "MCU name and type e.g. PMD:f2810 or AHP:msc1210" ) ;
 
-        GNAT.Command_Line.Getopt(config,SwitchHandler'access);
+      GNAT.Command_Line.Getopt(config,SwitchHandler'access);
 
     end ProcessCommandLine;
 

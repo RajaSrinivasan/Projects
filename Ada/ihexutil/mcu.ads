@@ -23,7 +23,6 @@ package mcu is
       end record ;
 
    type flash_ptr_type is access all flash_type'class ;
-
    type sectors_ptr_type is array (integer range <>) of flash_ptr_type ;
 
    function InSector( sector : flash_ptr_type ;
@@ -39,15 +38,31 @@ package mcu is
       end record ;
 
    function Create( name : string ;
-                    mcutype : string ) return Controller_Type'Class ;
+                    mcutype : string )
+                   return Controller_Type'Class ;
 
    function Create( name : unbounded_string ;
-                    mcutype : unbounded_string ) return Controller_Type'Class ;
+                    mcutype : unbounded_string )
+                   return Controller_Type'Class ;
 
    procedure Initialize( controller : in out Controller_TYpe'Class ;
                          name : string ) ;
+
+   procedure LoadHexFile( controller : in out Controller_Type'Class ;
+                          hexfilename : string ) ;
+
+   procedure GenerateHexFile( controller : Controller_Type'Class ;
+                              hexfilename : string ;
+                              blocklen : integer ) ;
+
    function WordLength( controller : Controller_Type )
-              return Integer ;
+                       return Integer ;
+
+   function CRC( controller : Controller_Type )
+                return Unsigned_16 is abstract ;
+
+   procedure CRC( controller : in out Controller_Type ;
+                  crcaddress : Unsigned_32 ) is abstract ;
 
    procedure Set( controller : Controller_Type ;
                  romaddress : Unsigned_32 ;
@@ -58,10 +73,11 @@ package mcu is
 
    procedure Set( controller : Controller_Type ;
                   rom : ihbr.ihbr_Binary_Record_Type ) is abstract ;
-   function Get( controller : Controller_Type ;
-                 romaddress : Unsigned_32 ;
-                blocklen : integer )
-                return ihbr.ihbr_Binary_Record_Type is abstract ;
+   procedure Get( controller : Controller_Type ;
+                  romaddress : in out Unsigned_32 ;
+                  blocklen : integer ;
+                  End_Of_Memory : out boolean ;
+                  rec : out ihbr.Ihbr_Binary_Record_Type ) is abstract ;
 
    procedure Show( controller : Controller_Type ) is abstract ;
    procedure Show( controller : access Controller_Type'Class ) ;

@@ -14,6 +14,7 @@ package mcu.tms320 is
    mcutype_f2810 : string := "f2810" ;
    function Create( name : string ) return f2810_type ;
 
+
    overriding
    procedure Set( controller : f2810_type ;
                  romaddress : Unsigned_32 ;
@@ -28,10 +29,19 @@ package mcu.tms320 is
 
    procedure Set( controller : f2810_Type ;
                   rom : ihbr.ihbr_Binary_Record_Type ) ;
-   function Get( controller : f2810_type ;
-                 romaddress : Unsigned_32 ;
-                blocklen : integer )
-                return ihbr.ihbr_Binary_Record_Type ;
+
+   procedure Get( controller : f2810_type ;
+                  romaddress : in out Unsigned_32 ;
+                  blocklen : integer ;
+                  End_Of_Memory : out boolean ;
+                  rec : out ihbr.Ihbr_Binary_Record_Type ) ;
+
+   function CRC( controller : f2810_Type )
+                return Unsigned_16 ;
+
+   procedure CRC( controller : in out f2810_type ;
+                  crcaddress : Unsigned_32 ) ;
+
    procedure Show( controller : f2810_type ) ;
 
 end mcu.tms320 ;

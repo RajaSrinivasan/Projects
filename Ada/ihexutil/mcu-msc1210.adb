@@ -3,6 +3,8 @@ with System.Storage_ELements ; use System.Storage_Elements ;
 with Ada.Text_Io; use Ada.Text_Io;
 with Ada.Integer_Text_Io; use Ada.Integer_Text_IO ;
 
+with crc16 ;
+
 package body mcu.msc1210 is
 
 
@@ -54,31 +56,59 @@ package body mcu.msc1210 is
       end loop ;
    end Set ;
 
-   function Get( controller : msc1210_type ;
-                 romaddress : Unsigned_32 ;
-                blocklen : integer )
-                return ihbr.ihbr_binary_record_type is
-      rec : ihbr.ihbr_binary_record_type( ihbr.Data_Rec ) ;
+   procedure Get( controller : msc1210_type ;
+                 romaddress : in out Unsigned_32 ;
+                 blocklen : integer ;
+                 End_Of_Memory : out boolean ;
+                 rec : out ihbr.Ihbr_Binary_Record_Type ) is
+      myrec : ihbr.ihbr_binary_record_type( ihbr.Data_Rec ) ;
+
    begin
-      rec.description.low := romaddress ;
-      rec.description.high := Unsigned_32(Integer(romaddress)+blocklen-1) ;
-      rec.datareclen := Unsigned_8(blocklen) ;
-      rec.LoadOffset := Unsigned_16(romaddress) ;
-      rec.data := (others => 0) ;
+      End_Of_Memory := false ;
+      if romaddress > Unsigned_32(controller.flash.rom'length)
+      then
+         End_Of_Memory := true ;
+         return ;
+      end if ;
+
+      End_Of_Memory := false ;
+
+      myrec.description.low := romaddress ;
+      myrec.description.high := Unsigned_32(Integer(romaddress)+blocklen-1) ;
+      myrec.datareclen := 0 ;
+      myrec.LoadOffset := Unsigned_16(romaddress) ;
+      myrec.data := (others => 0) ;
 
       for byte in 1..blocklen
       loop
          begin
-            rec.data(Storage_Offset(byte)) := Storage_Element((Get(Controller,romaddress+Unsigned_32(byte-1)))) ;
+            myrec.data(Storage_Offset(byte)) := Storage_Element((Get(Controller,romaddress))) ;
+            myrec.datareclen := rec.datareclen + 1 ;
+            romaddress := romaddress + 1 ;
          exception
             when others =>
                exit ;
          end ;
       end loop ;
-
-      return rec ;
+      rec  := myrec ;
    end Get ;
 
+   function CRC( controller : msc1210_type )
+                     return Unsigned_16 is
+      crc : unsigned_16 := 0 ;
+   begin
+      crc := crc16.Compute( Controller.flash.rom.all'address , controller.flash.rom.all'Length ) ;
+      return crc ;
+   end CRC ;
+
+
+   procedure CRC( controller : in out msc1210_type ;
+                  crcaddress : Unsigned_32 ) is
+      crc : unsigned_16 := 0 ;
+   begin
+      crc := crc16.Compute( Controller.flash.rom.all'address , controller.flash.rom.all'Length ) ;
+      Set( controller , crcaddress , unsigned_32(crc) );
+   end CRC ;
 
    procedure Show( controller : msc1210_type ) is
    begin

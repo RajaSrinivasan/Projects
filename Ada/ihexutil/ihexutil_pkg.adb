@@ -43,34 +43,28 @@ package body ihexutil_pkg is
    
     procedure CopyWithCRC( infilename : string ;
                            outfilename : string ;
-                           crcaddress : integer ) is
+                           crcaddress : integer ;
+                          Controller : not null access mcu.Controller_Type'Class ) is
       hexfilein, hexfileout : ihbr.File_Type ;
       hexrec : ihbr.Ihbr_Binary_Record_Type ;
       linecount : Integer := 0 ;
-      checksum : Interfaces.Unsigned_16 := 0 ;
+      CRC : unsigned_16 := 0 ;
     begin
-        ihbr.Open( infilename , hexfilein );
+        ihbr.Open( infilename , hexfilein , mcu.WordLength(Controller.all) );
         hexfileout := ihbr.Create( outfilename );
         while not ihbr.End_Of_File( hexfilein )
         loop
           ihbr.GetNext( hexfilein , hexrec ) ;
           linecount := linecount + 1 ;
-          if hexrec.RecType = ihbr.Data_Rec
-          then
-              crc16.Update( checksum , hexrec.Data(1)'Address , Integer(hexrec.DataRecLen) , checksum ) ;
-          elsif hexrec.RecType = ihbr.End_Of_File_Rec
-          then
+         if hexrec.RecType = ihbr.Data_Rec
+         then
+            mcu.Set( Controller.all , hexrec ) ; 
+         elsif hexrec.RecType = ihbr.End_Of_File_Rec
+         then
             if crcaddress > 0
-            then
-                declare
-                   csrec : ihbr.Ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
-                begin
-                   csrec.DataRecLen := 2 ;
-                   csrec.Data(1) := System.Storage_Elements.Storage_Element(checksum and 16#00ff#) ;
-                   csrec.Data(2) := System.Storage_Elements.Storage_Element(Shift_Right(checksum,8)) ;
-                   csrec.LoadOffset := Unsigned_16(crcaddress) ;
-                   ihbr.PutNext( hexfileout , csrec ) ;
-                end ;
+            then 
+               mcu.CRC( Controller.all , Unsigned_32(crcaddress) ) ;
+               crc := mcu.CRC( Controller.all ) ;                       
             end if ;
           end if ;
           ihbr.PutNext( hexfileout , hexrec ) ;
@@ -82,7 +76,7 @@ package body ihexutil_pkg is
             Put( linecount ) ; Put( " records copied from ") ;
             Put(infilename) ; Put(" to ") ; Put( outfilename ) ;
             New_Line ;
-            Put("Checksum Calculated ") ; Put( Integer(checksum) ) ;
+            Put("Checksum Calculated ") ; Put( Integer(CRC) ) ;
             New_Line ;
         end if ;
     end CopyWithCRC ;

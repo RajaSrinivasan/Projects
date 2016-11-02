@@ -3,6 +3,8 @@ with System.Storage_Elements ; use System.Storage_Elements ;
 with Ada.Text_Io; use ADa.Text_Io ;
 with Ada.Integer_Text_IO ; use Ada.Integer_Text_IO ;
 
+with crc16 ;
+
 package body mcu.tms320 is
 
    function Create( name : string ) return f2810_type is
@@ -27,7 +29,6 @@ package body mcu.tms320 is
       set_sector(5 , "SECTORE" , 16#003e_8000# , 16#4000# ) ;
       return this ;
    end create ;
-
 
    procedure Set( controller : f2810_type ;
                   romaddress : Unsigned_32 ;
@@ -103,34 +104,71 @@ package body mcu.tms320 is
       end loop ;
    end Set ;
 
-   function Get( controller : f2810_type ;
-                 romaddress : Unsigned_32 ;
-                 blocklen : integer )
-                 return ihbr.ihbr_Binary_Record_Type is
-      rec : ihbr.Ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
+   procedure Get( controller : f2810_type ;
+                  romaddress : in out Unsigned_32 ;
+                  blocklen : integer ;
+                  end_of_memory : out boolean ;
+                  rec : out ihbr.Ihbr_Binary_Record_Type ) is
+
+      myrec : ihbr.Ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
    begin
-      rec.description.low := romaddress ;
-      rec.description.high := Unsigned_32(Integer(romaddress)+blocklen-1) ;
-      rec.datareclen := Unsigned_8(blocklen) ;
-      rec.LoadOffset := Unsigned_16(romaddress) ;
-      rec.data := (others => 0) ;
+      if romaddress > controller.sectors(1).start + Unsigned_32(controller.sectors(1).length)
+      then
+         end_of_memory := true ;
+         return ;
+      end if ;
+      end_of_memory := false ;
+      if romaddress = 0
+      then
+         romaddress := controller.sectors(5).start ;
+      end if ;
+
+      myrec.description.low := romaddress ;
+      myrec.description.high := Unsigned_32(Integer(romaddress)+blocklen-1) ;
+
+      myrec.LoadOffset := Unsigned_16(romaddress) ;
+      myrec.data := (others => 0) ;
 
       for word in 1..blocklen/2
       loop
          declare
-            nextword : unsigned_16 := unsigned_16(Get(Controller,romaddress+Unsigned_32(word-1))) ;
+            nextword : unsigned_16 := unsigned_16(Get(Controller,romaddress)) ;
          begin
-            rec.data(Storage_Offset(word*2-1)) := Storage_Element(shift_right(nextword,8)) ;
-            rec.data(Storage_Offset(word*2)) := Storage_Element( nextword mod 256 ) ;
+            myrec.data(Storage_Offset(word*2-1)) := Storage_Element(shift_right(nextword,8)) ;
+            myrec.data(Storage_Offset(word*2)) := Storage_Element( nextword mod 256 ) ;
+            myrec.datareclen := myrec.DataRecLen + 1 ;
+            romaddress := romaddress + 1 ;
          exception
             when others =>
                exit ;
          end ;
       end loop ;
-
-      return rec ;
+      rec := myrec ;
    end Get ;
 
+   function CRC( controller : f2810_Type )
+                return Unsigned_16 IS
+      crc : unsigned_16 := 0 ;
+   begin
+      for sector in controller.sectors'Range
+      loop
+         crc16.Update(crc , Sector_type(Controller.Sectors(sector).all).flash.all'address ,
+                      Sector_Type(Controller.Sectors(sector).all).flash.all'length , crc ) ;
+      end loop ;
+      return crc ;
+   end CRC ;
+
+   procedure CRC( controller : in out f2810_type ;
+                  crcaddress : Unsigned_32 ) is
+      crc : unsigned_16 := 0 ;
+   begin
+      for sector in controller.sectors'Range
+      loop
+         crc16.Update(crc , Sector_type(Controller.Sectors(sector).all).flash.all'address ,
+                      Sector_Type(Controller.Sectors(sector).all).flash.all'length , crc ) ;
+      end loop ;
+      Set( controller , crcaddress , Unsigned_32(crc) ) ;
+   end CRC ;
 
    procedure Show( controller : f2810_type ) is
    begin
