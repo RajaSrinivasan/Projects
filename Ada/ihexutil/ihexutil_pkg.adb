@@ -41,9 +41,9 @@ package body ihexutil_pkg is
        Put_Line(filename);
    end Show ;
    
-    procedure CopyWithCRC( infilename : string ;
+    procedure CopyWithCRCObs( infilename : string ;
                            outfilename : string ;
-                           crcaddress : integer ;
+                           crcaddress : Unsigned_32 ;
                           Controller : not null access mcu.Controller_Type'Class ) is
       hexfilein, hexfileout : ihbr.File_Type ;
       hexrec : ihbr.Ihbr_Binary_Record_Type ;
@@ -63,8 +63,7 @@ package body ihexutil_pkg is
          then
             if crcaddress > 0
             then 
-               mcu.CRC( Controller.all , Unsigned_32(crcaddress) ) ;
-               crc := mcu.CRC( Controller.all ) ;                       
+               mcu.StoreCRC( Controller.all , crcaddress ) ;                     
             end if ;
           end if ;
           ihbr.PutNext( hexfileout , hexrec ) ;
@@ -79,7 +78,18 @@ package body ihexutil_pkg is
             Put("Checksum Calculated ") ; Put( Integer(CRC) ) ;
             New_Line ;
         end if ;
-    end CopyWithCRC ;
+   end CopyWithCRCObs ;
+   
+   procedure CopyWithCRC( infilename : string ;
+                          outfilename : string ;
+                          crcaddress : Unsigned_32 ;
+                          Controller : not null access mcu.Controller_Type'Class ) is
+   begin
+      mcu.LoadHexFile(Controller.all , infilename ) ;
+      mcu.StoreCRC(Controller.all , crcaddress ) ;
+      mcu.GenerateHexFile(Controller.all,outfilename,mcu.WordLength(Controller.all)*ihbr.WORDS_IN_LINE) ;
+   end CopyWithCRC;
+   
     procedure Checksum( line : string ) is
        cs : Interfaces.Unsigned_8 ;
     begin

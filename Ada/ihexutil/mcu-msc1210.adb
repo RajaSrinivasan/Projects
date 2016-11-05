@@ -18,6 +18,24 @@ package body mcu.msc1210 is
       return this ;
    end Create ;
 
+   procedure GenerateHexFile( controller : msc1210_type ;
+                              hexfilename : string ;
+                              blocklen : integer ) is
+      hexfileout : ihbr.File_Type ;
+      hexrec : ihbr.Ihbr_Binary_Record_Type ;
+      linecount : Integer := 0 ;
+      romaddress : Unsigned_32 := 0 ;
+      CRC : unsigned_16 := 0 ;
+      end_of_memory : boolean := false ;
+   begin
+      hexfileout := ihbr.Create( hexfilename );
+      while not End_Of_Memory
+      loop
+         Get( controller , romaddress , blocklen , end_of_memory , hexrec ) ;
+         ihbr.PutNext( hexfileout , hexrec ) ;
+      end loop ;
+      ihbr.Close( hexfileout ) ;
+   end GenerateHexFile ;
 
    procedure Set( controller : msc1210_type ;
                   romaddress : Unsigned_32 ;
@@ -102,13 +120,13 @@ package body mcu.msc1210 is
    end CRC ;
 
 
-   procedure CRC( controller : in out msc1210_type ;
-                  crcaddress : Unsigned_32 ) is
-      crc : unsigned_16 := 0 ;
+   procedure StoreCRC( controller : in out msc1210_type ;
+                       crcaddress : Unsigned_32 ) is
+      tempcrc : unsigned_16 := 0 ;
    begin
-      crc := crc16.Compute( Controller.flash.rom.all'address , controller.flash.rom.all'Length ) ;
-      Set( controller , crcaddress , unsigned_32(crc) );
-   end CRC ;
+      tempcrc := CRC(controller) ;
+      Set( controller , crcaddress , unsigned_32(tempcrc) );
+   end StoreCRC ;
 
    procedure Show( controller : msc1210_type ) is
    begin

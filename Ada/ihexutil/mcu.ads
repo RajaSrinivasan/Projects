@@ -51,9 +51,9 @@ package mcu is
    procedure LoadHexFile( controller : in out Controller_Type'Class ;
                           hexfilename : string ) ;
 
-   procedure GenerateHexFile( controller : Controller_Type'Class ;
+   procedure GenerateHexFile( controller : Controller_Type ;
                               hexfilename : string ;
-                              blocklen : integer ) ;
+                              blocklen : integer ) is abstract ;
 
    function WordLength( controller : Controller_Type )
                        return Integer ;
@@ -61,8 +61,8 @@ package mcu is
    function CRC( controller : Controller_Type )
                 return Unsigned_16 is abstract ;
 
-   procedure CRC( controller : in out Controller_Type ;
-                  crcaddress : Unsigned_32 ) is abstract ;
+   procedure StoreCRC( controller : in out Controller_Type ;
+                       crcaddress : Unsigned_32 ) is abstract ;
 
    procedure Set( controller : Controller_Type ;
                  romaddress : Unsigned_32 ;

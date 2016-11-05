@@ -49,7 +49,7 @@ begin
                      Put_Line("Need an output file name to generate CRC") ;
                      return ;
                   end if ;
-                  ihexutil_pkg.CopyWithCRC( arg , ihexutil_cli.outputname.all , ihexutil_cli.addcrcaddress ,
+                  ihexutil_pkg.CopyWithCRC( arg , ihexutil_cli.outputname.all , Unsigned_32(ihexutil_cli.addcrcaddress) ,
                                            ctrl'access ) ;
                end if ;
             end if ;

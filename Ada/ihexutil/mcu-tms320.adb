@@ -30,6 +30,14 @@ package body mcu.tms320 is
       return this ;
    end create ;
 
+   overriding
+   procedure GenerateHexFile( controller : f2810_type ;
+                              hexfilename : string ;
+                              blocklen : integer ) is
+   begin
+      Put_Line("Generating Hex File") ;
+   end GenerateHexFile ;
+
    procedure Set( controller : f2810_type ;
                   romaddress : Unsigned_32 ;
                   value : Unsigned_32 ) is
@@ -45,6 +53,9 @@ package body mcu.tms320 is
             return ;
          end ;
       end if ;
+      Put("Invalid ROM address ");
+      Put( Integer(romaddress) , base => 16  ) ;
+      New_Line ;
       raise Program_Error;
    end Set ;
 
@@ -158,17 +169,13 @@ package body mcu.tms320 is
       return crc ;
    end CRC ;
 
-   procedure CRC( controller : in out f2810_type ;
-                  crcaddress : Unsigned_32 ) is
-      crc : unsigned_16 := 0 ;
+   procedure StoreCRC( controller : in out f2810_type ;
+                       crcaddress : Unsigned_32 ) is
+      tempcrc : unsigned_16 := 0 ;
    begin
-      for sector in controller.sectors'Range
-      loop
-         crc16.Update(crc , Sector_type(Controller.Sectors(sector).all).flash.all'address ,
-                      Sector_Type(Controller.Sectors(sector).all).flash.all'length , crc ) ;
-      end loop ;
-      Set( controller , crcaddress , Unsigned_32(crc) ) ;
-   end CRC ;
+      tempcrc := CRC(controller) ;
+      Set( controller , crcaddress , Unsigned_32(tempcrc) ) ;
+   end StoreCRC ;
 
    procedure Show( controller : f2810_type ) is
    begin

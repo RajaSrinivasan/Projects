@@ -55,7 +55,7 @@ package Ihbr is
 
    type File_Type is private;
    MAX_LINE_LENGTH : constant := 300;
-
+   WORDS_IN_LINE : constant := 16 ;
    procedure Open (Name : String; File : out File_Type; wordlength : integer := 1 );
    function Create (name : String) return File_Type;
    procedure Close (File : in out File_Type);

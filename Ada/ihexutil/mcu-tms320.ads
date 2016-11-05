@@ -14,7 +14,10 @@ package mcu.tms320 is
    mcutype_f2810 : string := "f2810" ;
    function Create( name : string ) return f2810_type ;
 
-
+   overriding
+   procedure GenerateHexFile( controller : f2810_type ;
+                              hexfilename : string ;
+                              blocklen : integer ) ;
    overriding
    procedure Set( controller : f2810_type ;
                  romaddress : Unsigned_32 ;
@@ -39,7 +42,7 @@ package mcu.tms320 is
    function CRC( controller : f2810_Type )
                 return Unsigned_16 ;
 
-   procedure CRC( controller : in out f2810_type ;
+   procedure StoreCRC( controller : in out f2810_type ;
                   crcaddress : Unsigned_32 ) ;
 
    procedure Show( controller : f2810_type ) ;

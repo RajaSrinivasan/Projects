@@ -13,6 +13,10 @@ package mcu.msc1210 is
    mcutype_msc1210 : string := "msc1210" ;
    function Create( name : string ) return msc1210_type ;
 
+   overriding
+   procedure GenerateHexFile( controller : msc1210_type ;
+                              hexfilename : string ;
+                              blocklen : integer ) ;
    procedure Set( controller : msc1210_type ;
                  romaddress : Unsigned_32 ;
                  value : Unsigned_32 ) ;
@@ -31,8 +35,8 @@ package mcu.msc1210 is
    function CRC( controller : msc1210_type )
                      return Unsigned_16 ;
 
-   procedure CRC( controller : in out msc1210_type ;
-                  crcaddress : Unsigned_32 ) ;
+   procedure StoreCRC( controller : in out msc1210_type ;
+                       crcaddress : Unsigned_32 ) ;
 
    procedure Show( controller : msc1210_type ) ;
 
