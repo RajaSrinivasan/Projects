@@ -34,8 +34,41 @@ package body mcu.tms320 is
    procedure GenerateHexFile( controller : f2810_type ;
                               hexfilename : string ;
                               blocklen : integer ) is
+      hexfileout : ihbr.File_Type ;
+      procedure OutputSector(secno : integer) is
+         baseaddrrec : ihbr.ihbr_Binary_Record_Type( ihbr.Extended_Lin_Adr_Rec ) ;
+         corerec : ihbr.ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
+         tobewritten : integer := Integer(Controller.sectors(secno).length) ;
+         flash : sector_ptr_type := sector_ptr_type( controller.sectors(secno) ) ;
+         writtensofar : integer := 0 ;
+      begin
+         Put("Writing sector ");
+         Put_Line( to_string( Controller.sectors(secno).name ) );
+         baseaddrrec.Linear_Base_Address := Shift_Right(controller.sectors(secno).start , 16 );
+         ihbr.PutNext(hexfileout,baseaddrrec) ;
+         while writtensofar < tobewritten
+         loop
+            corerec.LoadOffset := Unsigned_16(writtensofar) ;
+            corerec.DataRecLen := 0 ;
+            for w in 1..blocklen
+            loop
+               corerec.Data(Storage_Offset(w)) := Storage_Element(flash.flash (writtensofar+1) / 256 ) ;
+               corerec.Data(Storage_Offset(w+1)) := Storage_Element(Shift_Right(flash.flash (writtensofar+1) ,8) ) ;
+
+               writtensofar := writtensofar + 1 ;
+               corerec.DataRecLen := corerec.DataRecLen + 2 ;
+            end loop ;
+            ihbr.PutNext(hexfileout,corerec) ;
+         end loop ;
+      end OutputSector ;
+
    begin
-      Put_Line("Generating Hex File") ;
+      hexfileout := ihbr.Create( hexfilename );
+      for sector in controller.sectors'Range
+      loop
+         OutputSector(sector) ;
+      end loop ;
+      ihbr.Close(hexfileout) ;
    end GenerateHexFile ;
 
    procedure Set( controller : f2810_type ;
