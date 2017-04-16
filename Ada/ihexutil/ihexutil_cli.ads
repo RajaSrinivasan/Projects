@@ -12,6 +12,7 @@ package ihexutil_cli is                                       -- [cli/$_cli]
 
    hexline : unbounded_string := null_unbounded_string ;
    outputname : aliased gnat.strings.string_access ;
+   comparehexname : aliased gnat.strings.string_access ;
 
    mcutype : unbounded_string := null_unbounded_string ;
    mcuname : unbounded_string := null_unbounded_string ;

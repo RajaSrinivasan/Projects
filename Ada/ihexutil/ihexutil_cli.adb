@@ -41,6 +41,7 @@ package body ihexutil_cli is                          -- [cli/$_cli]
             mcutype := to_unbounded_string(Parameter(sep+1 .. Parameter'last)) ;
          end ;
       end if ;
+
     end SwitchHandler ;
 
     procedure ProcessCommandLine is
@@ -68,6 +69,11 @@ package body ihexutil_cli is                          -- [cli/$_cli]
                                        Switch => "-o:",
                                        Long_Switch => "--output:",
                                        Help => "Output file name");
+      GNAT.Command_Line.Define_Switch(Config,
+                                      comparehexname'access ,
+                                      Switch => "-m:" ,
+                                      Long_Switch => "--compare:" ,
+                                      Help => "Compare with the hex file");
       GNAT.Command_Line.Define_Switch (Config,
                                        Switch => "-x:",
                                        Long_Switch => "--hexline:",
