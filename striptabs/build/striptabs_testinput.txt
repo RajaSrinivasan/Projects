@@ -1,6 +1,0 @@
-This is a test file for test tabs:
-	1. Line 1
-	2. Line 2
-		2.1 Line 2.1
-		2.2 Line 2.2
-	3. Line 3
