@@ -224,6 +224,13 @@ package body mcu.tms320 is
          Put( Integer( Controller.sectors(sector).start +
                        Unsigned_32(Controller.sectors(sector).length) - 1 ) , base=>16) ;
          New_Line;
+         for adr in controller.sectors(sector).start ..
+                    Controller.sectors(sector).start +
+                       Unsigned_32(Controller.sectors(sector).length) - 1
+         loop
+            Put( Integer(adr) , base => 16 ) ;
+            New_Line ;
+         end loop ;
       end loop ;
    end Show ;
 

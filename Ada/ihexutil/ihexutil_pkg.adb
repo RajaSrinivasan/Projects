@@ -39,6 +39,7 @@ package body ihexutil_pkg is
        Put(Integer'Image(linecount));
        Put(" lines read from ");
        Put_Line(filename);
+       mcu.Show( Controller );
    end Show ;
    
    procedure CopyWithCRC( infilename : string ;
