@@ -155,6 +155,7 @@ package body mcu.tms320 is
                   rec : out ihbr.Ihbr_Binary_Record_Type ) is
 
       myrec : ihbr.Ihbr_Binary_Record_Type( ihbr.Data_Rec ) ;
+      Sector : Integer := InSector(Controller.sectors,Romaddress) ;
    begin
       if romaddress > controller.sectors(1).start + Unsigned_32(controller.sectors(1).length)
       then
@@ -170,7 +171,7 @@ package body mcu.tms320 is
       myrec.description.low := romaddress ;
       myrec.description.high := Unsigned_32(Integer(romaddress)+blocklen-1) ;
 
-      myrec.LoadOffset := Unsigned_16(romaddress) ;
+      myrec.LoadOffset := Unsigned_16(Romaddress - Controller.Sectors(Sector).start) ;
       myrec.data := (others => 0) ;
 
       for word in 1..blocklen/2
@@ -211,6 +212,10 @@ package body mcu.tms320 is
    end StoreCRC ;
 
    procedure Show( controller : f2810_type ) is
+      BLOCK_LENGTH : constant := 16 ;
+      Ihbrrec : Ihbr.Ihbr_Binary_Record_Type ;
+      Eom : Boolean := False ;
+      Romaddr : Unsigned_32 ;
    begin
       for sector in controller.sectors'Range
       loop
@@ -224,12 +229,11 @@ package body mcu.tms320 is
          Put( Integer( Controller.sectors(sector).start +
                        Unsigned_32(Controller.sectors(sector).length) - 1 ) , base=>16) ;
          New_Line;
-         for adr in controller.sectors(sector).start ..
-                    Controller.sectors(sector).start +
-                       Unsigned_32(Controller.sectors(sector).length) - 1
+         Romaddr := Controller.Sectors(Sector).Start ;
+         while not Eom
          loop
-            Put( Integer(adr) , base => 16 ) ;
-            New_Line ;
+            Get( Controller , Romaddr , BLOCK_LENGTH , Eom , Ihbrrec ) ;
+            Ihbr.Show( Ihbrrec ) ;
          end loop ;
       end loop ;
    end Show ;
