@@ -39,46 +39,8 @@ package body ihexutil_pkg is
        Put(Integer'Image(linecount));
        Put(" lines read from ");
        Put_Line(filename);
+       mcu.Show( Controller );
    end Show ;
-   
-    procedure CopyWithCRCObs( infilename : string ;
-                           outfilename : string ;
-                           crcaddress : Unsigned_32 ;
-                          Controller : not null access mcu.Controller_Type'Class ) is
-      hexfilein, hexfileout : ihbr.File_Type ;
-      hexrec : ihbr.Ihbr_Binary_Record_Type ;
-      linecount : Integer := 0 ;
-      CRC : unsigned_16 := 0 ;
-    begin
-        ihbr.Open( infilename , hexfilein , mcu.WordLength(Controller.all) );
-        hexfileout := ihbr.Create( outfilename );
-        while not ihbr.End_Of_File( hexfilein )
-        loop
-          ihbr.GetNext( hexfilein , hexrec ) ;
-          linecount := linecount + 1 ;
-         if hexrec.RecType = ihbr.Data_Rec
-         then
-            mcu.Set( Controller.all , hexrec ) ; 
-         elsif hexrec.RecType = ihbr.End_Of_File_Rec
-         then
-            if crcaddress > 0
-            then 
-               mcu.StoreCRC( Controller.all , crcaddress ) ;                     
-            end if ;
-          end if ;
-          ihbr.PutNext( hexfileout , hexrec ) ;
-        end loop ;
-        ihbr.Close( hexfilein ) ;
-        ihbr.Close( hexfileout ) ;
-        if ihexutil_cli.Verbose
-        then
-            Put( linecount ) ; Put( " records copied from ") ;
-            Put(infilename) ; Put(" to ") ; Put( outfilename ) ;
-            New_Line ;
-            Put("Checksum Calculated ") ; Put( Integer(CRC) ) ;
-            New_Line ;
-        end if ;
-   end CopyWithCRCObs ;
    
    procedure CopyWithCRC( infilename : string ;
                           outfilename : string ;
