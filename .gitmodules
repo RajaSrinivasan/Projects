@@ -1,0 +1,3 @@
+[submodule "Ada/libcrypt"]
+	path = Ada/libcrypt
+	url = https://github.com/cforler/Ada-Crypto-Library.git
