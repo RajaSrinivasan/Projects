@@ -2,6 +2,7 @@ project Striptabs is
 
    for Object_Dir use "../build";
    for Main use ("striptabs.adb");
+   for Exec_Dir use "../bin" ;
 
    package Ide is
       for Vcs_Kind use "Git";

@@ -2,6 +2,7 @@ project lister is
 
    for Object_Dir use "../build";
    for Main use ("lister.adb");
+   for Exec_Dir use "../bin" ;
 
    package Pretty_Printer is
       for Default_Switches ("ada") use ("-M100", "-i4", "-aU");
