@@ -21,6 +21,8 @@ package logging is
 
    type Source_type is new Natural range 1 .. 128;
    procedure RegisterAll (filename : String);
+   procedure Register(sourcename : String) ;
+
    function Get (source : Source_type) return String;
    function Get (name : String) return Source_type;
 
