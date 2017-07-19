@@ -77,14 +77,24 @@ package body logging is
       Open (sourcesfile, In_File, filename);
       while not End_Of_File (sourcesfile) loop
          Get_Line (sourcesfile, sourceline, sourcelinelen);
-         pragma Debug
-           (Put_Line ("Registering " & sourceline (1 .. sourcelinelen)));
-         Sources_Pkg.Append
-           (registered_sources,
-            To_Unbounded_String (sourceline (1 .. sourcelinelen)));
+         Register(sourceline(1..sourcelinelen));
+--           pragma Debug
+--             (Put_Line ("Registering " & sourceline (1 .. sourcelinelen)));
+--           Sources_Pkg.Append
+--             (registered_sources,
+--              To_Unbounded_String (sourceline (1 .. sourcelinelen)));
       end loop;
       Close (sourcesfile);
    end RegisterAll;
+
+   procedure Register(sourcename : String) is
+   begin
+      pragma Debug
+        (Put_Line ("Registering " & sourcename ));
+         Sources_Pkg.Append
+           (registered_sources,
+            To_Unbounded_String (sourcename));
+   end Register ;
 
    ---------
    -- Get --
