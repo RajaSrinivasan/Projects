@@ -6,6 +6,11 @@ procedure testlogging is
 begin
     logging.client.SetSource("1") ;
     logging.SetDestination( dest ) ;
-    logging.client.SetFilter(logging.INFORMATIONAL) ;
-    logging.client.log( logging.CRITICAL , "Critical") ;
+   logging.client.SetFilter(logging.WARNING) ;
+   logging.client.log( logging.CRITICAL , "Critical") ;
+   for severity in logging.message_level_type'first .. logging.INFORMATIONAL
+   loop
+      logging.client.log( severity , "Message Severity " & logging.image(severity) , class => "unittest" ) ;
+   end loop ;
+
 end testlogging ;
