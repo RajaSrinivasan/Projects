@@ -8,6 +8,7 @@ package body logging.client is
 
    procedure SetSource (name : String) is
    begin
+      Register(name) ;
       Current_Source := Get (name);
    end SetSource;
 
